@@ -1,0 +1,69 @@
+site_name: Gary's Blog
+
+theme:
+  name: material  # 使用 Material for MkDocs 主题
+  icon:
+    repo: fontawesome/brands/github  # 仓库图标使用 GitHub 图标
+  palette:
+    # 三套配色方案（自动/亮色/暗色模式切换）
+    - media: "(prefers-color-scheme)"  # 自动模式
+      scheme: default
+      primary: black
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"  # 亮色模式
+      scheme: default
+      primary: black
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"  # 暗色模式
+      scheme: slate
+      primary: black
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  favicon: images/logo.png  # 浏览器标签页图标
+  features:  # 启用的主题功能
+    - content.tabs.link  # 内容标签页
+    - content.code.annotate  # 代码注释
+    - content.code.copy  # 代码复制按钮
+    - navigation.expand  # 导航可展开
+    - navigation.footer  # 底部导航
+    - navigation.tabs  # 顶部标签导航
+    - navigation.sections  # 分区导航
+    - navigation.path  # 显示路径
+    - navigation.indexes  # 索引导航
+    - navigation.top  # 返回顶部
+    - navigation.tracking  # 导航追踪
+    - search.suggest  # 搜索建议
+    - toc.follow  # 目录跟随滚动
+    - toc.integrate  # 集成目录
+
+plugins:
+  - search
+  - awesome-pages
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/XJTUGary
+      name: GitHub
+    - icon: material/email
+      link: mailto:wmlgaryx@gmail.com
+      name: E-mail
+
+
+markdown_extensions:
+  - admonition  # 警告框
+  - pymdownx.details  # 折叠区块
+  - attr_list  # 属性列表
+  - gfm_admonition  # GitHub风格警告框
+  - pymdownx.highlight:  # 代码高亮
+      use_pygments: true
+  - pymdownx.superfences  # 高级代码块
+  - pymdownx.tasklist:  # 任务列表
+      custom_checkbox: true
+
+copyright: © 2024 - 2025 Gary. All Rights Reserved.
