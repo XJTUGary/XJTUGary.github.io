@@ -1,3 +1,11 @@
+---
+date: 2025-08-02
+categories:
+  - RAG
+draft: false
+---
+RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。
+<!-- more -->
 # RAG 简介
 
 RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。

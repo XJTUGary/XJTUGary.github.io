@@ -1,3 +1,13 @@
+---
+date: 2025-08-01
+categories:
+  - SFT
+draft: false
+---
+
+SFT（Supervised Fine-Tuning，监督微调）是大语言模型训练的关键阶段之一。在预训练模型的基础上，通过标注数据进行进一步训练，使模型适应特定任务或领域的需求。
+<!-- more -->
+
 # SFT 简介
 
 SFT（Supervised Fine-Tuning，监督微调）是大语言模型训练的关键阶段之一。在预训练模型的基础上，通过标注数据进行进一步训练，使模型适应特定任务或领域的需求。

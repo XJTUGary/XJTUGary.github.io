@@ -2,6 +2,7 @@ site_name: Gary's Blog
 
 theme:
   name: material  # 使用 Material for MkDocs 主题
+  custom_dir: 'overrides'
   icon:
     repo: fontawesome/brands/github  # 仓库图标使用 GitHub 图标
   palette:
@@ -43,7 +44,23 @@ theme:
 
 plugins:
   - search
-  - awesome-pages
+  # - awesome-pages
+  - blog:
+      blog_dir: blog
+      blog_toc: true
+      post_date_format: full
+      # archive_date_format: MMMM yyyy
+      # archive_url_date_format: yyyy/MM
+nav:
+  - 首页: index.md
+  - 技术:
+    - blog/index.md
+  - 旅行:
+    - 旅行/index.md
+  - 摄影:
+    - 摄影/index.md
+  - 运动:
+    - 运动/index.md
 
 extra:
   social:
