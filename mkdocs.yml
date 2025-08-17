@@ -41,10 +41,17 @@ theme:
     - search.suggest  # 搜索建议
     - toc.follow  # 目录跟随滚动
     - toc.integrate  # 集成目录
+markdown_extensions:
+  - pymdownx.superfences:
+      # make exceptions to highlighting of code:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
 
 plugins:
   - search
-  # - awesome-pages
+  - mermaid2
   - blog:
       blog_dir: blog
       blog_toc: true
