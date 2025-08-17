@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../rag/">
+        <link rel="prev" href="../agent/">
       
       
-        <link rel="next" href="../../archive/2025/">
+        <link rel="next" href="../rag/">
       
       
       <link rel="icon" href="../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>SFT - Gary's Blog</title>
+        <title>JAVA - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sft" class="md-skip">
+        <a href="#java" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SFT
+              JAVA
             
           </span>
         </div>
@@ -616,12 +616,36 @@
                 
   
   
-  
     
   
   
-    <li class="md-nav__item">
-      <a href="../java/" class="md-nav__link">
+    
+      
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    JAVA
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -632,6 +656,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#jvm" class="md-nav__link">
+    <span class="md-ellipsis">
+      JVM 类加载过程
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -666,36 +719,12 @@
                 
   
   
-    
-  
   
     
-      
-    
   
   
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    SFT
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../sft/" class="md-nav__link">
         
   
   
@@ -706,35 +735,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#sft-intro" class="md-nav__link">
-    <span class="md-ellipsis">
-      Sft intro
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -953,7 +953,7 @@
   <div class="md-content" data-md-component="content">
     <div class="md-content__inner">
       <header class="md-typeset">
-        <h1 id="sft">SFT</h1>
+        <h1 id="java">JAVA</h1>
       </header>
       
         <article class="md-post md-post--excerpt">
@@ -962,18 +962,18 @@
     <div class="md-post__meta md-meta">
       <ul class="md-meta__list">
         <li class="md-meta__item">
-          <time datetime="2025-08-01 00:00:00+00:00">Friday, August 1, 2025</time></li>
+          <time datetime="2025-08-17 00:00:00+00:00">Sunday, August 17, 2025</time></li>
         
           <li class="md-meta__item">
             in
             
-              <a href="./" class="md-meta__link">SFT</a></li>
+              <a href="./" class="md-meta__link">JAVA</a></li>
         
         
           
           <li class="md-meta__item">
             
-              1 min read
+              2 min read
             
           </li>
         
@@ -982,12 +982,12 @@
     </div>
   </header>
   <div class="md-post__content md-typeset">
-    <h2 id="sft-intro"><a class="toclink" href="../../2025/08/01/sft-intro/">Sft intro</a></h2>
-<p>SFT（Supervised Fine-Tuning，监督微调）是大语言模型训练的关键阶段之一。在预训练模型的基础上，通过标注数据进行进一步训练，使模型适应特定任务或领域的需求。</p>
+    <h2 id="jvm"><a class="toclink" href="../../2025/08/17/jvm-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">JVM 类加载过程</a></h2>
+<p>在Java虚拟机（JVM）中，<strong>类加载机制</strong>是Java程序运行的核心基础。当我们在Java程序中创建一个新对象或访问静态成员时，JVM需要经历一个精密的类加载过程。本文将深入解析类加载过程中的四个关键阶段：<strong>加载（Loading）</strong>、<strong>验证（Verification）</strong>、<strong>准备（Preparation）</strong> 和<strong>解析（Resolution）</strong>，通过具体示例揭示JVM如何将.class文件转化为可执行代码。</p>
 
     
       <nav class="md-post__action">
-        <a href="../../2025/08/01/sft-intro/">
+        <a href="../../2025/08/17/jvm-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
           Continue reading
         </a>
       </nav>
@@ -1030,7 +1030,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../rag/" class="md-footer__link md-footer__link--prev" aria-label="Previous: RAG">
+          <a href="../agent/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Agent">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1040,20 +1040,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                RAG
+                Agent
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../archive/2025/" class="md-footer__link md-footer__link--next" aria-label="Next: 2025">
+          <a href="../rag/" class="md-footer__link md-footer__link--next" aria-label="Next: RAG">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                2025
+                RAG
               </div>
             </div>
             <div class="md-footer__button md-icon">

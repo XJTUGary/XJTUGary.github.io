@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../../01/sft-intro/">
+        <link rel="prev" href="../../02/rag-intro/">
       
-      
-        <link rel="next" href="../../17/jvm-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Rag intro - Gary's Blog</title>
+        <title>JVM 类加载过程 - Gary's Blog</title>
       
     
     
@@ -72,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rag" class="md-skip">
+        <a href="#jvm" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rag intro
+              JVM 类加载过程
             
           </span>
         </div>
@@ -927,7 +925,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-08-02 00:00:00+00:00" class="md-ellipsis">Saturday, August 2, 2025</time>
+                        <time datetime="2025-08-17 00:00:00+00:00" class="md-ellipsis">Sunday, August 17, 2025</time>
                       </div>
                     </li>
                     
@@ -938,7 +936,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/rag/">RAG</a></span>
+                              <a href="../../../../category/java/">JAVA</a></span>
                         </div>
                       </li>
                     
@@ -949,7 +947,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              1 min read
+                              2 min read
                             
                           </span>
                         </div>
@@ -978,27 +976,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rag_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      RAG的工作原理
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rag_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      RAG的优势
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      常见应用场景
+      类加载全景图
     </span>
   </a>
   
@@ -1007,7 +987,202 @@
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      典型框架
+      示例类代码
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      阶段一：加载（Loading）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="阶段一：加载（Loading）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      核心任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      具体操作流程
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      关键特点
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      阶段二：验证（Verification）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="阶段二：验证（Verification）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      核心任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      四层验证机制
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      验证失败示例
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#preparation" class="md-nav__link">
+    <span class="md-ellipsis">
+      阶段三：准备（Preparation）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="阶段三：准备（Preparation）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      核心任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      内存分配规则
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      示例处理
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resolution" class="md-nav__link">
+    <span class="md-ellipsis">
+      阶段四：解析（Resolution）
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="阶段四：解析（Resolution）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      核心任务
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      三种核心解析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      解析过程示例
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      完整流程图示
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      技术要点总结
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      结语
     </span>
   </a>
   
@@ -1028,37 +1203,293 @@
 
 
 
-<p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。</p>
+<p>在Java虚拟机（JVM）中，<strong>类加载机制</strong>是Java程序运行的核心基础。当我们在Java程序中创建一个新对象或访问静态成员时，JVM需要经历一个精密的类加载过程。本文将深入解析类加载过程中的四个关键阶段：<strong>加载（Loading）</strong>、<strong>验证（Verification）</strong>、<strong>准备（Preparation）</strong> 和<strong>解析（Resolution）</strong>，通过具体示例揭示JVM如何将.class文件转化为可执行代码。</p>
 <!-- more -->
-<h1 id="rag">RAG 简介</h1>
-<p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。</p>
-<h2 id="rag_1">RAG的工作原理</h2>
+
+<h1 id="jvm">JVM类加载机制详解</h1>
+<h2 id="_1">类加载全景图</h2>
+<p>在深入各阶段前，先了解整个类加载流程：
+<div class="highlight"><pre><span></span><code>graph LR
+A[加载 Loading] --&gt; B[验证 Verification]
+B --&gt; C[准备 Preparation]
+C --&gt; D[解析 Resolution]
+D --&gt; E[初始化 Initialization]
+</code></pre></div></p>
+<p>今天我们将重点解析前四个阶段（加载→验证→准备→解析），这些阶段共同构成<strong>连接（Linking）</strong> 过程。</p>
+<hr />
+<h2 id="_2">示例类代码</h2>
+<p>为便于理解，我们使用一个简单的<code>Employee</code>类作为示例：
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Employee</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 常量</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">COMPANY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;TechCorp&quot;</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 静态变量</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">totalEmployees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 实例变量</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 方法</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 引用其他类</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Department</span><span class="w"> </span><span class="nf">getDepartment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">class</span> <span class="nc">Department</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Engineering&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<hr />
+<h2 id="loading">阶段一：加载（Loading）</h2>
+<h3 id="_3">核心任务</h3>
+<p>查找并加载类的二进制数据（.class文件）</p>
+<h3 id="_4">具体操作流程</h3>
 <ol>
-<li><strong>检索阶段</strong>：根据用户查询，从文档库或知识库中检索相关的文档片段</li>
-<li><strong>增强阶段</strong>：将检索到的文档片段与用户查询结合，形成增强的输入</li>
-<li><strong>生成阶段</strong>：LLM基于增强的输入生成回答</li>
+<li><strong>定位类文件</strong>：通过全限定名（如<code>com/example/Employee</code>）查找.class文件</li>
+<li><strong>读取字节码</strong>：将.class文件内容读入内存</li>
+<li><strong>创建类结构</strong>：在方法区创建类的运行时数据结构</li>
+<li><strong>生成Class对象</strong>：在堆中创建对应的<code>java.lang.Class</code>实例</li>
 </ol>
-<h2 id="rag_2">RAG的优势</h2>
+<div class="highlight"><pre><span></span><code>graph LR
+A[ClassLoader] --&gt; B[查找 Employee.class]
+B --&gt; C[读取字节码]
+C --&gt; D[在方法区创建类结构]
+D --&gt; E[在堆中创建 Class 对象]
+</code></pre></div>
+<h3 id="_5">关键特点</h3>
 <ul>
-<li><strong>知识更新</strong>：无需重新训练模型，通过更新文档库即可更新知识</li>
-<li><strong>事实准确性</strong>：减少模型生成幻觉（hallucination）的可能性</li>
-<li><strong>领域适应性</strong>：可针对特定领域的文档进行检索，提高领域问题的回答质量</li>
-<li><strong>可解释性</strong>：可以引用检索到的文档片段，增强回答的可解释性</li>
+<li><strong>类加载器层级</strong>：Bootstrap → Extension → Application → Custom</li>
+<li><strong>数据来源</strong>：JAR文件、网络、动态生成等</li>
+<li><strong>结果</strong>：方法区存储类元数据，堆中生成<code>Employee.class</code>对象</li>
 </ul>
-<h2 id="_1">常见应用场景</h2>
-<ul>
-<li>问答系统：针对特定领域的知识问答</li>
-<li>文档摘要：基于检索到的文档生成摘要</li>
-<li>信息抽取：从大量文档中抽取特定信息并回答问题</li>
-<li>客服系统：结合企业知识库，提供更准确的客户服务</li>
-</ul>
-<h2 id="_2">典型框架</h2>
-<ul>
-<li>LangChain：提供RAG相关的工具和组件</li>
-<li>LlamaIndex：专注于构建RAG应用的框架</li>
-<li>Haystack：开源的NLP框架，支持RAG功能</li>
-<li>DeepLake：支持向量存储和RAG应用的框架</li>
-</ul>
+<blockquote>
+<p>📌 <strong>重要提示</strong>：加载阶段完成后，JVM已掌握类的基本结构信息，但此时类还<strong>不能直接使用</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="verification">阶段二：验证（Verification）</h2>
+<h3 id="_6">核心任务</h3>
+<p>确保加载的类符合JVM规范且不会危害虚拟机安全</p>
+<h3 id="_7">四层验证机制</h3>
+<ol>
+<li>
+<p><strong>文件格式验证</strong> - 检查字节码文件结构
+   <div class="highlight"><pre><span></span><code><span class="c1">// 检查魔数CAFEBABE（合法.class文件开头）</span>
+<span class="mh">0xCAFEBABE</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>元数据验证</strong> - 语义检查
+   <div class="highlight"><pre><span></span><code><span class="c1">// 检查示例：</span>
+<span class="o">-</span><span class="w"> </span><span class="n">是否继承了final类</span><span class="err">？</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">非法</span>
+<span class="o">-</span><span class="w"> </span><span class="n">非抽象类是否实现所有接口方法</span><span class="err">？</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">必须实现</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>字节码验证</strong> - 程序逻辑检查
+   <div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 验证：</span>
+<span class="w">    </span><span class="c1">// 1. 操作数栈类型匹配 ✔</span>
+<span class="w">    </span><span class="c1">// 2. 跳转指令不会跳出方法 ✔</span>
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>符号引用验证</strong> - 常量池检查
+   <div class="highlight"><pre><span></span><code><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span><span class="w"> </span><span class="c1">// 验证Department类是否存在且可访问</span>
+</code></pre></div></p>
+</li>
+</ol>
+<h3 id="_8">验证失败示例</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Invalid</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">jump</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w">  </span><span class="c1">// 无效字节码指令 → 验证失败</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<blockquote>
+<p>⚠️ <strong>性能提示</strong>：验证阶段可能消耗类加载总时间的30%-50%，现代JVM使用<strong>栈映射帧（StackMapTable）</strong> 优化此过程。</p>
+</blockquote>
+<hr />
+<h2 id="preparation">阶段三：准备（Preparation）</h2>
+<h3 id="_9">核心任务</h3>
+<p>为<strong>类变量（静态变量）</strong> 分配内存并设置初始值</p>
+<h3 id="_10">内存分配规则</h3>
+<table>
+<thead>
+<tr>
+<th>变量类型</th>
+<th>初始值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int</code>/<code>short</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>long</code></td>
+<td>0L</td>
+</tr>
+<tr>
+<td><code>float</code></td>
+<td>0.0f</td>
+</tr>
+<tr>
+<td><code>double</code></td>
+<td>0.0d</td>
+</tr>
+<tr>
+<td><code>char</code></td>
+<td>'\u0000'</td>
+</tr>
+<tr>
+<td><code>boolean</code></td>
+<td>false</td>
+</tr>
+<tr>
+<td><strong>引用类型</strong></td>
+<td><strong>null</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="_11">示例处理</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 普通静态变量 → 零值初始化</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">totalEmployees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">// 准备阶段赋值为0</span>
+
+<span class="c1">// 常量（final static）→ 直接赋真实值</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">COMPANY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;TechCorp&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// 准备阶段赋值为&quot;TechCorp&quot;</span>
+</code></pre></div>
+<blockquote>
+<p>🔍 <strong>关键区别</strong>：普通静态变量在准备阶段初始化为<strong>零值</strong>，而常量直接赋予<strong>真实值</strong>。</p>
+</blockquote>
+<hr />
+<h2 id="resolution">阶段四：解析（Resolution）</h2>
+<h3 id="_12">核心任务</h3>
+<p>将常量池中的<strong>符号引用</strong>转换为<strong>直接引用</strong></p>
+<h3 id="_13">三种核心解析</h3>
+<ol>
+<li>
+<p><strong>类/接口解析</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1">// 符号引用：Department</span>
+<span class="c1">// 转换为直接引用：方法区中Department类的内存指针</span>
+<span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>字段解析</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1">// 字段：Department.name</span>
+<span class="c1">// 转换为：字段在内存中的偏移量</span>
+<span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Engineering&quot;</span><span class="p">;</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>方法解析</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1">// 方法：Employee.setName()</span>
+<span class="c1">// 转换为：方法在方法表中的实际入口地址</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div></p>
+</li>
+</ol>
+<h3 id="_14">解析过程示例</h3>
+<div class="highlight"><pre><span></span><code><span class="n">常量池条目</span><span class="err">（</span><span class="n">符号引用</span><span class="err">）：</span>
+<span class="w">  </span><span class="err">#</span><span class="mi">7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="w">        </span><span class="err">#</span><span class="mi">25</span><span class="w">   </span><span class="c1">// Department</span>
+<span class="w">  </span><span class="err">#</span><span class="mi">8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Methodref</span><span class="w">    </span><span class="err">#</span><span class="mf">7.</span><span class="err">#</span><span class="mi">26</span><span class="w"> </span><span class="c1">// Department.&lt;init&gt;()</span>
+
+<span class="n">解析后</span><span class="err">：</span>
+<span class="w">  </span><span class="n">直接引用指向</span><span class="err">：</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">Department类在方法区的位置</span>
+<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">构造函数的代码入口地址</span>
+</code></pre></div>
+<blockquote>
+<p>⏱️ <strong>延迟解析</strong>：现代JVM通常采用<strong>延迟解析</strong>策略，直到符号引用首次使用时才执行解析。</p>
+</blockquote>
+<hr />
+<h2 id="_15">完整流程图示</h2>
+<div class="highlight"><pre><span></span><code>sequenceDiagram
+    participant CL as ClassLoader
+    participant M as Method Area
+    participant H as Heap
+
+    Note over CL: 1. 加载
+    CL-&gt;&gt;M: 查找Employee.class
+    CL-&gt;&gt;M: 创建类元数据
+    CL-&gt;&gt;H: 创建Class对象
+
+    Note over M: 2. 验证
+    M--&gt;&gt;M: 文件格式检查
+    M--&gt;&gt;M: 元数据验证
+    M--&gt;&gt;M: 字节码验证
+    M--&gt;&gt;M: 符号引用验证
+
+    Note over M: 3. 准备
+    M-&gt;&gt;M: 分配静态变量空间
+    M-&gt;&gt;M: totalEmployees = 0
+    M-&gt;&gt;M: COMPANY = &quot;TechCorp&quot; (常量)
+
+    Note over M: 4. 解析
+    M-&gt;&gt;M: 解析Department类引用
+    M-&gt;&gt;M: 解析字段/方法引用
+</code></pre></div>
+<hr />
+<h2 id="_16">技术要点总结</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>核心任务</th>
+<th>是否触发类加载</th>
+<th>线程安全</th>
+<th>耗时占比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>加载</td>
+<td>创建Class对象/方法区结构</td>
+<td>是</td>
+<td>❌</td>
+<td>10%-20%</td>
+</tr>
+<tr>
+<td>验证</td>
+<td>字节码安全性检查</td>
+<td>否</td>
+<td>✔</td>
+<td>30%-50%</td>
+</tr>
+<tr>
+<td>准备</td>
+<td>静态变量零值初始化</td>
+<td>否</td>
+<td>✔</td>
+<td>5%-10%</td>
+</tr>
+<tr>
+<td>解析</td>
+<td>符号引用→直接引用</td>
+<td>可能</td>
+<td>✔</td>
+<td>10%-30%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键特性</strong>：
+1. <strong>解析触发加载</strong>：解析阶段可能触发其他类的加载（如解析<code>Department</code>时）
+2. <strong>常量特殊处理</strong>：final常量在准备阶段直接赋值
+3. <strong>线程安全</strong>：除加载阶段外，其他阶段都是线程安全的
+4. <strong>性能优化</strong>：JIT编译器会优化高频调用的解析结果</p>
+<hr />
+<h2 id="_17">结语</h2>
+<p>理解JVM的类加载机制对于<strong>性能优化</strong>、<strong>内存管理</strong>和<strong>安全加固</strong>至关重要。通过深入分析加载、验证、准备、解析四个阶段，我们不仅能看到JVM如何保障程序的正确执行，也能理解为何Java能在保持安全性的同时实现"一次编写，到处运行"的承诺。</p>
+<blockquote>
+<p>当你在Java中写下<code>new Employee()</code>时，背后正是这些精密配合的加载阶段在默默工作，将静态的字节码转化为动态的执行能力。这正是Java虚拟机工程艺术的完美体现！</p>
+</blockquote>
 
 
 
@@ -1075,6 +1506,60 @@
   
 
 
+
+  <h2 id="__comments">Comments</h2>
+  <!-- Insert generated snippet here -->
+    <script src="https://giscus.app/client.js"
+        data-repo="XJTUGary/XJTUGary.github.io"
+        data-repo-id="R_kgDOPeNkAA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPeNkAM4CuNUz"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
 
       
     </article>
@@ -1103,7 +1588,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../01/sft-intro/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sft intro">
+          <a href="../../02/rag-intro/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Rag intro">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1113,27 +1598,11 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Sft intro
+                Rag intro
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../../17/jvm-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B/" class="md-footer__link md-footer__link--next" aria-label="Next: JVM 类加载过程">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                JVM 类加载过程
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     
