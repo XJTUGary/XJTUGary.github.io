@@ -850,11 +850,21 @@ D --&gt; E[在堆中创建 Class 对象]
 </tr>
 </tbody>
 </table>
-<p><strong>关键特性</strong>：
-1. <strong>解析触发加载</strong>：解析阶段可能触发其他类的加载（如解析<code>Department</code>时）
-2. <strong>常量特殊处理</strong>：final常量在准备阶段直接赋值
-3. <strong>线程安全</strong>：除加载阶段外，其他阶段都是线程安全的
-4. <strong>性能优化</strong>：JIT编译器会优化高频调用的解析结果</p>
+<p><strong>关键特性</strong>：</p>
+<ol>
+<li>
+<p><strong>解析触发加载</strong>：解析阶段可能触发其他类的加载（如解析<code>Department</code>时）</p>
+</li>
+<li>
+<p><strong>常量特殊处理</strong>：final常量在准备阶段直接赋值</p>
+</li>
+<li>
+<p><strong>线程安全</strong>：除加载阶段外，其他阶段都是线程安全的</p>
+</li>
+<li>
+<p><strong>性能优化</strong>：JIT编译器会优化高频调用的解析结果</p>
+</li>
+</ol>
 <hr/>
 <h2 id="_17">结语</h2>
 <p>理解JVM的类加载机制对于<strong>性能优化</strong>、<strong>内存管理</strong>和<strong>安全加固</strong>至关重要。通过深入分析加载、验证、准备、解析四个阶段，我们不仅能看到JVM如何保障程序的正确执行，也能理解为何Java能在保持安全性的同时实现"一次编写，到处运行"的承诺。</p>
