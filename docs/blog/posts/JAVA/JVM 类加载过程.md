@@ -12,15 +12,20 @@ comments: true
 
 ## 类加载全景图
 在深入各阶段前，先了解整个类加载流程：
+
 ```mermaid
 graph LR
-A[加载 Loading] --> B[验证 Verification]
-B --> C[准备 Preparation]
-C --> D[解析 Resolution]
-D --> E[初始化 Initialization]
+    A[加载 Loading] --> B
+
+    subgraph 链接 Linking
+        B[验证 Verification] --> C[准备 Preparation]
+        C --> D[解析 Resolution]
+    end
+
+    D --> E[初始化 Initialization]
 ```
 
-今天我们将重点解析前四个阶段（加载→验证→准备→解析），这些阶段共同构成**连接（Linking）** 过程。
+今天我们将重点解析验证→准备→解析 这三个阶段，这些阶段共同构成**链接（Linking）** 过程。
 
 ---
 

@@ -41,14 +41,6 @@ theme:
     - search.suggest  # 搜索建议
     - toc.follow  # 目录跟随滚动
     - toc.integrate  # 集成目录
-markdown_extensions:
-  - pymdownx.superfences:
-      # make exceptions to highlighting of code:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:mermaid2.fence_mermaid_custom
-
 plugins:
   - search
   - mermaid2
@@ -86,7 +78,11 @@ markdown_extensions:
   - gfm_admonition  # GitHub风格警告框
   - pymdownx.highlight:  # 代码高亮
       use_pygments: true
-  - pymdownx.superfences  # 高级代码块
+  - pymdownx.superfences:  # 高级代码块
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
   - pymdownx.tasklist:  # 任务列表
       custom_checkbox: true
 
