@@ -1,4 +1,5 @@
 ---
+title: JVM类加载机制详解
 date: 2025-08-17
 categories:
   - JAVA
@@ -7,8 +8,6 @@ comments: true
 ---
 在Java虚拟机（JVM）中，**类加载机制**是Java程序运行的核心基础。当我们在Java程序中创建一个新对象或访问静态成员时，JVM需要经历一个精密的类加载过程。本文将深入解析类加载过程中的四个关键阶段：**加载（Loading）**、**验证（Verification）**、**准备（Preparation）** 和**解析（Resolution）**，通过具体示例揭示JVM如何将.class文件转化为可执行代码。
 <!-- more -->
-
-# JVM类加载机制详解
 
 ## 类加载全景图
 在深入各阶段前，先了解整个类加载流程：
