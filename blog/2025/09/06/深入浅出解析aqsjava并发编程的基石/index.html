@@ -1299,10 +1299,12 @@
 <span class="cm">     */</span>
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">state</span><span class="p">;</span>
 </code></pre></div>
-<p>因为需要支持更丰富的并发场景：
-- <strong>互斥场景</strong>：state=0表示空闲，1表示被占用（ReentrantLock）
-- <strong>共享场景</strong>：state表示可用资源数（如Semaphore允许多个线程同时访问）
-- <strong>可重入场景</strong>：state记录重入次数，重入一次加1，释放一次减1</p>
+<p>因为需要支持更丰富的并发场景：</p>
+<ul>
+<li><strong>互斥场景</strong>：state=0表示空闲，1表示被占用（ReentrantLock）</li>
+<li><strong>共享场景</strong>：state表示可用资源数（如Semaphore允许多个线程同时访问）</li>
+<li><strong>可重入场景</strong>：state记录重入次数，重入一次加1，释放一次减1</li>
+</ul>
 <p>通过<code>volatile</code>保证可见性，通过CAS操作保证原子性，为并发控制提供基础。
 <div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">/**</span>
 <span class="cm">     * Atomically sets synchronization state to the given updated</span>
@@ -1332,9 +1334,11 @@
 <span class="p">}</span>
 </code></pre></div>
 <h3 id="2">2. 为什么选择双向链表？</h3>
-<p>AQS使用双向链表实现FIFO队列，这种设计有两大优势：
-- <strong>插入删除高效</strong>：O(1)时间复杂度
-- <strong>支持公平策略</strong>：队列的先进先出特性为实现公平锁奠定基础</p>
+<p>AQS使用双向链表实现FIFO队列，这种设计有两大优势：</p>
+<ul>
+<li><strong>插入删除高效</strong>：O(1)时间复杂度</li>
+<li><strong>支持公平策略</strong>：队列的先进先出特性为实现公平锁奠定基础</li>
+</ul>
 <p>在“等待队列的精妙设计”中我们提到，AQS使用了一个FIFO双向队列。一个很自然的问题是：为什么是<strong>双向</strong>链表？相比单向链表，每个节点需要额外维护一个<code>prev</code>前驱指针，这似乎带来了额外的内存开销。然而，这个设计是AQS能够高效、可靠处理复杂并发场景的基石，其核心优势在于<strong>支持高效地删除任意节点</strong>。</p>
 <h4 id="1-cancellation">1. 高效处理取消操作（Cancellation）</h4>
 <p>在多线程环境中，一个正在队列中等待获取锁的线程可能会因为<strong>超时（<code>tryAcquireNanos</code>）</strong> 或<strong>被中断（<code>acquireInterruptibly</code>）</strong> 而需要取消等待，将其对应的节点从队列中移除。</p>
