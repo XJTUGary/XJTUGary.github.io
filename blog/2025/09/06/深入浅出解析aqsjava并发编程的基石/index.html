@@ -9,8 +9,8 @@
       
       
       
+        <link rel="prev" href="../../../08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">
       
-        <link rel="next" href="../../../08/01/sft-intro/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -18,7 +18,7 @@
     
     
       
-        <title>Agent intro - Gary's Blog</title>
+        <title>深入浅出解析AQS：Java并发编程的基石 - Gary's Blog</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#agent" class="md-skip">
+        <a href="#aqs" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Agent intro
+              深入浅出解析AQS：Java并发编程的基石
             
           </span>
         </div>
@@ -1006,7 +1006,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-07-15 00:00:00+00:00" class="md-ellipsis">Tuesday, July 15, 2025</time>
+                        <time datetime="2025-09-06 00:00:00+00:00" class="md-ellipsis">Saturday, September 6, 2025</time>
                       </div>
                     </li>
                     
@@ -1017,7 +1017,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/agent/">Agent</a></span>
+                              <a href="../../../../category/java/">JAVA</a>, 
+                              <a href="../../../../category/%E5%B9%B6%E5%8F%91/">并发</a></span>
                         </div>
                       </li>
                     
@@ -1028,7 +1029,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              1 min read
+                              3 min read
                             
                           </span>
                         </div>
@@ -1047,8 +1048,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1057,9 +1056,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#agent_1" class="md-nav__link">
+  <a href="#aqs" class="md-nav__link">
     <span class="md-ellipsis">
-      Agent的核心能力
+      一、AQS解决了什么问题？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#state" class="md-nav__link">
+    <span class="md-ellipsis">
+      二、状态变量state的设计奥秘
     </span>
   </a>
   
@@ -1068,16 +1076,190 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      常见应用场景
+      三、等待队列的精妙设计
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="三、等待队列的精妙设计">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-node" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Node节点结构
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 为什么选择双向链表？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 为什么选择双向链表？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-cancellation" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 高效处理取消操作（Cancellation）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-signal" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 显式维护前驱节点的状态（SIGNAL）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-condition-queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 条件队列（Condition Queue）功能的支撑
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      典型框架
+      四、核心流程源码解析
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、核心流程源码解析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-tryacquireacquire" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 获取资源 - tryAcquire/acquire流程
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 释放资源 - release流程
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aqs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      五、AQS的两种模式
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="五、AQS的两种模式">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-exclusive" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 独占模式（Exclusive）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-shared" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 共享模式（Shared）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aqscondition" class="md-nav__link">
+    <span class="md-ellipsis">
+      六、AQS高级特性：Condition条件队列
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      七、为什么不用操作系统互斥锁？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aqs_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      八、AQS在实际开发中的应用
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="八、AQS在实际开发中的应用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-reentrantlock-vs-synchronized" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. ReentrantLock vs synchronized
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 常用同步工具实现原理
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      九、总结
     </span>
   </a>
   
@@ -1098,31 +1280,210 @@
 
 
 
-<p>Agent（智能体）是指能够自主感知环境、做出决策并执行行动的软件实体。在LLM（大语言模型）领域，Agent通常指基于大语言模型构建的智能系统，能够理解用户需求，调用工具或API，完成复杂任务。</p>
+  <h1>深入浅出解析AQS：Java并发编程的基石</h1>
+
+<p>在Java并发编程中，AbstractQueuedSynchronizer（AQS）是<code>java.util.concurrent.locks</code>包的核心基础，像ReentrantLock、Semaphore、CountDownLatch等常用同步工具都构建于其上。理解AQS，就掌握了JUC包的精髓。本文将从设计思想、核心机制到源码实现，带你彻底搞懂AQS。</p>
 <!-- more -->
-<h1 id="agent">Agent 简介</h1>
-<p>Agent（智能体）是指能够自主感知环境、做出决策并执行行动的软件实体。在LLM（大语言模型）领域，Agent通常指基于大语言模型构建的智能系统，能够理解用户需求，调用工具或API，完成复杂任务。</p>
-<h2 id="agent_1">Agent的核心能力</h2>
+
+<h2 id="aqs">一、AQS解决了什么问题？</h2>
+<p>AQS的核心目标是：<strong>当多个线程竞争共享资源时，如何高效、安全地管理线程的排队与唤醒</strong>。它通过三大组件解决这个问题：</p>
 <ol>
-<li><strong>自主决策</strong>：根据用户需求和环境信息，制定行动方案</li>
-<li><strong>工具使用</strong>：调用外部工具、API或服务来完成任务</li>
-<li><strong>记忆管理</strong>：存储和检索对话历史、任务状态等信息</li>
-<li><strong>多任务协调</strong>：处理复杂的、多步骤的任务</li>
+<li><strong>volatile int state</strong>：表示共享资源的状态（如锁的可重入次数、信号量的许可证数）</li>
+<li><strong>FIFO双向队列</strong>：封装竞争失败的线程，让它们排队等待</li>
+<li><strong>模板方法模式</strong>：AQS提供核心框架，子类定义具体资源分配规则</li>
 </ol>
-<h2 id="_1">常见应用场景</h2>
+<h2 id="state">二、状态变量state的设计奥秘</h2>
+<p>为什么state是int类型而不是boolean？</p>
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * The synchronization state.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">state</span><span class="p">;</span>
+</code></pre></div>
+<p>因为需要支持更丰富的并发场景：
+- <strong>互斥场景</strong>：state=0表示空闲，1表示被占用（ReentrantLock）
+- <strong>共享场景</strong>：state表示可用资源数（如Semaphore允许多个线程同时访问）
+- <strong>可重入场景</strong>：state记录重入次数，重入一次加1，释放一次减1</p>
+<p>通过<code>volatile</code>保证可见性，通过CAS操作保证原子性，为并发控制提供基础。
+<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">/**</span>
+<span class="cm">     * Atomically sets synchronization state to the given updated</span>
+<span class="cm">     * value if the current state value equals the expected value.</span>
+<span class="cm">     * This operation has memory semantics of a {@code volatile} read</span>
+<span class="cm">     * and write.</span>
+<span class="cm">     *</span>
+<span class="cm">     * @param expect the expected value</span>
+<span class="cm">     * @param update the new value</span>
+<span class="cm">     * @return {@code true} if successful. False return indicates that the actual</span>
+<span class="cm">     *         value was not equal to the expected value.</span>
+<span class="cm">     */</span>
+<span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">compareAndSetState</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">expect</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">update</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">U</span><span class="p">.</span><span class="na">compareAndSetInt</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">STATE</span><span class="p">,</span><span class="w"> </span><span class="n">expect</span><span class="p">,</span><span class="w"> </span><span class="n">update</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+</code></pre></div></p>
+<h2 id="_1">三、等待队列的精妙设计</h2>
+<p>当线程通过CAS修改state失败后，AQS如何管理这些等待线程？</p>
+<h3 id="1-node">1. Node节点结构</h3>
+<p>每个等待线程被封装成Node节点：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Node</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">waitStatus</span><span class="p">;</span><span class="w"> </span><span class="c1">// 等待状态：CANCELLED、SIGNAL、CONDITION等</span>
+<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w">      </span><span class="c1">// 前驱节点</span>
+<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w">      </span><span class="c1">// 后继节点</span>
+<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="p">;</span><span class="w">  </span><span class="c1">// 线程引用</span>
+<span class="w">    </span><span class="n">Node</span><span class="w"> </span><span class="n">nextWaiter</span><span class="p">;</span><span class="w">         </span><span class="c1">// 条件队列链接</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2">2. 为什么选择双向链表？</h3>
+<p>AQS使用双向链表实现FIFO队列，这种设计有两大优势：
+- <strong>插入删除高效</strong>：O(1)时间复杂度
+- <strong>支持公平策略</strong>：队列的先进先出特性为实现公平锁奠定基础</p>
+<p>在“等待队列的精妙设计”中我们提到，AQS使用了一个FIFO双向队列。一个很自然的问题是：为什么是<strong>双向</strong>链表？相比单向链表，每个节点需要额外维护一个<code>prev</code>前驱指针，这似乎带来了额外的内存开销。然而，这个设计是AQS能够高效、可靠处理复杂并发场景的基石，其核心优势在于<strong>支持高效地删除任意节点</strong>。</p>
+<h4 id="1-cancellation">1. 高效处理取消操作（Cancellation）</h4>
+<p>在多线程环境中，一个正在队列中等待获取锁的线程可能会因为<strong>超时（<code>tryAcquireNanos</code>）</strong> 或<strong>被中断（<code>acquireInterruptibly</code>）</strong> 而需要取消等待，将其对应的节点从队列中移除。</p>
 <ul>
-<li>智能助手：回答问题、提供建议、安排日程</li>
-<li>代码生成：编写、调试和优化代码</li>
-<li>数据分析：处理和分析数据，生成报告</li>
-<li>内容创作：撰写文章、诗歌、故事等</li>
+<li>
+<p><strong>单向链表的困境</strong>：如果一个节点（Node B）需要取消，要移除它，必须知道它的前驱节点（Node A）。但在单向链表中，Node B只持有后继节点Node C的引用。要找到Node A，<strong>必须从链表头部开始遍历</strong>，直到某个节点的<code>next</code>指向Node B。这个遍历操作的时间复杂度是O(n)，在高并发场景下，长队列会带来巨大的性能开销。</p>
+</li>
+<li>
+<p><strong>双向链表的优势</strong>：Node B本身就保存了指向其前驱节点（Node A）的引用（<code>node.prev</code>）。移除Node B变得非常简单：</p>
+<ol>
+<li>通过<code>B.prev</code>直接找到Node A。</li>
+<li>将<code>A.next</code>指向<code>B.next</code>。</li>
+<li>如果<code>B.next</code>（Node C）不为空，将<code>C.prev</code>指向Node A。</li>
+</ol>
+</li>
 </ul>
-<h2 id="_2">典型框架</h2>
+<p>这个过程<strong>无需遍历</strong>，时间复杂度是O(1)，极大地提升了性能。</p>
+<p><strong>源码佐证</strong>：在 <code>acquireQueued</code> 方法的 <code>finally</code> 块中，如果获取资源失败（例如发生异常），会调用 <code>cancelAcquire(node)</code> 方法。这个方法内部大量依赖了 <code>node.prev</code> 引用来进行复杂的链表清理和重建工作，这正是双向链表价值最直接的体现。</p>
+<h4 id="2-signal">2. 显式维护前驱节点的状态（SIGNAL）</h4>
+<p>在AQS中，一个节点的线程在阻塞自己（<code>park</code>）之前，需要确保它的前驱节点的<code>waitStatus</code>是<code>SIGNAL</code>（<code>shouldParkAfterFailedAcquire</code>方法）。这建立了一种“责任链”协议：<strong>“我（前驱节点）释放资源后会负责唤醒你（当前节点），所以你现在可以安心睡觉了”</strong>。</p>
+<p>如果一个节点的前驱节点取消了（<code>waitStatus = CANCELLED</code>），它需要<strong>跳过</strong>这些已取消的节点，找到一个有效的、状态为<code>SIGNAL</code>的前驱节点，并重新建立链接。双向链表使得节点可以轻松地<strong>向前遍历</strong>（通过<code>prev</code>指针），高效地完成这个“寻找有效前驱”的任务。</p>
+<p><strong>源码佐证：<code>shouldParkAfterFailedAcquire</code> 方法</strong>
+<div class="highlight"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">shouldParkAfterFailedAcquire</span><span class="p">(</span><span class="n">Node</span><span class="w"> </span><span class="n">pred</span><span class="p">,</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="p">.</span><span class="na">waitStatus</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ws</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">SIGNAL</span><span class="p">)</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ws</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 前驱节点已取消（CANCELLED）</span>
+<span class="w">        </span><span class="c1">// 关键：通过prev指针向前遍历，跳过所有已取消的节点</span>
+<span class="w">        </span><span class="k">do</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">node</span><span class="p">.</span><span class="na">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="p">.</span><span class="na">prev</span><span class="p">;</span><span class="w"> </span><span class="c1">// 双向链表的核心！</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">pred</span><span class="p">.</span><span class="na">waitStatus</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="n">pred</span><span class="p">.</span><span class="na">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">node</span><span class="p">;</span><span class="w"> </span><span class="c1">// 重新链接链表</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">compareAndSetWaitStatus</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="w"> </span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">SIGNAL</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+如果没有<code>prev</code>指针，这个“跳过已取消节点”的操作将变得极其低效，需要从队列头开始遍历。</p>
+<h4 id="3-condition-queue">3. 条件队列（Condition Queue）功能的支撑</h4>
+<p>AQS的强大功能之一是其条件变量（<code>ConditionObject</code>），而这严重依赖双向链表的结构。</p>
 <ul>
-<li>LangChain：提供构建LLM应用程序的工具和组件</li>
-<li>AutoGPT：自主GPT代理，能够完成复杂任务</li>
-<li>AgentGPT：基于浏览器的自主Agent构建工具</li>
-<li>BabyAGI：自主生成和执行任务的Agent系统</li>
+<li>当调用 <code>condition.await()</code> 时，当前线程会<strong>释放锁</strong>，并将当前节点从<strong>同步队列</strong>（锁队列）转移到<strong>条件队列</strong>（一个由<code>nextWaiter</code>连接的单向链表）。</li>
+<li>当调用 <code>condition.signal()</code> 时，需要将节点从条件队列<strong>转移回同步队列</strong>。</li>
 </ul>
+<p>这个“转移”操作涉及到将节点重新插入到同步队列的尾部。而一旦节点回到同步队列，它就可能会面临上述的<strong>取消</strong>和<strong>状态维护</strong>问题。因此，一个必须是双向链表的同步队列，是高效实现条件变量机制的基础。</p>
+<h2 id="_2">四、核心流程源码解析</h2>
+<h3 id="1-tryacquireacquire">1. 获取资源 - tryAcquire/acquire流程</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">protected</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">tryAcquire</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UnsupportedOperationException</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">tryAcquire</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="c1">// 子类实现的具体获取逻辑</span>
+<span class="w">        </span><span class="n">acquireQueued</span><span class="p">(</span><span class="n">addWaiter</span><span class="p">(</span><span class="n">Node</span><span class="p">.</span><span class="na">EXCLUSIVE</span><span class="p">),</span><span class="w"> </span><span class="n">arg</span><span class="p">))</span>
+<span class="w">        </span><span class="n">selfInterrupt</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这是一个经典模板方法模式，流程如下：</p>
+<ol>
+<li><strong>tryAcquire</strong>：子类定义资源获取规则（如ReentrantLock中尝试加锁）</li>
+<li><strong>addWaiter</strong>：将线程包装为Node并加入队列尾部</li>
+<li><strong>acquireQueued</strong>：在队列中循环尝试获取资源，必要时阻塞线程</li>
+</ol>
+<h3 id="2-release">2. 释放资源 - release流程</h3>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tryRelease</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 子类实现的具体释放逻辑</span>
+<span class="w">        </span><span class="n">Node</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">head</span><span class="p">;</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="na">waitStatus</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="w">            </span><span class="n">unparkSuccessor</span><span class="p">(</span><span class="n">h</span><span class="p">);</span><span class="w"> </span><span class="c1">// 唤醒后继节点</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>释放资源后，AQS会唤醒队列中合适的等待线程，使其重新尝试获取资源。</p>
+<h2 id="aqs_1">五、AQS的两种模式</h2>
+<h3 id="1-exclusive">1. 独占模式（Exclusive）</h3>
+<p>一次只有一个线程能访问资源，适用于互斥场景，如ReentrantLock。</p>
+<ul>
+<li><strong>获取</strong>：acquire、tryAcquire</li>
+<li><strong>释放</strong>：release、tryRelease</li>
+</ul>
+<h3 id="2-shared">2. 共享模式（Shared）</h3>
+<p>多个线程可以共享资源，适用于协作场景，如Semaphore、CountDownLatch。</p>
+<ul>
+<li><strong>获取</strong>：acquireShared、tryAcquireShared</li>
+<li><strong>释放</strong>：releaseShared、tryReleaseShared</li>
+</ul>
+<h2 id="aqscondition">六、AQS高级特性：Condition条件队列</h2>
+<p>除了同步队列，AQS还通过ConditionObject支持条件队列：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConditionObject</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Condition</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">firstWaiter</span><span class="p">;</span><span class="w"> </span><span class="c1">// 条件队列头</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">lastWaiter</span><span class="p">;</span><span class="w">  </span><span class="c1">// 条件队列尾</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这与同步队列的区别在于：
+- <strong>同步队列</strong>：存放等待锁的线程
+- <strong>条件队列</strong>：存放调用了await()主动放弃锁的线程</p>
+<p>通过多个Condition对象，可以实现精细化的线程通信和唤醒。</p>
+<h2 id="_3">七、为什么不用操作系统互斥锁？</h2>
+<p>AQS在用户态实现同步机制有显著优势：</p>
+<ol>
+<li><strong>性能高效</strong>：避免用户态-内核态切换的开销</li>
+<li><strong>灵活可扩展</strong>：Java层面可自定义公平策略、共享模式等</li>
+<li><strong>功能丰富</strong>：支持可重入、中断、超时、条件等待等复杂特性</li>
+</ol>
+<h2 id="aqs_2">八、AQS在实际开发中的应用</h2>
+<h3 id="1-reentrantlock-vs-synchronized">1. ReentrantLock vs synchronized</h3>
+<p>基于AQS的ReentrantLock提供了更多高级功能：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>ReentrantLock</th>
+<th>synchronized</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>尝试非阻塞获取</td>
+<td>✅ tryLock()</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>可中断</td>
+<td>✅ lockInterruptibly()</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>公平锁</td>
+<td>✅ 支持</td>
+<td>❌</td>
+</tr>
+<tr>
+<td>条件队列</td>
+<td>✅ 多条件</td>
+<td>❌ 单条件</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2_1">2. 常用同步工具实现原理</h3>
+<ul>
+<li><strong>Semaphore</strong>：state表示许可证数量，acquire获取许可证，release释放许可证</li>
+<li><strong>CountDownLatch</strong>：state表示剩余任务数，countDown递减，await等待归零</li>
+<li><strong>ReentrantReadWriteLock</strong>：通过两个AQS子类分别管理读锁和写锁</li>
+</ul>
+<h2 id="_4">九、总结</h2>
+<p>AQS是Java并发包的基石，通过state状态管理、CLH队列和模板方法模式，提供了一个高度灵活、高效的同步框架。理解AQS的设计思想和实现原理，不仅有助于我们更好地使用JUC包中的同步工具，也为设计和实现自定义同步器提供了坚实基础。</p>
 
 
 
@@ -1220,22 +1581,22 @@
       
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
-        
           
-          <a href="../../../08/01/sft-intro/" class="md-footer__link md-footer__link--next" aria-label="Next: Sft intro">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Sft intro
-              </div>
-            </div>
+          <a href="../../../08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 蚂蚁面试官：介绍设计模式及其在工作中的应用？">
             <div class="md-footer__button md-icon">
               
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                蚂蚁面试官：介绍设计模式及其在工作中的应用？
+              </div>
             </div>
           </a>
+        
         
       </nav>
     
