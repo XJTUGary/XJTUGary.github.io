@@ -1,0 +1,918 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../15/agent-intro/" rel="next"/>
+<link href="../../../../../images/logo.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>深入分析ThreadLocal：原理、内存泄漏与最佳实践 - Gary's Blog</title>
+<link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="black" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#threadlocal">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Gary's Blog" class="md-header__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Gary's Blog
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              深入分析ThreadLocal：原理、内存泄漏与最佳实践
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../..">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../../../">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Gary's Blog" class="md-nav__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Gary's Blog
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../..">
+<span class="md-ellipsis">
+    首页
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<span class="md-ellipsis">
+    技术
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+<span class="md-ellipsis">
+    Archive
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2025/">
+<span class="md-ellipsis">
+    2025
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Categories
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/agent/">
+<span class="md-ellipsis">
+    Agent
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/java/">
+<span class="md-ellipsis">
+    JAVA
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/rag/">
+<span class="md-ellipsis">
+    RAG
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sft/">
+<span class="md-ellipsis">
+    SFT
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E5%B9%B6%E5%8F%91/">
+<span class="md-ellipsis">
+    并发
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<span class="md-ellipsis">
+    设计模式
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E9%9D%A2%E7%BB%8F/">
+<span class="md-ellipsis">
+    面经
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+<span class="md-ellipsis">
+    旅行
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+<span class="md-ellipsis">
+    摄影
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+<span class="md-ellipsis">
+    运动
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content md-content--post" data-md-component="content">
+<div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner md-post">
+<nav class="md-nav md-nav--primary">
+<div class="md-post__back">
+<div class="md-nav__title md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+<span class="md-ellipsis">
+                    Back to index
+                  </span>
+</a>
+</div>
+</div>
+<ul class="md-post__meta md-nav__list">
+<li class="md-nav__item md-nav__item--section">
+<div class="md-post__title">
+<span class="md-ellipsis">
+                    Metadata
+                  </span>
+</div>
+<nav class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
+<time class="md-ellipsis" datetime="2025-07-08 00:00:00+00:00">Tuesday, July 8, 2025</time>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"></path></svg>
+<span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/java/">JAVA</a>, 
+                              <a href="../../../../category/%E5%B9%B6%E5%8F%91/">并发</a></span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
+<span class="md-ellipsis">
+                            
+                              2 min read
+                            
+                          </span>
+</div>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#threadlocal">
+<span class="md-ellipsis">
+      什么是ThreadLocal？
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#threadlocal_1">
+<span class="md-ellipsis">
+      ThreadLocal的底层实现原理
+    </span>
+</a>
+<nav aria-label="ThreadLocal的底层实现原理" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_1">
+<span class="md-ellipsis">
+      存储结构
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      数据存储方式
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      核心操作机制
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#key">
+<span class="md-ellipsis">
+      为什么key要使用弱引用？
+    </span>
+</a>
+<nav aria-label="为什么key要使用弱引用？" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      内存泄漏风险分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      弱引用的作用
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      内存泄漏问题详解
+    </span>
+</a>
+<nav aria-label="内存泄漏问题详解" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#key_1">
+<span class="md-ellipsis">
+      Key被回收后的情况
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expungestaleentry">
+<span class="md-ellipsis">
+      清理机制与expungeStaleEntry方法
+    </span>
+</a>
+<nav aria-label="清理机制与expungeStaleEntry方法" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#expungestaleentry_1">
+<span class="md-ellipsis">
+      expungeStaleEntry方法的作用
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      方法实现原理
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#value">
+<span class="md-ellipsis">
+      为什么value不是弱引用？
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      避免内存泄漏的最佳实践
+    </span>
+</a>
+<nav aria-label="避免内存泄漏的最佳实践" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-remove">
+<span class="md-ellipsis">
+      1. 总是调用remove()
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-static-final">
+<span class="md-ellipsis">
+      2. 使用static final修饰
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-threadlocal">
+<span class="md-ellipsis">
+      3. 避免使用线程池+ThreadLocal的复杂场景
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#threadlocal_2">
+<span class="md-ellipsis">
+      ThreadLocal与锁的对比
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_9">
+<span class="md-ellipsis">
+      实际应用场景
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_10">
+<span class="md-ellipsis">
+      总结
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<article class="md-content__inner md-typeset">
+<h1>深入分析ThreadLocal：原理、内存泄漏与最佳实践</h1>
+<p>你是否也曾在项目中使用ThreadLocal却对它的内部机制一知半解？是否遇到过莫名其妙的内存泄漏问题却找不到根源？ThreadLocal作为Java并发编程中的重要工具，既能优雅地解决线程隔离问题，也可能在不规范使用时埋下性能隐患。</p>
+<p>从SimpleDateFormat的线程安全包装，到数据库连接管理，再到用户会话传递，ThreadLocal的应用无处不在。但它为什么要用弱引用作为key？内存泄漏又是如何发生的？怎样才能安全地使用它？本文将从底层原理出发，深入剖析ThreadLocal的工作机制，揭示内存泄漏的本质原因，并总结一套切实可行的最佳实践。无论你是Java初学者还是有经验的开发者，相信这篇文章都能帮你彻底掌握ThreadLocal，让它成为你编程工具箱中的得力助手。</p>
+<!-- more -->
+<h2 id="threadlocal">什么是ThreadLocal？</h2>
+<p>ThreadLocal是Java中用于实现线程局部变量的重要工具。它为每个使用该变量的线程提供独立的变量副本，实现了<strong>线程隔离</strong>，避免了多线程环境下的竞争条件。</p>
+<h2 id="threadlocal_1">ThreadLocal的底层实现原理</h2>
+<h3 id="_1">存储结构</h3>
+<p>每个Thread线程内部都有一个<code>ThreadLocalMap</code>，这是一个定制化的哈希表，用于存储线程的局部变量。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Thread类中的关键字段</span>
+<span class="kd">class</span> <span class="nc">Thread</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ThreadLocal</span><span class="p">.</span><span class="na">ThreadLocalMap</span><span class="w"> </span><span class="n">threadLocals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// ...</span>
+<span class="p">}</span>
+
+<span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ThreadLocalMap</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Entry</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Object</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="_2">数据存储方式</h3>
+<p>下图展示了ThreadLocal的内部存储结构：</p>
+<div class="mermaid">flowchart TD
+    A[Thread线程] --&gt; B[threadLocals: ThreadLocalMap]
+
+    subgraph C [ThreadLocalMap结构]
+        D[Entry数组]
+
+        subgraph Entry1 [Entry 1]
+            E1[Key: WeakReference to ThreadLocal]
+            F1[Value: 实际值]
+        end
+
+        subgraph Entry2 [Entry 2]
+            E2[Key: WeakReference to ThreadLocal]
+            F2[Value: 实际值]
+        end
+
+        subgraph EntryN [Entry N]
+            EN[Key: null（已回收）]
+            FN[Value: 实际值<br/>内存泄漏风险]
+        end
+    end
+
+    B --&gt; D
+
+    G[静态ThreadLocal变量] -.-&gt;|弱引用| E1
+    G -.-&gt;|弱引用| E2
+
+    style EN fill:#f9f,stroke:#333,stroke-width:2px
+    style FN fill:#f9f,stroke:#333,stroke-width:2px
+</div>
+<ul>
+<li><strong>Key</strong>：ThreadLocal对象的弱引用</li>
+<li><strong>Value</strong>：线程局部变量的实际值（强引用）</li>
+<li><strong>数据结构</strong>：数组 + 线性探测法解决哈希冲突</li>
+</ul>
+<h3 id="_3">核心操作机制</h3>
+<p>当调用<code>ThreadLocal.set()</code>和<code>ThreadLocal.get()</code>方法时：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Thread</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">();</span>
+<span class="w">    </span><span class="n">ThreadLocalMap</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">getMap</span><span class="p">(</span><span class="n">t</span><span class="p">);</span><span class="w"> </span><span class="c1">// 获取当前线程的ThreadLocalMap</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">map</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">map</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span><span class="w"> </span><span class="c1">// 以当前ThreadLocal实例为key存储值</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">createMap</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span><span class="w"> </span><span class="c1">// 创建新的ThreadLocalMap</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="key">为什么key要使用弱引用？</h2>
+<h3 id="_4">内存泄漏风险分析</h3>
+<p>在线程池场景中，线程会被重复使用，从而导致以下引用链长期存在：</p>
+<div class="highlight"><pre><span></span><code>Thread → ThreadLocalMap → Entry → Key (ThreadLocal) → ThreadLocal对象
+</code></pre></div>
+<p>如果Key使用强引用，即使业务代码中将ThreadLocal对象设置为null，由于这条引用链的存在，ThreadLocal对象也无法被GC回收，导致内存泄漏。</p>
+<h3 id="_5">弱引用的作用</h3>
+<p>将Key设置为弱引用后，当ThreadLocal对象没有其他强引用时（即业务代码中设置为null后），在下一次GC时，Key会被自动回收，Entry中的Key字段变为null。</p>
+<div class="highlight"><pre><span></span><code><span class="kd">static</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Entry</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Object</span><span class="w"> </span><span class="n">value</span><span class="p">;</span>
+<span class="w">    </span><span class="n">Entry</span><span class="p">(</span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kd">super</span><span class="p">(</span><span class="n">k</span><span class="p">);</span><span class="w"> </span><span class="c1">// key作为弱引用</span>
+<span class="w">        </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">;</span><span class="w"> </span><span class="c1">// value作为强引用</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="_6">内存泄漏问题详解</h2>
+<h3 id="key_1">Key被回收后的情况</h3>
+<p>虽然Key被回收后变为null，但Value仍然被Entry强引用，而Entry又被ThreadLocalMap强引用，导致Value无法被回收。</p>
+<h3 id="expungestaleentry">清理机制与expungeStaleEntry方法</h3>
+<p>ThreadLocal内部通过<code>expungeStaleEntry</code>方法清理无效Entry（key为null的Entry）。这个方法在以下时机被调用：</p>
+<ol>
+<li><strong>直接调用</strong>：在<code>set()</code>、<code>get()</code>、<code>remove()</code>方法中显式调用</li>
+<li><strong>间接调用</strong>：通过<code>cleanSomeSlots()</code>和<code>rehash()</code>方法调用</li>
+<li><strong>扩容时</strong>：在调整表大小时会先清理所有stale entries</li>
+</ol>
+<h4 id="expungestaleentry_1">expungeStaleEntry方法的作用</h4>
+<p><code>expungeStaleEntry</code>方法是ThreadLocalMap清理无效Entry的核心方法，其主要功能是：</p>
+<ol>
+<li><strong>清理特定位置的无效Entry</strong>（key为null的Entry）</li>
+<li><strong>重新哈希后续的Entry</strong>以确保哈希表的完整性</li>
+<li><strong>返回下一个可能包含stale entry的索引位置</strong></li>
+</ol>
+<h4 id="_7">方法实现原理</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">expungeStaleEntry</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">staleSlot</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Entry</span><span class="o">[]</span><span class="w"> </span><span class="n">tab</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">table</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">len</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tab</span><span class="p">.</span><span class="na">length</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// 1. 清理当前staleSlot位置的Entry</span>
+<span class="w">    </span><span class="n">tab</span><span class="o">[</span><span class="n">staleSlot</span><span class="o">]</span><span class="p">.</span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">  </span><span class="c1">// 释放value引用，避免内存泄漏</span>
+<span class="w">    </span><span class="n">tab</span><span class="o">[</span><span class="n">staleSlot</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">        </span><span class="c1">// 将Entry本身置为null</span>
+<span class="w">    </span><span class="n">size</span><span class="o">--</span><span class="p">;</span><span class="w">                       </span><span class="c1">// 更新大小计数器</span>
+
+<span class="w">    </span><span class="c1">// 2. 重新哈希后续的Entry，直到遇到null槽位</span>
+<span class="w">    </span><span class="n">Entry</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextIndex</span><span class="p">(</span><span class="n">staleSlot</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span><span class="w"> </span>
+<span class="w">         </span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w"> </span>
+<span class="w">         </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextIndex</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">        </span><span class="n">ThreadLocal</span><span class="o">&lt;?&gt;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">get</span><span class="p">();</span><span class="w">  </span><span class="c1">// 获取key的引用</span>
+
+<span class="w">        </span><span class="c1">// 2.1 如果key为null，清理这个Entry</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">  </span><span class="c1">// 释放value引用</span>
+<span class="w">            </span><span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">   </span><span class="c1">// 清理Entry</span>
+<span class="w">            </span><span class="n">size</span><span class="o">--</span><span class="p">;</span><span class="w">          </span><span class="c1">// 更新大小</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span>
+<span class="w">        </span><span class="c1">// 2.2 如果key不为null，重新计算哈希位置</span>
+<span class="w">        </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">k</span><span class="p">.</span><span class="na">threadLocalHashCode</span><span class="w"> </span><span class="o">&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">len</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+
+<span class="w">            </span><span class="c1">// 如果当前位置不是计算出的哈希位置，需要重新放置</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">tab</span><span class="o">[</span><span class="n">i</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">  </span><span class="c1">// 清空当前位置</span>
+
+<span class="w">                </span><span class="c1">// 线性探测找到新的位置</span>
+<span class="w">                </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">tab</span><span class="o">[</span><span class="n">h</span><span class="o">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span>
+<span class="w">                    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextIndex</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">len</span><span class="p">);</span>
+<span class="w">                </span><span class="n">tab</span><span class="o">[</span><span class="n">h</span><span class="o">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">e</span><span class="p">;</span><span class="w">     </span><span class="c1">// 将Entry放到新位置</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">i</span><span class="p">;</span><span class="w">  </span><span class="c1">// 返回下一个可能包含stale entry的位置</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="value">为什么value不是弱引用？</h3>
+<p>如果value也使用弱引用，可能会在业务代码还需要使用时被意外回收，导致程序错误。</p>
+<h2 id="_8">避免内存泄漏的最佳实践</h2>
+<h3 id="1-remove">1. 总是调用remove()</h3>
+<p>使用完ThreadLocal后，必须调用<code>remove()</code>方法清理entry。</p>
+<div class="highlight"><pre><span></span><code><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">threadLocal</span><span class="p">.</span><span class="na">set</span><span class="p">(</span><span class="s">"value"</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// 业务逻辑</span>
+<span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">threadLocal</span><span class="p">.</span><span class="na">remove</span><span class="p">();</span><span class="w"> </span><span class="c1">// 必须清理</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2-static-final">2. 使用static final修饰</h3>
+<p>将ThreadLocal声明为static final，避免重复创建：</p>
+<div class="highlight"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">SimpleDateFormat</span><span class="o">&gt;</span><span class="w"> </span><span class="n">DATE_FORMATTER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">    </span><span class="n">ThreadLocal</span><span class="p">.</span><span class="na">withInitial</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s">"yyyy-MM-dd"</span><span class="p">));</span>
+</code></pre></div>
+<h3 id="3-threadlocal">3. 避免使用线程池+ThreadLocal的复杂场景</h3>
+<p>在简单场景下手动管理ThreadLocal的生命周期。</p>
+<h2 id="threadlocal_2">ThreadLocal与锁的对比</h2>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>ThreadLocal</th>
+<th>锁机制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>解决思路</strong></td>
+<td>数据副本，空间换时间</td>
+<td>互斥访问，时间换空间</td>
+</tr>
+<tr>
+<td><strong>性能</strong></td>
+<td>无竞争，高性能</td>
+<td>有竞争，性能开销大</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>线程隔离数据</td>
+<td>共享资源保护</td>
+</tr>
+<tr>
+<td><strong>内存占用</strong></td>
+<td>每个线程一份副本</td>
+<td>只占一份资源</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_9">实际应用场景</h2>
+<ol>
+<li><strong>数据库连接管理</strong>：每个线程独立的数据库连接</li>
+<li><strong>用户会话信息</strong>：在Web应用中存储用户身份信息</li>
+<li><strong>日期格式化</strong>：SimpleDateFormat非线程安全，可用ThreadLocal包装</li>
+<li><strong>全局参数传递</strong>：避免在方法参数中层层传递</li>
+</ol>
+<h2 id="_10">总结</h2>
+<p>ThreadLocal通过为每个线程创建变量副本来实现线程隔离，是解决线程安全问题的有效方案。但其使用需要注意：</p>
+<ol>
+<li><strong>Key使用弱引用</strong>是为了避免ThreadLocal对象的内存泄漏</li>
+<li><strong>必须调用remove()</strong>是为了避免value的内存泄漏</li>
+<li><strong>理解清理机制</strong>特别是<code>expungeStaleEntry</code>方法的工作原理，有助于正确使用和调试</li>
+</ol>
+<p>虽然ThreadLocal提供了自动清理机制，但开发者仍然应该显式调用<code>remove()</code>方法，因为：</p>
+<ol>
+<li>自动清理只在后续操作时触发</li>
+<li>如果线程不再使用ThreadLocal，无效Entry可能长期存在</li>
+<li>显式清理可以立即释放资源，而不是等待后续操作</li>
+</ol>
+<p>正确使用ThreadLocal可以提高程序性能并简化代码设计，但滥用或不当使用会导致内存泄漏问题。在实际开发中，应根据具体需求谨慎选择使用ThreadLocal还是其他同步机制。</p>
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Next: Agent intro" class="md-footer__link md-footer__link--next" href="../../15/agent-intro/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                Agent intro
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/XJTUGary" rel="noopener" target="_blank" title="GitHub">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="mailto:wmlgaryx@gmail.com" rel="noopener" target="_blank" title="E-mail">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
