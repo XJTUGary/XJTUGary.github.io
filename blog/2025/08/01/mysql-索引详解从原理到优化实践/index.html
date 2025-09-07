@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../../04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/">
+        <link rel="prev" href="../../../07/15/agent-intro/">
       
       
-        <link rel="next" href="../../07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/">
+        <link rel="next" href="../sft-intro/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>深入浅出解析AQS：Java并发编程的基石 - Gary's Blog</title>
+        <title>MySQL 索引详解：从原理到优化实践 - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#aqs" class="md-skip">
+        <a href="#_1" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              深入浅出解析AQS：Java并发编程的基石
+              MySQL 索引详解：从原理到优化实践
             
           </span>
         </div>
@@ -1035,7 +1035,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-09-06 00:00:00+00:00" class="md-ellipsis">Saturday, September 6, 2025</time>
+                        <time datetime="2025-08-01 00:00:00+00:00" class="md-ellipsis">Friday, August 1, 2025</time>
                       </div>
                     </li>
                     
@@ -1046,8 +1046,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/java/">JAVA</a>, 
-                              <a href="../../../../category/%E5%B9%B6%E5%8F%91/">并发</a></span>
+                              <a href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></span>
                         </div>
                       </li>
                     
@@ -1085,37 +1084,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#aqs" class="md-nav__link">
-    <span class="md-ellipsis">
-      一、AQS解决了什么问题？
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#state" class="md-nav__link">
-    <span class="md-ellipsis">
-      二、状态变量state的设计奥秘
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      三、等待队列的精妙设计
+      什么是索引？为什么需要索引？
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="三、等待队列的精妙设计">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      索引的数据结构演进
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      MySQL索引类型
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MySQL索引类型">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-node" class="md-nav__link">
+  <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
-      1. Node节点结构
+      1. 聚集索引（聚簇索引）
     </span>
   </a>
   
@@ -1124,35 +1123,7 @@
           <li class="md-nav__item">
   <a href="#2" class="md-nav__link">
     <span class="md-ellipsis">
-      2. 为什么选择双向链表？
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="2. 为什么选择双向链表？">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-cancellation" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. 高效处理取消操作（Cancellation）
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-signal" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. 显式维护前驱节点的状态（SIGNAL）
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-condition-queue" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 条件队列（Condition Queue）功能的支撑
+      2. 非聚集索引（非聚簇索引/二级索引）
     </span>
   </a>
   
@@ -1160,112 +1131,74 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      四、核心流程源码解析
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="四、核心流程源码解析">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-tryacquireacquire" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. 获取资源 - tryAcquire/acquire流程
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-release" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. 释放资源 - release流程
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aqs_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      五、AQS的两种模式
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="五、AQS的两种模式">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-exclusive" class="md-nav__link">
-    <span class="md-ellipsis">
-      1. 独占模式（Exclusive）
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2-shared" class="md-nav__link">
-    <span class="md-ellipsis">
-      2. 共享模式（Shared）
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aqscondition" class="md-nav__link">
-    <span class="md-ellipsis">
-      六、AQS高级特性：Condition条件队列
-    </span>
-  </a>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      七、为什么不用操作系统互斥锁？
+      索引优化实践
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="索引优化实践">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      覆盖索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      联合索引
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      最左前缀匹配原则
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      索引失效的常见场景
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#aqs_2" class="md-nav__link">
+  <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
-      八、AQS在实际开发中的应用
+      索引设计原则
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="八、AQS在实际开发中的应用">
+    <nav class="md-nav" aria-label="索引设计原则">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-reentrantlock-vs-synchronized" class="md-nav__link">
+  <a href="#1_1" class="md-nav__link">
     <span class="md-ellipsis">
-      1. ReentrantLock vs synchronized
+      1. 适合建索引的情况
     </span>
   </a>
   
@@ -1274,7 +1207,16 @@
           <li class="md-nav__item">
   <a href="#2_1" class="md-nav__link">
     <span class="md-ellipsis">
-      2. 常用同步工具实现原理
+      2. 不适合建索引的情况
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 其他建议
     </span>
   </a>
   
@@ -1286,9 +1228,84 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
+  <a href="#_9" class="md-nav__link">
     <span class="md-ellipsis">
-      九、总结
+      索引监控与优化
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="索引监控与优化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#explain" class="md-nav__link">
+    <span class="md-ellipsis">
+      什么是 EXPLAIN？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explain_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      EXPLAIN 结果中的关键字段详解
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      核心字段深度解读与举例
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="核心字段深度解读与举例">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. type（访问类型）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-extra" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Extra（额外信息）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      综合实战分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      总结
     </span>
   </a>
   
@@ -1309,214 +1326,291 @@
 
 
 
-  <h1>深入浅出解析AQS：Java并发编程的基石</h1>
+  <h1>MySQL 索引详解：从原理到优化实践</h1>
 
-<p>在Java并发编程中，AbstractQueuedSynchronizer（AQS）是<code>java.util.concurrent.locks</code>包的核心基础，像ReentrantLock、Semaphore、CountDownLatch等常用同步工具都构建于其上。理解AQS，就掌握了JUC包的精髓。本文将从设计思想、核心机制到源码实现，带你彻底搞懂AQS。</p>
+<p>索引之于数据库，犹如目录之于鸿篇巨著。没有目录，我们只能逐页翻找，费时费力；而有了精准的目录，我们便能直指目标，效率倍增。本文将为您深入浅出地解析MySQL索引的底层逻辑，从B+树的数据结构选择，到聚簇索引与二级索引的精妙设计，再到联合索引的“最左前缀”原则与实践陷阱。</p>
 <!-- more -->
 
-<h2 id="aqs">一、AQS解决了什么问题？</h2>
-<p>AQS的核心目标是：<strong>当多个线程竞争共享资源时，如何高效、安全地管理线程的排队与唤醒</strong>。它通过三大组件解决这个问题：</p>
+<p><img alt="MySQL索引" src="../../../../%E6%95%B0%E6%8D%AE%E5%BA%93/images/MySQL%20%E7%B4%A2%E5%BC%95.jpg" /></p>
+<h2 id="_1">什么是索引？为什么需要索引？</h2>
+<p>索引是数据库中用于提高查询效率的一种数据结构，其核心思想是“以空间换时间”。举个通俗的例子：当我们查字典时，不会一页一页地翻找，而是先通过目录定位到目标字的大致位置，这里的目录就相当于索引。</p>
+<p>在数据库层面，索引就是一种能够快速查找的数据结构，能够显著加快SQL查询速度。没有索引的查询就像全表扫描（一页页翻字典），而使用索引的查询就像通过目录查找，效率自然更高。</p>
+<h2 id="_2">索引的数据结构演进</h2>
+<p>数据库索引选型经历了多个数据结构的探索：</p>
 <ol>
-<li><strong>volatile int state</strong>：表示共享资源的状态（如锁的可重入次数、信号量的许可证数）</li>
-<li><strong>FIFO双向队列</strong>：封装竞争失败的线程，让它们排队等待</li>
-<li><strong>模板方法模式</strong>：AQS提供核心框架，子类定义具体资源分配规则</li>
+<li><strong>哈希表</strong>：虽然查询时间复杂度为O(1)，但无法支持范围查询和排序</li>
+<li><strong>二叉排序树</strong>：支持排序和范围查询，但顺序插入时会退化为链表，性能急剧下降</li>
+<li><strong>平衡二叉树</strong>：通过旋转操作保持树平衡，但追求绝对平衡导致频繁旋转，产生大量磁盘IO</li>
+<li><strong>红黑树</strong>：大致平衡的二叉排序树，降低了旋转频率，但作为二叉树，存储大量数据时树高过高，查找性能不佳</li>
+<li><strong>B树</strong>：多路平衡排序树，一个节点有多个孩子，降低了树高。但节点同时存储数据和索引，导致单个节点存储的索引数量有限</li>
+<li><strong>B+树</strong>（最终选择）：非叶子节点只存索引值，不存数据，使得单个节点能存储更多索引，树高更低。叶子节点存储所有数据并通过双向链表连接，范围查询时只需遍历链表，无需回溯整个结构</li>
 </ol>
-<h2 id="state">二、状态变量state的设计奥秘</h2>
-<p>为什么state是int类型而不是boolean？</p>
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * The synchronization state.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">state</span><span class="p">;</span>
-</code></pre></div>
-<p>因为需要支持更丰富的并发场景：</p>
+<p>MySQL最终选择B+树作为索引数据结构，因其在磁盘IO效率、范围查询和排序方面都有优异表现。</p>
+<h2 id="mysql">MySQL索引类型</h2>
+<h3 id="1">1. 聚集索引（聚簇索引）</h3>
 <ul>
-<li><strong>互斥场景</strong>：state=0表示空闲，1表示被占用（ReentrantLock）</li>
-<li><strong>共享场景</strong>：state表示可用资源数（如Semaphore允许多个线程同时访问）</li>
-<li><strong>可重入场景</strong>：state记录重入次数，重入一次加1，释放一次减1</li>
+<li>索引值和数据存储在一起</li>
+<li>主键索引就是聚集索引</li>
+<li>叶子节点保存索引值和对应的完整行数据</li>
+<li>建议使用自增主键，避免页分裂带来的性能问题</li>
 </ul>
-<p>通过<code>volatile</code>保证可见性，通过CAS操作保证原子性，为并发控制提供基础。
-<div class="highlight"><pre><span></span><code><span class="w">    </span><span class="cm">/**</span>
-<span class="cm">     * Atomically sets synchronization state to the given updated</span>
-<span class="cm">     * value if the current state value equals the expected value.</span>
-<span class="cm">     * This operation has memory semantics of a {@code volatile} read</span>
-<span class="cm">     * and write.</span>
-<span class="cm">     *</span>
-<span class="cm">     * @param expect the expected value</span>
-<span class="cm">     * @param update the new value</span>
-<span class="cm">     * @return {@code true} if successful. False return indicates that the actual</span>
-<span class="cm">     *         value was not equal to the expected value.</span>
-<span class="cm">     */</span>
-<span class="w">    </span><span class="kd">protected</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">compareAndSetState</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">expect</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">update</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">U</span><span class="p">.</span><span class="na">compareAndSetInt</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="w"> </span><span class="n">STATE</span><span class="p">,</span><span class="w"> </span><span class="n">expect</span><span class="p">,</span><span class="w"> </span><span class="n">update</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
+<h3 id="2">2. 非聚集索引（非聚簇索引/二级索引）</h3>
+<ul>
+<li>索引值和数据分开存储</li>
+<li>包括唯一索引、普通索引、前缀索引等</li>
+<li>叶子节点存储索引值和对应的主键ID</li>
+<li>查询时需要先查索引树获取主键ID，再通过主键索引查找数据，这个过程称为<strong>回表</strong></li>
+</ul>
+<h2 id="_3">索引优化实践</h2>
+<h3 id="_4">覆盖索引</h3>
+<p>当索引包含所有需要查询的字段时，无需回表查询，这种称为覆盖索引。例如：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 假设有联合索引(name, age)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;张三&#39;</span><span class="p">;</span>
 </code></pre></div></p>
-<h2 id="_1">三、等待队列的精妙设计</h2>
-<p>当线程通过CAS修改state失败后，AQS如何管理这些等待线程？</p>
-<h3 id="1-node">1. Node节点结构</h3>
-<p>每个等待线程被封装成Node节点：</p>
-<div class="highlight"><pre><span></span><code><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Node</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">waitStatus</span><span class="p">;</span><span class="w"> </span><span class="c1">// 等待状态：CANCELLED、SIGNAL、CONDITION等</span>
-<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">prev</span><span class="p">;</span><span class="w">      </span><span class="c1">// 前驱节点</span>
-<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">next</span><span class="p">;</span><span class="w">      </span><span class="c1">// 后继节点</span>
-<span class="w">    </span><span class="kd">volatile</span><span class="w"> </span><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="p">;</span><span class="w">  </span><span class="c1">// 线程引用</span>
-<span class="w">    </span><span class="n">Node</span><span class="w"> </span><span class="n">nextWaiter</span><span class="p">;</span><span class="w">         </span><span class="c1">// 条件队列链接</span>
-<span class="p">}</span>
-</code></pre></div>
-<h3 id="2">2. 为什么选择双向链表？</h3>
-<p>AQS使用双向链表实现FIFO队列，这种设计有两大优势：</p>
+<h3 id="_5">联合索引</h3>
+<p>对多个字段建立的索引，可以增加覆盖索引的概率：
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_name_age</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">users</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">);</span>
+</code></pre></div></p>
+<h3 id="_6">最左前缀匹配原则</h3>
+<p>联合索引按照索引列的顺序建立B+树，查询时必须从最左边的列开始匹配:</p>
 <ul>
-<li><strong>插入删除高效</strong>：O(1)时间复杂度</li>
-<li><strong>支持公平策略</strong>：队列的先进先出特性为实现公平锁奠定基础</li>
+<li><code>WHERE a=1 AND b=2</code> ✅ 使用索引</li>
+<li><code>WHERE b=2 AND a=1</code> ✅ 使用索引（优化器会自动调整顺序）</li>
+<li><code>WHERE a=1 AND c=3</code> ✅ 仅a使用索引</li>
+<li><code>WHERE b=2 AND c=3</code> ❌ 不使用索引</li>
 </ul>
-<p>在“等待队列的精妙设计”中我们提到，AQS使用了一个FIFO双向队列。一个很自然的问题是：为什么是<strong>双向</strong>链表？相比单向链表，每个节点需要额外维护一个<code>prev</code>前驱指针，这似乎带来了额外的内存开销。然而，这个设计是AQS能够高效、可靠处理复杂并发场景的基石，其核心优势在于<strong>支持高效地删除任意节点</strong>。</p>
-<h4 id="1-cancellation">1. 高效处理取消操作（Cancellation）</h4>
-<p>在多线程环境中，一个正在队列中等待获取锁的线程可能会因为<strong>超时（<code>tryAcquireNanos</code>）</strong> 或<strong>被中断（<code>acquireInterruptibly</code>）</strong> 而需要取消等待，将其对应的节点从队列中移除。</p>
-<ul>
-<li>
-<p><strong>单向链表的困境</strong>：如果一个节点（Node B）需要取消，要移除它，必须知道它的前驱节点（Node A）。但在单向链表中，Node B只持有后继节点Node C的引用。要找到Node A，<strong>必须从链表头部开始遍历</strong>，直到某个节点的<code>next</code>指向Node B。这个遍历操作的时间复杂度是O(n)，在高并发场景下，长队列会带来巨大的性能开销。</p>
-</li>
-<li>
-<p><strong>双向链表的优势</strong>：Node B本身就保存了指向其前驱节点（Node A）的引用（<code>node.prev</code>）。移除Node B变得非常简单：</p>
+<h2 id="_7">索引失效的常见场景</h2>
 <ol>
-<li>通过<code>B.prev</code>直接找到Node A。</li>
-<li>将<code>A.next</code>指向<code>B.next</code>。</li>
-<li>如果<code>B.next</code>（Node C）不为空，将<code>C.prev</code>指向Node A。</li>
+<li><strong>模糊查询</strong>：<code>LIKE '%前缀'</code> 会导致索引失效，<code>LIKE '前缀%'</code> 可以使用索引</li>
+<li><strong>对索引列运算或使用函数</strong>：<code>WHERE YEAR(create_time) = 2023</code></li>
+<li><strong>隐式类型转换</strong>：字符串字段用数字查询会触发CAST函数导致索引失效</li>
+<li><strong>OR条件包含非索引列</strong>：一边有索引一边无索引会导致全表扫描</li>
+<li><strong>不符合最左前缀原则</strong>：联合索引跳过左侧列查询</li>
 </ol>
-</li>
-</ul>
-<p>这个过程<strong>无需遍历</strong>，时间复杂度是O(1)，极大地提升了性能。</p>
-<p><strong>源码佐证</strong>：在 <code>acquireQueued</code> 方法的 <code>finally</code> 块中，如果获取资源失败（例如发生异常），会调用 <code>cancelAcquire(node)</code> 方法。这个方法内部大量依赖了 <code>node.prev</code> 引用来进行复杂的链表清理和重建工作，这正是双向链表价值最直接的体现。</p>
-<h4 id="2-signal">2. 显式维护前驱节点的状态（SIGNAL）</h4>
-<p>在AQS中，一个节点的线程在阻塞自己（<code>park</code>）之前，需要确保它的前驱节点的<code>waitStatus</code>是<code>SIGNAL</code>（<code>shouldParkAfterFailedAcquire</code>方法）。这建立了一种“责任链”协议：<strong>“我（前驱节点）释放资源后会负责唤醒你（当前节点），所以你现在可以安心睡觉了”</strong>。</p>
-<p>如果一个节点的前驱节点取消了（<code>waitStatus = CANCELLED</code>），它需要<strong>跳过</strong>这些已取消的节点，找到一个有效的、状态为<code>SIGNAL</code>的前驱节点，并重新建立链接。双向链表使得节点可以轻松地<strong>向前遍历</strong>（通过<code>prev</code>指针），高效地完成这个“寻找有效前驱”的任务。</p>
-<p><strong>源码佐证：<code>shouldParkAfterFailedAcquire</code> 方法</strong>
-<div class="highlight"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">shouldParkAfterFailedAcquire</span><span class="p">(</span><span class="n">Node</span><span class="w"> </span><span class="n">pred</span><span class="p">,</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">node</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="p">.</span><span class="na">waitStatus</span><span class="p">;</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ws</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">SIGNAL</span><span class="p">)</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ws</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 前驱节点已取消（CANCELLED）</span>
-<span class="w">        </span><span class="c1">// 关键：通过prev指针向前遍历，跳过所有已取消的节点</span>
-<span class="w">        </span><span class="k">do</span><span class="w"> </span><span class="p">{</span>
-<span class="w">            </span><span class="n">node</span><span class="p">.</span><span class="na">prev</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pred</span><span class="p">.</span><span class="na">prev</span><span class="p">;</span><span class="w"> </span><span class="c1">// 双向链表的核心！</span>
-<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">pred</span><span class="p">.</span><span class="na">waitStatus</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
-<span class="w">        </span><span class="n">pred</span><span class="p">.</span><span class="na">next</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">node</span><span class="p">;</span><span class="w"> </span><span class="c1">// 重新链接链表</span>
-<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="n">compareAndSetWaitStatus</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="w"> </span><span class="n">ws</span><span class="p">,</span><span class="w"> </span><span class="n">Node</span><span class="p">.</span><span class="na">SIGNAL</span><span class="p">);</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-如果没有<code>prev</code>指针，这个“跳过已取消节点”的操作将变得极其低效，需要从队列头开始遍历。</p>
-<h4 id="3-condition-queue">3. 条件队列（Condition Queue）功能的支撑</h4>
-<p>AQS的强大功能之一是其条件变量（<code>ConditionObject</code>），而这严重依赖双向链表的结构。</p>
+<h2 id="_8">索引设计原则</h2>
+<!-- 1. 适合建索引的情况 -->
+<h3 id="1_1">1. 适合建索引的情况</h3>
 <ul>
-<li>当调用 <code>condition.await()</code> 时，当前线程会<strong>释放锁</strong>，并将当前节点从<strong>同步队列</strong>（锁队列）转移到<strong>条件队列</strong>（一个由<code>nextWaiter</code>连接的单向链表）。</li>
-<li>当调用 <code>condition.signal()</code> 时，需要将节点从条件队列<strong>转移回同步队列</strong>。</li>
+<li>数据量大的表</li>
+<li>查询频繁的字段</li>
+<li>WHERE、GROUP BY、ORDER BY子句中的字段</li>
+<li>区分度高的字段（如身份证号）</li>
 </ul>
-<p>这个“转移”操作涉及到将节点重新插入到同步队列的尾部。而一旦节点回到同步队列，它就可能会面临上述的<strong>取消</strong>和<strong>状态维护</strong>问题。因此，一个必须是双向链表的同步队列，是高效实现条件变量机制的基础。</p>
-<h2 id="_2">四、核心流程源码解析</h2>
-<h3 id="1-tryacquireacquire">1. 获取资源 - tryAcquire/acquire流程</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">protected</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">tryAcquire</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">UnsupportedOperationException</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">acquire</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">tryAcquire</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="c1">// 子类实现的具体获取逻辑</span>
-<span class="w">        </span><span class="n">acquireQueued</span><span class="p">(</span><span class="n">addWaiter</span><span class="p">(</span><span class="n">Node</span><span class="p">.</span><span class="na">EXCLUSIVE</span><span class="p">),</span><span class="w"> </span><span class="n">arg</span><span class="p">))</span>
-<span class="w">        </span><span class="n">selfInterrupt</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>这是一个经典模板方法模式，流程如下：</p>
+<h3 id="2_1">2. 不适合建索引的情况</h3>
+<ul>
+<li>数据量小的表</li>
+<li>增删改频繁的字段</li>
+<li>区分度低的字段（如性别）</li>
+<li>过长的字符串（考虑使用前缀索引）</li>
+</ul>
+<h3 id="3">3. 其他建议</h3>
+<ul>
+<li>一张表的索引数量不宜过多（建议不超过5个）</li>
+<li>优先使用联合索引而非多个单列索引</li>
+<li>避免使用SELECT *，减少回表查询</li>
+</ul>
+<h2 id="_9">索引监控与优化</h2>
 <ol>
-<li><strong>tryAcquire</strong>：子类定义资源获取规则（如ReentrantLock中尝试加锁）</li>
-<li><strong>addWaiter</strong>：将线程包装为Node并加入队列尾部</li>
-<li><strong>acquireQueued</strong>：在队列中循环尝试获取资源，必要时阻塞线程</li>
+<li><strong>慢查询日志</strong>：记录执行时间超过阈值的SQL语句</li>
+<li><strong>EXPLAIN分析</strong>：查看SQL执行计划，分析是否使用索引</li>
 </ol>
-<h3 id="2-release">2. 释放资源 - release流程</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">arg</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">tryRelease</span><span class="p">(</span><span class="n">arg</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 子类实现的具体释放逻辑</span>
-<span class="w">        </span><span class="n">Node</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">head</span><span class="p">;</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="p">.</span><span class="na">waitStatus</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
-<span class="w">            </span><span class="n">unparkSuccessor</span><span class="p">(</span><span class="n">h</span><span class="p">);</span><span class="w"> </span><span class="c1">// 唤醒后继节点</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>释放资源后，AQS会唤醒队列中合适的等待线程，使其重新尝试获取资源。</p>
-<h2 id="aqs_1">五、AQS的两种模式</h2>
-<h3 id="1-exclusive">1. 独占模式（Exclusive）</h3>
-<p>一次只有一个线程能访问资源，适用于互斥场景，如ReentrantLock。</p>
-<ul>
-<li><strong>获取</strong>：acquire、tryAcquire</li>
-<li><strong>释放</strong>：release、tryRelease</li>
-</ul>
-<h3 id="2-shared">2. 共享模式（Shared）</h3>
-<p>多个线程可以共享资源，适用于协作场景，如Semaphore、CountDownLatch。</p>
-<ul>
-<li><strong>获取</strong>：acquireShared、tryAcquireShared</li>
-<li><strong>释放</strong>：releaseShared、tryReleaseShared</li>
-</ul>
-<h2 id="aqscondition">六、AQS高级特性：Condition条件队列</h2>
-<p>除了同步队列，AQS还通过ConditionObject支持条件队列：</p>
-<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">ConditionObject</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Condition</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">firstWaiter</span><span class="p">;</span><span class="w"> </span><span class="c1">// 条件队列头</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">lastWaiter</span><span class="p">;</span><span class="w">  </span><span class="c1">// 条件队列尾</span>
-<span class="p">}</span>
-</code></pre></div>
-<p>这与同步队列的区别在于：
-- <strong>同步队列</strong>：存放等待锁的线程
-- <strong>条件队列</strong>：存放调用了await()主动放弃锁的线程</p>
-<p>通过多个Condition对象，可以实现精细化的线程通信和唤醒。</p>
-<h2 id="_3">七、为什么不用操作系统互斥锁？</h2>
-<p>AQS在用户态实现同步机制有显著优势：</p>
-<ol>
-<li><strong>性能高效</strong>：避免用户态-内核态切换的开销</li>
-<li><strong>灵活可扩展</strong>：Java层面可自定义公平策略、共享模式等</li>
-<li><strong>功能丰富</strong>：支持可重入、中断、超时、条件等待等复杂特性</li>
-</ol>
-<h2 id="aqs_2">八、AQS在实际开发中的应用</h2>
-<h3 id="1-reentrantlock-vs-synchronized">1. ReentrantLock vs synchronized</h3>
-<p>基于AQS的ReentrantLock提供了更多高级功能：</p>
+<h3 id="explain">什么是 EXPLAIN？</h3>
+<p><code>EXPLAIN</code> 是 MySQL 的一个关键字，用于模拟 MySQL 优化器如何执行一条 SQL 查询语句。它可以显示语句的执行计划，包括是否使用索引、使用何种索引、表如何连接、连接顺序以及预计需要扫描的行数等关键信息。</p>
+<p><strong>使用方法极其简单：</strong>
+<div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">your_table</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">your_condition</span><span class="p">;</span>
+<span class="c1">-- 或者用于分析更新/删除（但通常是只读模拟）</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">your_table</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">condition</span><span class="p">;</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">DELETE</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">your_table</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">condition</span><span class="p">;</span>
+</code></pre></div></p>
+<hr />
+<h3 id="explain_1">EXPLAIN 结果中的关键字段详解</h3>
+<p>执行 <code>EXPLAIN</code> 后会返回一个表格，包含以下重要列。理解每一列的含义是进行优化分析的基础。</p>
 <table>
 <thead>
 <tr>
-<th>特性</th>
-<th>ReentrantLock</th>
-<th>synchronized</th>
+<th style="text-align: left;">字段</th>
+<th style="text-align: left;">描述</th>
+<th style="text-align: left;">解读与重点</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>尝试非阻塞获取</td>
-<td>✅ tryLock()</td>
-<td>❌</td>
+<td style="text-align: left;"><strong>id</strong></td>
+<td style="text-align: left;">查询的序列号</td>
+<td style="text-align: left;">标识 <code>SELECT</code> 子查询的执行顺序。id 相同，执行顺序从上到下；id 不同，值越大优先级越高，越先执行。</td>
 </tr>
 <tr>
-<td>可中断</td>
-<td>✅ lockInterruptibly()</td>
-<td>❌</td>
+<td style="text-align: left;"><strong>select_type</strong></td>
+<td style="text-align: left;">查询的类型</td>
+<td style="text-align: left;">说明是简单查询、子查询还是联合查询。</td>
 </tr>
 <tr>
-<td>公平锁</td>
-<td>✅ 支持</td>
-<td>❌</td>
+<td style="text-align: left;"><strong>table</strong></td>
+<td style="text-align: left;">正在访问的表名</td>
+<td style="text-align: left;">如果表有别名，则显示别名。</td>
 </tr>
 <tr>
-<td>条件队列</td>
-<td>✅ 多条件</td>
-<td>❌ 单条件</td>
+<td style="text-align: left;"><strong>partitions</strong></td>
+<td style="text-align: left;">匹配的分区</td>
+<td style="text-align: left;">如果表建立了分区，这条数据查询的是哪个分区。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>type</strong></td>
+<td style="text-align: left;"><strong><span style="color:red">访问类型</span></strong></td>
+<td style="text-align: left;"><strong><span style="color:red">这是衡量查询效率至关重要的指标！</span></strong> 从好到坏：<code>system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</code>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>possible_keys</strong></td>
+<td style="text-align: left;">可能使用的索引</td>
+<td style="text-align: left;">显示查询可能使用的所有索引，但不一定实际使用。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>key</strong></td>
+<td style="text-align: left;"><strong><span style="color:red">实际使用的索引</span></strong></td>
+<td style="text-align: left;">显示查询优化器实际决定使用的索引。为 <code>NULL</code> 则表示未使用索引。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>key_len</strong></td>
+<td style="text-align: left;">使用的索引长度</td>
+<td style="text-align: left;">表示索引中使用的字节数，可计算到底使用了联合索引的几部分。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>ref</strong></td>
+<td style="text-align: left;">与索引比较的列</td>
+<td style="text-align: left;">显示哪些列或常量被用于查找索引列上的值。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>rows</strong></td>
+<td style="text-align: left;"><strong><span style="color:red">预估需要扫描的行数</span></strong></td>
+<td style="text-align: left;">根据表统计信息及索引选用情况，大致估算出找到所需记录需要读取的行数。<strong>值越小越好</strong>。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>filtered</strong></td>
+<td style="text-align: left;">按条件过滤后的行百分比</td>
+<td style="text-align: left;">表示存储引擎返回的数据在服务器层过滤后，剩余的行数所占的百分比。</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Extra</strong></td>
+<td style="text-align: left;"><strong><span style="color:red">额外信息</span></strong></td>
+<td style="text-align: left;"><strong>包含非常关键的优化信息</strong>，如是否使用临时表、文件排序等。</td>
 </tr>
 </tbody>
 </table>
-<h3 id="2_1">2. 常用同步工具实现原理</h3>
+<hr />
+<h3 id="_10">核心字段深度解读与举例</h3>
+<h4 id="1-type">1. type（访问类型）</h4>
+<p>这是 <strong>最需要关注的字段</strong>，它直接反映了查询的性能水平。</p>
 <ul>
-<li><strong>Semaphore</strong>：state表示许可证数量，acquire获取许可证，release释放许可证</li>
-<li><strong>CountDownLatch</strong>：state表示剩余任务数，countDown递减，await等待归零</li>
-<li><strong>ReentrantReadWriteLock</strong>：通过两个AQS子类分别管理读锁和写锁</li>
+<li>
+<p><strong>const / system</strong>：最优级别。通过主键（Primary Key）或唯一索引（Unique Index）进行唯一性查询，最多只返回一条记录。<code>system</code> 是 <code>const</code> 的特例（系统表）。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">-- `id` 是主键，type 为 `const`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>eq_ref</strong>：在进行多表连接查询时，对于前表的每一行，后表只有一行被匹配。通常出现在使用<strong>主键或唯一索引</strong>作为关联条件的连接查询中。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">orders</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+<span class="c1">-- 如果 `users.id` 是主键，对于 `orders` 的每一行 `user_id`，`users` 表只有一行匹配，type 为 `eq_ref`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>ref</strong>：使用<strong>非唯一性索引</strong>进行扫描或等值查询，可能返回多行。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;john@example.com&#39;</span><span class="p">;</span>
+<span class="c1">-- 如果 `email` 是一个普通索引（非唯一），type 为 `ref`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>range</strong>：使用索引检索<strong>给定范围</strong>的行，操作符如 <code>BETWEEN</code>、<code>IN()</code>、<code>&gt;</code>、<code>&lt;</code> 等。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">20</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span>
+<span class="c1">-- 如果 `age` 字段有索引，type 为 `range`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>index</strong>：<strong>全索引扫描</strong>（Full Index Scan）。遍历整个索引树来获取数据，虽然比全表扫描快（因为索引文件通常比数据文件小），但依然不高效。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="p">;</span>
+<span class="c1">-- 如果某个二级索引存在，优化器可能会选择扫描这个更小的索引树，type 为 `index`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>ALL</strong>：<strong>全表扫描</strong>（Full Table Scan）。性能最差，意味着数据库需要遍历整张表来找到匹配的行。<strong>必须优化</strong>。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">;</span>
+<span class="c1">-- 如果 `name` 字段没有索引，type 为 `ALL`</span>
+</code></pre></div></p>
+</li>
 </ul>
-<h2 id="_4">九、总结</h2>
-<p>AQS是Java并发包的基石，通过state状态管理、CLH队列和模板方法模式，提供了一个高度灵活、高效的同步框架。理解AQS的设计思想和实现原理，不仅有助于我们更好地使用JUC包中的同步工具，也为设计和实现自定义同步器提供了坚实基础。</p>
+<h4 id="2-extra">2. Extra（额外信息）</h4>
+<p>这里提供了查询执行过程的许多细节。</p>
+<ul>
+<li>
+<p><strong>Using index</strong>：<strong>性能非常好</strong>。表示查询使用了<strong>覆盖索引（Covering Index）</strong>，所有需要的数据直接从索引中获取，无需回表。
+    <div class="highlight"><pre><span></span><code><span class="c1">-- 假设在 `users(name, age)` 上有一个联合索引</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="p">;</span>
+<span class="c1">-- Extra 会出现 `Using index`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Using where</strong>：表示存储引擎返回行后，MySQL 服务器层还需要再进行过滤（WHERE 条件中的某些字段没有使用索引）。
+    <div class="highlight"><pre><span></span><code><span class="c1">-- 假设在 `users(name)` 上有一个索引</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;John&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">25</span><span class="p">;</span>
+<span class="c1">-- 索引只帮助过滤了 `name`，`age` 条件需要在服务器层过滤，Extra 会出现 `Using where`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Using temporary</strong>：<strong>需要优化</strong>。表示查询需要创建临时表来存储中间结果，常见于 <code>GROUP BY</code> 和 <code>ORDER BY</code> 的子句涉及不同的列。
+    <div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="k">COUNT</span><span class="p">(</span><span class="o">*</span><span class="p">)</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">GROUP</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="c1">-- `GROUP BY` 和 `ORDER BY` 的列不同，Extra 可能会出现 `Using temporary; Using filesort`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Using filesort</strong>：<strong>需要优化</strong>。表示 MySQL 无法利用索引完成排序，需要在内存或磁盘上进行额外的排序操作。
+    <div class="highlight"><pre><span></span><code><span class="c1">-- 假设 `age` 字段没有索引</span>
+<span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">age</span><span class="p">;</span>
+<span class="c1">-- Extra 会出现 `Using filesort`</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Using join buffer (Block Nested Loop)</strong>：<strong>需要优化</strong>。表示表连接时没有使用索引，需要使用连接缓冲区来加速查询。</p>
+</li>
+</ul>
+<hr />
+<h3 id="_11">综合实战分析</h3>
+<p>假设我们有一张 <code>orders</code> 表，结构如下：
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">  </span><span class="n">user_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">  </span><span class="n">amount</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">  </span><span class="n">order_date</span><span class="w"> </span><span class="nb">DATE</span><span class="p">,</span>
+<span class="w">  </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_user_id</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>
+<span class="w">  </span><span class="k">KEY</span><span class="w"> </span><span class="n">idx_date_amount</span><span class="w"> </span><span class="p">(</span><span class="n">order_date</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span>
+<span class="p">);</span>
+</code></pre></div></p>
+<p><strong>场景 1：分析一个低效查询</strong>
+<div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+</code></pre></div>
+<strong>分析结果预测</strong>:</p>
+<ul>
+<li><strong>type</strong>: <code>ALL</code> （因为 <code>amount</code> 不是索引的最左前缀，无法使用 <code>idx_date_amount</code>）</li>
+<li><strong>key</strong>: <code>NULL</code> （未使用索引）</li>
+<li><strong>rows</strong>: 数值很大（全表扫描）</li>
+<li><strong>Extra</strong>: <code>Using where</code></li>
+</ul>
+<p><strong>优化建议</strong>：考虑为 <code>amount</code> 单独建立索引，或者修改查询条件和业务逻辑，尝试利用现有索引。</p>
+<p><strong>场景 2：分析一个高效查询（覆盖索引）</strong>
+<div class="highlight"><pre><span></span><code><span class="k">EXPLAIN</span><span class="w"> </span><span class="k">SELECT</span><span class="w"> </span><span class="n">order_date</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">order_date</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="s1">&#39;2023-01-01&#39;</span><span class="p">;</span>
+</code></pre></div>
+<strong>分析结果预测</strong>:</p>
+<ul>
+<li><strong>type</strong>: <code>range</code> （使用了范围查询）</li>
+<li><strong>key</strong>: <code>idx_date_amount</code> （使用了联合索引）</li>
+<li><strong>key_len</strong>: 4 （可能，<code>order_date</code> 字段的长度）</li>
+<li><strong>rows</strong>: 预估扫描的行数</li>
+<li><strong>Extra</strong>: <code>Using index</code> （太好了！不需要回表，所有数据索引里都有）</li>
+</ul>
+<p>通过系统地解读 <code>EXPLAIN</code> 输出中的这些关键字段，你就能准确地定位 SQL 语句的性能瓶颈所在，从而做出针对性的优化，如添加索引、修改查询写法、重构表结构等。它是每个数据库开发者和DBA必须掌握的核心技能。</p>
+<h2 id="_12">总结</h2>
+<p>索引是提高数据库查询性能的利器，但需要合理设计和使用。理解索引的工作原理和数据结构，掌握最左前缀原则，避免索引失效场景，才能充分发挥索引的价值。记住：索引不是越多越好，需要根据实际查询需求和数据特征进行科学设计。</p>
+<p>通过慢查询日志和EXPLAIN分析工具，可以持续监控和优化数据库性能，确保系统在高并发场景下仍能保持优异的响应速度。</p>
 
 
 
@@ -1615,7 +1709,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 深入理解CAS：乐观锁的核心原理与实战应用">
+          <a href="../../../07/15/agent-intro/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Agent intro">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1625,20 +1719,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                深入理解CAS：乐观锁的核心原理与实战应用
+                Agent intro
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/" class="md-footer__link md-footer__link--next" aria-label="Next: 深入理解Java synchronized：从底层原理到锁升级机制">
+          <a href="../sft-intro/" class="md-footer__link md-footer__link--next" aria-label="Next: Sft intro">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                深入理解Java synchronized：从底层原理到锁升级机制
+                Sft intro
               </div>
             </div>
             <div class="md-footer__button md-icon">
