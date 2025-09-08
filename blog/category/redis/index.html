@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../sft/">
+        <link rel="prev" href="../rag/">
       
       
-        <link rel="next" href="../%E6%95%B0%E6%8D%AE%E5%BA%93/">
+        <link rel="next" href="../sft/">
       
       
       <link rel="icon" href="../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>并发 - Gary's Blog</title>
+        <title>Redis - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#redis" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              并发
+              Redis
             
           </span>
         </div>
@@ -676,12 +676,36 @@
                 
   
   
-  
     
   
   
-    <li class="md-nav__item">
-      <a href="../redis/" class="md-nav__link">
+    
+      
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Redis
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -692,6 +716,35 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#redis-rdb-aof" class="md-nav__link">
+    <span class="md-ellipsis">
+      Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -726,36 +779,12 @@
                 
   
   
-    
-  
   
     
-      
-    
   
   
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    并发
-    
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../%E5%B9%B6%E5%8F%91/" class="md-nav__link">
         
   
   
@@ -766,62 +795,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#java-synchronized" class="md-nav__link">
-    <span class="md-ellipsis">
-      深入理解Java synchronized：从底层原理到锁升级机制
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#aqsjava" class="md-nav__link">
-    <span class="md-ellipsis">
-      深入浅出解析AQS：Java并发编程的基石
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cas" class="md-nav__link">
-    <span class="md-ellipsis">
-      深入理解CAS：乐观锁的核心原理与实战应用
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#threadlocal" class="md-nav__link">
-    <span class="md-ellipsis">
-      深入分析ThreadLocal：原理、内存泄漏与最佳实践
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1115,7 +1088,7 @@
   <div class="md-content" data-md-component="content">
     <div class="md-content__inner">
       <header class="md-typeset">
-        <h1 id="_1">并发</h1>
+        <h1 id="redis">Redis</h1>
       </header>
       
         <article class="md-post md-post--excerpt">
@@ -1124,94 +1097,12 @@
     <div class="md-post__meta md-meta">
       <ul class="md-meta__list">
         <li class="md-meta__item">
-          <time datetime="2025-09-07 00:00:00+00:00">Sunday, September 7, 2025</time></li>
+          <time datetime="2025-07-01 00:00:00+00:00">Tuesday, July 1, 2025</time></li>
         
           <li class="md-meta__item">
             in
             
-              <a href="../java/" class="md-meta__link">JAVA</a>, 
-              <a href="./" class="md-meta__link">并发</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              1 min read
-            
-          </li>
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="java-synchronized"><a class="toclink" href="../../2025/09/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/">深入理解Java synchronized：从底层原理到锁升级机制</a></h2>
-<p>synchronized作为Java中最基本的同步机制，经过多年的发展和优化，已经成为一个高效、可靠的线程同步工具。理解其底层原理和锁升级机制，不仅有助于编写更高效的并发代码，也是Java开发者面试和进阶的必备知识。</p>
-<p>从无锁到偏向锁，再到轻量级锁和重量级锁的升级过程，体现了Java团队对性能优化的不懈追求：在保证线程安全的前提下，根据实际竞争情况动态调整策略，达到性能的最优平衡。</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../2025/09/07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/">
-          Continue reading
-        </a>
-      </nav>
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2025-09-06 00:00:00+00:00">Saturday, September 6, 2025</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../java/" class="md-meta__link">JAVA</a>, 
-              <a href="./" class="md-meta__link">并发</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              3 min read
-            
-          </li>
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="aqsjava"><a class="toclink" href="../../2025/09/06/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E8%A7%A3%E6%9E%90aqsjava%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E5%9F%BA%E7%9F%B3/">深入浅出解析AQS：Java并发编程的基石</a></h2>
-<p>在Java并发编程中，AbstractQueuedSynchronizer（AQS）是<code>java.util.concurrent.locks</code>包的核心基础，像ReentrantLock、Semaphore、CountDownLatch等常用同步工具都构建于其上。理解AQS，就掌握了JUC包的精髓。本文将从设计思想、核心机制到源码实现，带你彻底搞懂AQS。</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../2025/09/06/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA%E8%A7%A3%E6%9E%90aqsjava%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E7%9A%84%E5%9F%BA%E7%9F%B3/">
-          Continue reading
-        </a>
-      </nav>
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2025-09-04 00:00:00+00:00">Thursday, September 4, 2025</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../java/" class="md-meta__link">JAVA</a>, 
-              <a href="./" class="md-meta__link">并发</a></li>
+              <a href="./" class="md-meta__link">Redis</a></li>
         
         
           
@@ -1226,53 +1117,13 @@
     </div>
   </header>
   <div class="md-post__content md-typeset">
-    <h2 id="cas"><a class="toclink" href="../../2025/09/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/">深入理解CAS：乐观锁的核心原理与实战应用</a></h2>
-<p>你是否曾好奇，像JDK中<code>AtomicInteger</code>这样的并发工具，为何能在不加锁的情况下安全地处理多线程竞争？其核心奥秘正是一种名为<strong>CAS（比较并交换）</strong> 的硬件级原子操作。它不仅颠覆了“同步必加锁”的传统思维，更是构建高性能并发系统的基石。本文将为你彻底解析CAS的工作原理，揭示其如何通过一条CPU指令实现高效的无锁同步，并深入探讨其著名的ABA问题与解决方案，带你从本质上理解现代并发编程的精妙之处。</p>
+    <h2 id="redis-rdb-aof"><a class="toclink" href="../../2025/07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/">Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择</a></h2>
+<p>Redis 因其卓越的性能和丰富的数据结构而成为最流行的缓存和内存数据库之一。然而，由于其数据主要存储在内存中，服务器断电或重启会导致所有数据丢失。为了解决这个问题，Redis 提供了两种核心的持久化机制：<strong>RDB</strong> 和 <strong>AOF</strong>。理解它们的原理、优缺点和适用场景，是高效、可靠使用 Redis 的关键。</p>
+<p>本文将深入探讨 RDB 和 AOF，并介绍结合两者优点的混合持久化方案。</p>
 
     
       <nav class="md-post__action">
-        <a href="../../2025/09/04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/">
-          Continue reading
-        </a>
-      </nav>
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2025-07-08 00:00:00+00:00">Tuesday, July 8, 2025</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../java/" class="md-meta__link">JAVA</a>, 
-              <a href="./" class="md-meta__link">并发</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              2 min read
-            
-          </li>
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="threadlocal"><a class="toclink" href="../../2025/07/08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">深入分析ThreadLocal：原理、内存泄漏与最佳实践</a></h2>
-<p>你是否也曾在项目中使用ThreadLocal却对它的内部机制一知半解？是否遇到过莫名其妙的内存泄漏问题却找不到根源？ThreadLocal作为Java并发编程中的重要工具，既能优雅地解决线程隔离问题，也可能在不规范使用时埋下性能隐患。</p>
-<p>从SimpleDateFormat的线程安全包装，到数据库连接管理，再到用户会话传递，ThreadLocal的应用无处不在。但它为什么要用弱引用作为key？内存泄漏又是如何发生的？怎样才能安全地使用它？本文将从底层原理出发，深入剖析ThreadLocal的工作机制，揭示内存泄漏的本质原因，并总结一套切实可行的最佳实践。无论你是Java初学者还是有经验的开发者，相信这篇文章都能帮你彻底掌握ThreadLocal，让它成为你编程工具箱中的得力助手。</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../2025/07/08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+        <a href="../../2025/07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/">
           Continue reading
         </a>
       </nav>
@@ -1315,7 +1166,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../sft/" class="md-footer__link md-footer__link--prev" aria-label="Previous: SFT">
+          <a href="../rag/" class="md-footer__link md-footer__link--prev" aria-label="Previous: RAG">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1325,20 +1176,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                SFT
+                RAG
               </div>
             </div>
           </a>
         
         
           
-          <a href="../%E6%95%B0%E6%8D%AE%E5%BA%93/" class="md-footer__link md-footer__link--next" aria-label="Next: 数据库">
+          <a href="../sft/" class="md-footer__link md-footer__link--next" aria-label="Next: SFT">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                数据库
+                SFT
               </div>
             </div>
             <div class="md-footer__button md-icon">
