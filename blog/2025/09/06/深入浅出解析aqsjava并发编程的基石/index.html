@@ -1464,9 +1464,11 @@
 <span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">transient</span><span class="w"> </span><span class="n">Node</span><span class="w"> </span><span class="n">lastWaiter</span><span class="p">;</span><span class="w">  </span><span class="c1">// 条件队列尾</span>
 <span class="p">}</span>
 </code></pre></div>
-<p>这与同步队列的区别在于：
-- <strong>同步队列</strong>：存放等待锁的线程
-- <strong>条件队列</strong>：存放调用了await()主动放弃锁的线程</p>
+<p>这与同步队列的区别在于：</p>
+<ul>
+<li><strong>同步队列</strong>：存放等待锁的线程</li>
+<li><strong>条件队列</strong>：存放调用了await()主动放弃锁的线程</li>
+</ul>
 <p>通过多个Condition对象，可以实现精细化的线程通信和唤醒。</p>
 <h2 id="_3">七、为什么不用操作系统互斥锁？</h2>
 <p>AQS在用户态实现同步机制有显著优势：</p>

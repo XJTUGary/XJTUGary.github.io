@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../mysql-%E7%B4%A2%E5%BC%95%E8%AF%A6%E8%A7%A3%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/">
+        <link rel="prev" href="../../01/sft-intro/">
       
       
-        <link rel="next" href="../../02/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E4%BB%8Eacid%E7%89%B9%E6%80%A7%E5%88%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E5%AE%9E%E7%8E%B0/">
+        <link rel="next" href="../rag-intro/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Sft intro - Gary's Blog</title>
+        <title>深入理解数据库事务：从ACID特性到隔离级别实现 - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sft" class="md-skip">
+        <a href="#_1" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Sft intro
+              深入理解数据库事务：从ACID特性到隔离级别实现
             
           </span>
         </div>
@@ -1035,7 +1035,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-08-01 00:00:00+00:00" class="md-ellipsis">Friday, August 1, 2025</time>
+                        <time datetime="2025-08-02 00:00:00+00:00" class="md-ellipsis">Saturday, August 2, 2025</time>
                       </div>
                     </li>
                     
@@ -1046,7 +1046,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/sft/">SFT</a></span>
+                              <a href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></span>
                         </div>
                       </li>
                     
@@ -1057,7 +1057,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              1 min read
+                              2 min read
                             
                           </span>
                         </div>
@@ -1076,8 +1076,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1086,45 +1084,171 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#sft_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      SFT的工作原理
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sft_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      SFT的作用
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      常见应用场景
+      什么是数据库事务？
     </span>
   </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acid" class="md-nav__link">
+    <span class="md-ellipsis">
+      事务的ACID特性
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="事务的ACID特性">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-atomicity" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 原子性（Atomicity）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-consistency" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 一致性（Consistency）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 隔离性（Isolation）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-durability" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 持久性（Durability）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      关键技术和挑战
+      并发事务带来的问题
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="并发事务带来的问题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-dirty-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 脏读（Dirty Read）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-non-repeatable-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 不可重复读（Non-repeatable Read）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-phantom-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 幻读（Phantom Read）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      典型工具和框架
+      事务隔离级别
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="事务隔离级别">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-read-uncommitted" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 读未提交（Read Uncommitted）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-read-committed" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 读已提交（Read Committed）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-repeatable-read" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 可重复读（Repeatable Read）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-serializable" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 串行化（Serializable）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      实践建议
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      总结
     </span>
   </a>
   
@@ -1145,46 +1269,306 @@
 
 
 
-<p>SFT（Supervised Fine-Tuning，监督微调）是大语言模型训练的关键阶段之一。在预训练模型的基础上，通过标注数据进行进一步训练，使模型适应特定任务或领域的需求。</p>
+  <h1>深入理解数据库事务：从ACID特性到隔离级别实现</h1>
+
+<p>在现代数据库系统中，事务是保证数据一致性和可靠性的核心机制。无论是银行转账、电商下单还是社交媒体的点赞功能，都离不开事务的支撑。简单来说，事务就是将多个数据库操作捆绑成一个不可分割的工作单元，确保这些操作要么全部成功，要么全部失败。本文将深入探讨数据库事务的ACID特性、并发问题及解决方案，并详细解析MySQL中事务隔离级别的实现机制。</p>
 <!-- more -->
 
-<h1 id="sft">SFT 简介</h1>
-<p>SFT（Supervised Fine-Tuning，监督微调）是大语言模型训练的关键阶段之一。在预训练模型的基础上，通过标注数据进行进一步训练，使模型适应特定任务或领域的需求。</p>
-<h2 id="sft_1">SFT的工作原理</h2>
+<h2 id="_1">什么是数据库事务？</h2>
+<p>事务是由一系列SQL语句构成的逻辑操作单元，这些操作作为一个整体向数据库系统提交或回滚。事务的核心价值在于确保数据库从一个一致性状态转换到另一个一致性状态。</p>
+<p>以一个经典转账场景为例：
+<div class="highlight"><pre><span></span><code><span class="c1">-- A向B转账100元</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;A&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;B&#39;</span><span class="p">;</span>
+</code></pre></div></p>
+<p>这两个操作必须作为一个原子单元执行。如果A账户扣款成功但B账户加款失败（或因系统故障中断），就会导致数据不一致。事务机制正是为了解决这类问题而设计的。</p>
+<h2 id="acid">事务的ACID特性</h2>
+<h3 id="1-atomicity">1. 原子性（Atomicity）</h3>
+<p>原子性确保事务中的所有操作要么全部完成，要么全部不执行，不存在中间状态。</p>
+<p><strong>实现机制</strong>：通过Undo Log（回滚日志）实现。当事务需要回滚时，数据库系统会执行Undo Log中记录的反向操作，将数据恢复到事务开始前的状态。</p>
+<h3 id="2-consistency">2. 一致性（Consistency）</h3>
+<p>一致性保证事务执行前后，数据库必须从一个一致性状态变换到另一个一致性状态。例如转账前后，A和B的账户总额应当保持不变。</p>
+<p><strong>实现机制</strong>：一致性是原子性、隔离性和持久性共同作用的结果，同时还依赖于应用层定义的业务规则（如外键约束、唯一约束等）。</p>
+<h3 id="3-isolation">3. 隔离性（Isolation）</h3>
+<p>隔离性确保并发执行的事务相互隔离，一个事务的执行不应影响其他事务。</p>
+<p><strong>实现机制</strong>：通过锁机制和多版本并发控制（MVCC）实现。MySQL的InnoDB存储引擎主要使用MVCC来保证隔离性。</p>
+<h3 id="4-durability">4. 持久性（Durability）</h3>
+<p>持久性保证一旦事务提交，其对数据库的修改就是永久性的，即使系统发生故障也不会丢失。</p>
+<p><strong>实现机制</strong>：通过Redo Log（重做日志）实现。事务提交时，先将修改写入Redo Log，即使数据页还没有刷盘，MySQL重启后也能通过Redo Log恢复数据。</p>
+<h2 id="_2">并发事务带来的问题</h2>
+<p>当多个事务并发执行时，可能会引发以下问题：</p>
+<h3 id="1-dirty-read">1. 脏读（Dirty Read）</h3>
+<p>一个事务读取了另一个未提交事务修改的数据。如果后者回滚，前者读取的就是无效数据。</p>
+<p><strong>示例场景</strong>：事务A修改库存，事务B在A提交前读取了这个库存值。</p>
+<p><strong>表结构</strong>：
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">  </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">  </span><span class="n">stock</span><span class="w"> </span><span class="nb">INT</span>
+<span class="p">);</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;测试商品&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+</code></pre></div></p>
+<p><strong>操作顺序</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>时间点</th>
+<th>事务A</th>
+<th>事务B</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>START TRANSACTION;</code></td>
+<td></td>
+<td>事务A开始</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>UPDATE products SET stock = 1 WHERE id = 1;</code></td>
+<td></td>
+<td>事务A修改数据，但未提交</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td><code>START TRANSACTION;</code></td>
+<td>事务B开始</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td><code>SELECT stock FROM products WHERE id = 1;</code></td>
+<td>脏读发生：事务B读到了事务A未提交的数据</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>ROLLBACK;</code></td>
+<td></td>
+<td>事务A回滚，库存恢复为0</td>
+</tr>
+<tr>
+<td>6</td>
+<td></td>
+<td><code>COMMIT;</code></td>
+<td>事务B提交，但基于错误数据操作</td>
+</tr>
+</tbody>
+</table>
+<p><strong>如何避免</strong>：将事务隔离级别设置为 READ COMMITTED 或更高。</p>
+<h3 id="2-non-repeatable-read">2. 不可重复读（Non-repeatable Read）</h3>
+<p>同一事务内多次读取同一数据，结果不一致（因为其他事务修改了该数据）。</p>
+<p><strong>示例场景</strong>：事务A在同一个事务内两次查询账户余额，期间事务B向该账户转账并提交。</p>
+<p><strong>表结构</strong>：
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="w">  </span><span class="n">name</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span>
+<span class="w">  </span><span class="n">balance</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;用户A&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span>
+</code></pre></div></p>
+<p><strong>操作顺序</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>时间点</th>
+<th>事务A</th>
+<th>事务B</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>START TRANSACTION;</code></td>
+<td></td>
+<td>事务A开始</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>SELECT balance FROM accounts WHERE id = 1;</code></td>
+<td></td>
+<td>第一次读取，balance = 100.00</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td><code>START TRANSACTION;</code></td>
+<td>事务B开始</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td><code>UPDATE accounts SET balance = balance + 50 WHERE id = 1;</code></td>
+<td>给账户增加50元</td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td><code>COMMIT;</code></td>
+<td>事务B提交</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>SELECT balance FROM accounts WHERE id = 1;</code></td>
+<td></td>
+<td>不可重复读发生：第二次读取，balance = 150.00</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>COMMIT;</code></td>
+<td></td>
+<td>事务A提交</td>
+</tr>
+</tbody>
+</table>
+<p><strong>如何避免</strong>：将事务隔离级别设置为 REPEATABLE READ 或更高。</p>
+<h3 id="3-phantom-read">3. 幻读（Phantom Read）</h3>
+<p>同一事务内多次查询同一范围的数据，返回的记录数不一致（因为其他事务新增或删除了数据）。</p>
+<p><strong>示例场景</strong>：事务A统计订单数量，期间事务B创建了一个新订单并提交。</p>
+<p><strong>表结构</strong>：
+<div class="highlight"><pre><span></span><code><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="p">,</span>
+<span class="w">  </span><span class="n">user_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span>
+<span class="w">  </span><span class="n">amount</span><span class="w"> </span><span class="nb">DECIMAL</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">101</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">.</span><span class="mi">00</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">102</span><span class="p">,</span><span class="w"> </span><span class="mi">300</span><span class="p">.</span><span class="mi">00</span><span class="p">);</span>
+</code></pre></div></p>
+<p><strong>操作顺序</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>时间点</th>
+<th>事务A</th>
+<th>事务B</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>START TRANSACTION;</code></td>
+<td></td>
+<td>事务A开始</td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>SELECT COUNT(*) FROM orders WHERE user_id = 103;</code></td>
+<td></td>
+<td>第一次统计，计数为0</td>
+</tr>
+<tr>
+<td>3</td>
+<td></td>
+<td><code>START TRANSACTION;</code></td>
+<td>事务B开始</td>
+</tr>
+<tr>
+<td>4</td>
+<td></td>
+<td><code>INSERT INTO orders (user_id, amount) VALUES (103, 250.00);</code></td>
+<td>插入新订单</td>
+</tr>
+<tr>
+<td>5</td>
+<td></td>
+<td><code>COMMIT;</code></td>
+<td>事务B提交</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>SELECT COUNT(*) FROM orders WHERE user_id = 103;</code></td>
+<td></td>
+<td>幻读发生：第二次统计，计数为1</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>COMMIT;</code></td>
+<td></td>
+<td>事务A提交</td>
+</tr>
+</tbody>
+</table>
+<p><strong>如何避免</strong>：将事务隔离级别设置为 SERIALIZABLE。</p>
+<h2 id="_3">事务隔离级别</h2>
+<p>SQL标准定义了四种隔离级别，用于解决上述并发问题：</p>
+<table>
+<thead>
+<tr>
+<th>隔离级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>性能</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>读未提交（Read Uncommitted）</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>最高</td>
+</tr>
+<tr>
+<td>读已提交（Read Committed）</td>
+<td>✅</td>
+<td>❌</td>
+<td>❌</td>
+<td>较高</td>
+</tr>
+<tr>
+<td>可重复读（Repeatable Read）</td>
+<td>✅</td>
+<td>✅</td>
+<td>❌</td>
+<td>中等</td>
+</tr>
+<tr>
+<td>串行化（Serializable）</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>最低</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-read-uncommitted">1. 读未提交（Read Uncommitted）</h3>
+<p>最低的隔离级别，允许读取其他事务未提交的数据。不能解决任何并发问题，实际应用中很少使用。</p>
+<h3 id="2-read-committed">2. 读已提交（Read Committed）</h3>
+<p>只能读取其他事务已提交的数据，解决了脏读问题。Oracle等数据库的默认隔离级别。</p>
+<h3 id="3-repeatable-read">3. 可重复读（Repeatable Read）</h3>
+<p>确保同一事务内多次读取同一数据的结果一致，解决了脏读和不可重复读问题。MySQL的InnoDB存储引擎默认隔离级别。</p>
+<p><strong>实现机制</strong>：使用MVCC，事务第一次读取时生成数据快照（Read View），后续读取都基于这个快照。</p>
+<h3 id="4-serializable">4. 串行化（Serializable）</h3>
+<p>最高的隔离级别，完全串行化执行事务，解决了所有并发问题，但性能最差。</p>
+<p><strong>实现机制</strong>：通过加锁实现，所有操作都需要获取锁，读写相互阻塞。</p>
+<h2 id="_4">实践建议</h2>
 <ol>
-<li><strong>数据准备</strong>：收集和标注特定任务或领域的数据</li>
-<li><strong>模型初始化</strong>：使用预训练好的语言模型作为基础</li>
-<li><strong>微调训练</strong>：用标注数据训练模型，调整模型参数</li>
-<li><strong>评估与优化</strong>：评估模型性能，调整超参数，优化模型</li>
+<li>
+<p><strong>合理选择隔离级别</strong>：根据业务需求选择最低的足够隔离级别，通常读已提交或可重复读能满足大多数场景。</p>
+</li>
+<li>
+<p><strong>避免长事务</strong>：长事务会持有锁较长时间，并保留大量Undo Log，影响系统性能和存储空间。</p>
+</li>
+<li>
+<p><strong>注意幻读问题</strong>：在可重复读隔离级别下，写操作（UPDATE/DELETE）仍可能遇到幻读，需要通过加锁（如SELECT ... FOR UPDATE）解决。</p>
+</li>
+<li>
+<p><strong>利用自动提交</strong>：对于单条SQL语句的操作，可以依赖MySQL的自动提交机制；对于多个操作组成的业务逻辑，需要显式使用事务。</p>
+</li>
 </ol>
-<h2 id="sft_2">SFT的作用</h2>
-<ul>
-<li><strong>任务适应</strong>：使通用模型适应特定任务（如文本分类、问答等）</li>
-<li><strong>领域适配</strong>：使模型熟悉特定领域的术语和知识</li>
-<li><strong>行为调整</strong>：调整模型的输出风格、安全性等</li>
-<li><strong>性能提升</strong>：在特定任务上提高模型的准确性和表现</li>
-</ul>
-<h2 id="_1">常见应用场景</h2>
-<ul>
-<li>对话系统：微调模型以生成更符合特定场景的对话</li>
-<li>文本生成：调整模型生成文本的风格、格式等</li>
-<li>情感分析：提高模型在特定领域情感分析的准确性</li>
-<li>机器翻译：优化模型在特定语言对或领域的翻译质量</li>
-</ul>
-<h2 id="_2">关键技术和挑战</h2>
-<ul>
-<li><strong>数据质量</strong>：高质量的标注数据是SFT成功的关键</li>
-<li><strong>过拟合预防</strong>：采用正则化、数据增强等方法防止过拟合</li>
-<li><strong>迁移学习</strong>：有效利用预训练模型的知识</li>
-<li><strong>计算资源</strong>：SFT通常需要大量的计算资源</li>
-</ul>
-<h2 id="_3">典型工具和框架</h2>
-<ul>
-<li>Hugging Face Transformers：提供SFT相关的工具和API</li>
-<li>PyTorch：常用的深度学习框架，支持SFT实现</li>
-<li>TensorFlow：另一个常用的深度学习框架</li>
-<li>PEFT (Parameter-Efficient Fine-Tuning)：参数高效微调方法，减少计算资源需求</li>
-</ul>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 显式使用事务示例</span>
+<span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;A&#39;</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">user_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;B&#39;</span><span class="p">;</span>
+<span class="k">COMMIT</span><span class="p">;</span>
+</code></pre></div>
+<h2 id="_5">总结</h2>
+<p>数据库事务是保证数据一致性和可靠性的基石，ACID特性描述了事务的基本要求。通过不同的隔离级别和MVCC等实现技术，数据库系统在保证数据一致性的同时，尽可能提高并发性能。理解事务的原理和实现机制，对于设计高可用、高一致性的应用系统至关重要。</p>
+<p>在实际开发中，应根据业务特点选择合适的隔离级别，避免过度使用串行化等高级别隔离导致性能下降。同时，注意事务的边界和时长，确保系统既能保证数据一致性，又能维持良好的性能表现。</p>
 
 
 
@@ -1201,6 +1585,60 @@
   
 
 
+
+  <h2 id="__comments">Comments</h2>
+  <!-- Insert generated snippet here -->
+    <script src="https://giscus.app/client.js"
+        data-repo="XJTUGary/XJTUGary.github.io"
+        data-repo-id="R_kgDOPeNkAA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPeNkAM4CuNUz"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
 
       
     </article>
@@ -1229,7 +1667,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../mysql-%E7%B4%A2%E5%BC%95%E8%AF%A6%E8%A7%A3%E4%BB%8E%E5%8E%9F%E7%90%86%E5%88%B0%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/" class="md-footer__link md-footer__link--prev" aria-label="Previous: MySQL 索引详解：从原理到优化实践">
+          <a href="../../01/sft-intro/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Sft intro">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1239,20 +1677,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                MySQL 索引详解：从原理到优化实践
+                Sft intro
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../02/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E4%BB%8Eacid%E7%89%B9%E6%80%A7%E5%88%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E5%AE%9E%E7%8E%B0/" class="md-footer__link md-footer__link--next" aria-label="Next: 深入理解数据库事务：从ACID特性到隔离级别实现">
+          <a href="../rag-intro/" class="md-footer__link md-footer__link--next" aria-label="Next: Rag intro">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                深入理解数据库事务：从ACID特性到隔离级别实现
+                Rag intro
               </div>
             </div>
             <div class="md-footer__button md-icon">
