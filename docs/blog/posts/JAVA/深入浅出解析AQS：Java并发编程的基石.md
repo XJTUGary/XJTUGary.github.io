@@ -200,6 +200,7 @@ public class ConditionObject implements Condition {
 ```
 
 这与同步队列的区别在于：
+
 - **同步队列**：存放等待锁的线程
 - **条件队列**：存放调用了await()主动放弃锁的线程
 
