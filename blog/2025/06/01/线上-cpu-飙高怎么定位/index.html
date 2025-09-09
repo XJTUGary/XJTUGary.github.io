@@ -5,11 +5,10 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<link href="../../16/java-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E7%94%9F%E4%BA%A7%E5%AE%9E%E8%B7%B5/" rel="prev"/>
-<link href="../../19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" rel="next"/>
+<link href="../../../07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/" rel="next"/>
 <link href="../../../../../images/logo.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
-<title>JVM类加载机制详解 - Gary's Blog</title>
+<title>线上 CPU 飙高怎么定位？ - Gary's Blog</title>
 <link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
 <link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -46,7 +45,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              JVM类加载机制详解
+              线上 CPU 飙高怎么定位？
             
           </span>
 </div>
@@ -418,7 +417,7 @@
 <li class="md-nav__item">
 <div class="md-nav__link">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
-<time class="md-ellipsis" datetime="2025-08-17 00:00:00+00:00">Sunday, August 17, 2025</time>
+<time class="md-ellipsis" datetime="2025-06-01 00:00:00+00:00">Sunday, June 1, 2025</time>
 </div>
 </li>
 <li class="md-nav__item">
@@ -427,7 +426,8 @@
 <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/java/">JAVA</a></span>
+                              <a href="../../../../category/sre/">SRE</a>, 
+                              <a href="../../../../category/%E9%9D%A2%E7%BB%8F/">面经</a></span>
 </div>
 </li>
 <li class="md-nav__item">
@@ -435,7 +435,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
 <span class="md-ellipsis">
                             
-                              2 min read
+                              3 min read
                             
                           </span>
 </div>
@@ -454,163 +454,139 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_1">
 <span class="md-ellipsis">
-      类加载全景图
+      核心排查思路：层层递进
     </span>
 </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#system-level-process">
+<span class="md-ellipsis">
+      第一步：定位问题进程（System Level -&gt; Process）
+    </span>
+</a>
+<nav aria-label="第一步：定位问题进程（System Level -&gt; Process）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-top">
+<span class="md-ellipsis">
+      1. 使用 top 命令
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-htop-atop">
+<span class="md-ellipsis">
+      2. 使用 htop 或 atop（增强版）
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#process-thread">
+<span class="md-ellipsis">
+      第二步：定位问题线程（Process -&gt; Thread）
+    </span>
+</a>
+<nav aria-label="第二步：定位问题线程（Process -&gt; Thread）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-top-hp-pid">
+<span class="md-ellipsis">
+      1. 使用 top -Hp &lt;PID&gt; 命令
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#thread-code">
+<span class="md-ellipsis">
+      第三步：定位具体问题（Thread -&gt; Code）
+    </span>
+</a>
+<nav aria-label="第三步：定位具体问题（Thread -&gt; Code）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#a-java">
+<span class="md-ellipsis">
+      情况A：如果是 Java 应用
+    </span>
+</a>
+<nav aria-label="情况A：如果是 Java 应用" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-id-tid">
+<span class="md-ellipsis">
+      1. 将线程 ID (TID) 转换为十六进制
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-java">
+<span class="md-ellipsis">
+      2. 打印 Java 线程栈并分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-arthas">
+<span class="md-ellipsis">
+      3. 使用阿里 Arthas（神器推荐）
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#b-ccgolang">
+<span class="md-ellipsis">
+      情况B：如果是 C/C++、Golang 等原生应用
+    </span>
+</a>
+<nav aria-label="情况B：如果是 C/C++、Golang 等原生应用" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-pstack-pid">
+<span class="md-ellipsis">
+      1. 使用 pstack &lt;PID&gt; 命令
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-gdb">
+<span class="md-ellipsis">
+      2. 使用 gdb 调试器（高级）
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-perf">
+<span class="md-ellipsis">
+      3. 使用 perf（性能分析神器）
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_2">
 <span class="md-ellipsis">
-      示例类代码
+      第四步：根因分析与解决
     </span>
 </a>
 </li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#loading">
-<span class="md-ellipsis">
-      阶段一：加载（Loading）
-    </span>
-</a>
-<nav aria-label="阶段一：加载（Loading）" class="md-nav">
-<ul class="md-nav__list">
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_3">
 <span class="md-ellipsis">
-      核心任务
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_4">
-<span class="md-ellipsis">
-      具体操作流程
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_5">
-<span class="md-ellipsis">
-      关键特点
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#verification">
-<span class="md-ellipsis">
-      阶段二：验证（Verification）
-    </span>
-</a>
-<nav aria-label="阶段二：验证（Verification）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_6">
-<span class="md-ellipsis">
-      核心任务
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_7">
-<span class="md-ellipsis">
-      四层验证机制
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_8">
-<span class="md-ellipsis">
-      验证失败示例
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#preparation">
-<span class="md-ellipsis">
-      阶段三：准备（Preparation）
-    </span>
-</a>
-<nav aria-label="阶段三：准备（Preparation）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_9">
-<span class="md-ellipsis">
-      核心任务
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_10">
-<span class="md-ellipsis">
-      内存分配规则
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_11">
-<span class="md-ellipsis">
-      示例处理
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#resolution">
-<span class="md-ellipsis">
-      阶段四：解析（Resolution）
-    </span>
-</a>
-<nav aria-label="阶段四：解析（Resolution）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_12">
-<span class="md-ellipsis">
-      核心任务
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_13">
-<span class="md-ellipsis">
-      三种核心解析
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_14">
-<span class="md-ellipsis">
-      解析过程示例
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_15">
-<span class="md-ellipsis">
-      完整流程图示
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_16">
-<span class="md-ellipsis">
-      技术要点总结
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#_17">
-<span class="md-ellipsis">
-      结语
+      总结与排查清单
     </span>
 </a>
 </li>
@@ -620,306 +596,166 @@
 </div>
 </div>
 <article class="md-content__inner md-typeset">
-<h1>JVM类加载机制详解</h1>
-<p>在Java虚拟机（JVM）中，<strong>类加载机制</strong>是Java程序运行的核心基础。当我们在Java程序中创建一个新对象或访问静态成员时，JVM需要经历一个精密的类加载过程。本文将深入解析类加载过程中的四个关键阶段：<strong>加载（Loading）</strong>、<strong>验证（Verification）</strong>、<strong>准备（Preparation）</strong> 和<strong>解析（Resolution）</strong>，通过具体示例揭示JVM如何将.class文件转化为可执行代码。</p>
+<h1>线上 CPU 飙高怎么定位？</h1>
+<p>CPU 使用率飙高是线上系统最常见的故障之一，它会导致服务响应变慢、超时，甚至雪崩。本文将带你一步步揭开谜底，精准定位到导致问题的具体代码行。</p>
 <!-- more -->
-<h2 id="_1">类加载全景图</h2>
-<p>在深入各阶段前，先了解整个类加载流程：</p>
-<div class="mermaid">graph LR
-    A[加载 Loading] --&gt; B
+<h2 id="_1">核心排查思路：层层递进</h2>
+<p>整个排查过程遵循一个清晰的链条，如下图所示，它展示了从发现问题到定位根因的完整路径：</p>
+<div class="mermaid">flowchart TD
+    A[报告: CPU使用率飙高] --&gt; B[第一步: 定位问题进程]
+    B --&gt; C[第二步: 定位问题线程]
+    C --&gt; D[第三步: 定位线程内问题]
+    D --&gt; E{是否为Java进程?}
 
-    subgraph 链接 Linking
-        B[验证 Verification] --&gt; C[准备 Preparation]
-        C --&gt; D[解析 Resolution]
-    end
+    E -- Yes --&gt; F[<b>Java应用</b><br/>使用jstack打印线程栈<br/>转换TID为十六进制<br/>在栈信息中查找nid]
+    F --&gt; G[分析栈信息找到问题代码行]
 
-    D --&gt; E[初始化 Initialization]
+    E -- No --&gt; H[<b>非Java应用</b><br/>使用gdb/pstack<br/>附加到进程分析线程栈]
+    H --&gt; G
+
+    G --&gt; I[第四步: 根因分析与解决]
 </div>
-<p>今天我们将重点解析验证→准备→解析 这三个阶段，这些阶段共同构成<strong>链接（Linking）</strong> 过程。</p>
 <hr/>
-<h2 id="_2">示例类代码</h2>
-<p>为便于理解，我们使用一个简单的<code>Employee</code>类作为示例：
-<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Employee</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// 常量</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">COMPANY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"TechCorp"</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// 静态变量</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">totalEmployees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// 实例变量</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
-
-<span class="w">    </span><span class="c1">// 方法</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
-<span class="w">    </span><span class="p">}</span>
-
-<span class="w">    </span><span class="c1">// 引用其他类</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">Department</span><span class="w"> </span><span class="nf">getDepartment</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">class</span> <span class="nc">Department</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Engineering"</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></p>
-<hr/>
-<h2 id="loading">阶段一：加载（Loading）</h2>
-<h3 id="_3">核心任务</h3>
-<p>查找并加载类的二进制数据（.class文件）</p>
-<h3 id="_4">具体操作流程</h3>
-<ol>
-<li><strong>定位类文件</strong>：通过全限定名（如<code>com/example/Employee</code>）查找.class文件</li>
-<li><strong>读取字节码</strong>：将.class文件内容读入内存</li>
-<li><strong>创建类结构</strong>：在方法区创建类的运行时数据结构</li>
-<li><strong>生成Class对象</strong>：在堆中创建对应的<code>java.lang.Class</code>实例</li>
-</ol>
-<div class="mermaid">graph LR
-A[ClassLoader] --&gt; B[查找 Employee.class]
-B --&gt; C[读取字节码]
-C --&gt; D[在方法区创建类结构]
-D --&gt; E[在堆中创建 Class 对象]
-</div>
-<h3 id="_5">关键特点</h3>
+<h2 id="system-level-process">第一步：定位问题进程（System Level -&gt; Process）</h2>
+<p>当监控系统报警或用户反馈系统变卡时，我们首先需要确定是哪个进程在消耗大量的 CPU 资源。</p>
+<h3 id="1-top">1. 使用 <code>top</code> 命令</h3>
+<p>登录服务器，执行 <code>top</code> 命令。这是最基础、最强大的系统监控工具。</p>
 <ul>
-<li><strong>类加载器层级</strong>：Bootstrap → Extension → Application → Custom</li>
-<li><strong>数据来源</strong>：JAR文件、网络、动态生成等</li>
-<li><strong>结果</strong>：方法区存储类元数据，堆中生成<code>Employee.class</code>对象</li>
+<li><strong>操作</strong>：<ol>
+<li>在命令行输入 <code>top</code>，然后按回车。</li>
+<li>看显示结果的第一部分（摘要信息）：<code>%Cpu(s)</code> 行会显示总的 CPU 使用情况（us-用户, sy-系统, id-空闲）。</li>
+<li><strong>看列表的左上角</strong>：<code>PID</code>（进程ID）、<code>USER</code>（用户）、<code>%CPU</code>（CPU使用率）、<code>%MEM</code>（内存使用率）、<code>COMMAND</code>（命令）。</li>
+</ol>
+</li>
+<li><strong>技巧</strong>：<ul>
+<li>按下 <strong><code>Shift + P</code></strong>（大写P），让进程列表按 <strong>CPU 使用率降序</strong>排列。消耗 CPU 最高的进程会排在第一行。</li>
+<li>按下 <strong><code>1</code></strong>（数字1），可以展开显示所有 CPU 核心的单独使用情况，看看是否是单核跑满。</li>
 </ul>
-<blockquote>
-<p>📌 <strong>重要提示</strong>：加载阶段完成后，JVM已掌握类的基本结构信息，但此时类还<strong>不能直接使用</strong>。</p>
-</blockquote>
+</li>
+</ul>
+<p><strong>目标</strong>：找到 <code>%CPU</code> 异常高的进程，并记下它的 <strong>PID</strong>（例如：<code>PID 12345</code>）。</p>
+<h3 id="2-htop-atop">2. 使用 <code>htop</code> 或 <code>atop</code>（增强版）</h3>
+<p>如果系统安装了 <code>htop</code>，它提供了比 <code>top</code> 更直观的视图（支持颜色、树状结构、鼠标操作等），用法类似。</p>
 <hr/>
-<h2 id="verification">阶段二：验证（Verification）</h2>
-<h3 id="_6">核心任务</h3>
-<p>确保加载的类符合JVM规范且不会危害虚拟机安全</p>
-<h3 id="_7">四层验证机制</h3>
-<ol>
-<li>
-<p><strong>文件格式验证</strong> - 检查字节码文件结构
-   <div class="highlight"><pre><span></span><code><span class="c1">// 检查魔数CAFEBABE（合法.class文件开头）</span>
-<span class="mh">0xCAFEBABE</span>
-</code></pre></div></p>
+<h2 id="process-thread">第二步：定位问题线程（Process -&gt; Thread）</h2>
+<p>一个进程由多个线程组成。现在我们知道是哪个进程有问题了，接下来需要深入这个进程内部，找到是哪个<strong>线程</strong>在疯狂占用 CPU。</p>
+<h3 id="1-top-hp-pid">1. 使用 <code>top -Hp &lt;PID&gt;</code> 命令</h3>
+<ul>
+<li><strong>操作</strong>：在上一步找到问题进程的 PID 后，执行 <code>top -Hp 12345</code>。<ul>
+<li><code>-H</code>：表示显示线程（Threads）。</li>
+<li><code>-p</code>：指定特定的进程 ID。</li>
+</ul>
 </li>
-<li>
-<p><strong>元数据验证</strong> - 语义检查
-   <div class="highlight"><pre><span></span><code><span class="c1">// 检查示例：</span>
-<span class="o">-</span><span class="w"> </span><span class="n">是否继承了final类</span><span class="err">？</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">非法</span>
-<span class="o">-</span><span class="w"> </span><span class="n">非抽象类是否实现所有接口方法</span><span class="err">？</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">必须实现</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>字节码验证</strong> - 程序逻辑检查
-   <div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="c1">// 验证：</span>
-<span class="w">    </span><span class="c1">// 1. 操作数栈类型匹配 ✔</span>
-<span class="w">    </span><span class="c1">// 2. 跳转指令不会跳出方法 ✔</span>
-<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="na">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>符号引用验证</strong> - 常量池检查
-   <div class="highlight"><pre><span></span><code><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span><span class="w"> </span><span class="c1">// 验证Department类是否存在且可访问</span>
-</code></pre></div></p>
-</li>
-</ol>
-<h3 id="_8">验证失败示例</h3>
-<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Invalid</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">jump</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">        </span><span class="k">goto</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span><span class="w">  </span><span class="c1">// 无效字节码指令 → 验证失败</span>
-<span class="w">    </span><span class="p">}</span>
-<span class="p">}</span>
+<li><strong>技巧</strong>：同样，在 <code>top -Hp</code> 的界面中，按下 <strong><code>Shift + P</code></strong> 按 CPU 使用率排序。</li>
+</ul>
+<p><strong>目标</strong>：找到这个进程下 <code>%CPU</code> 异常高的线程，并记下它的 <strong>线程ID（TID）</strong>。例如，我们发现 <code>TID 12346</code> 的线程占用了 99% 的 CPU。</p>
+<hr/>
+<h2 id="thread-code">第三步：定位具体问题（Thread -&gt; Code）</h2>
+<p>这是最关键的一步，我们需要查看这个高负载线程到底在执行什么代码。</p>
+<h3 id="a-java">情况A：如果是 Java 应用</h3>
+<p>Java 应用是线上 CPU 飙高的重灾区，通常是因为死循环、频繁 GC、锁竞争等。</p>
+<h4 id="1-id-tid">1. 将线程 ID (TID) 转换为十六进制</h4>
+<p>操作系统看到的 TID 是十进制，而 Java 线程栈中的 <code>nid</code>（原生ID）是十六进制。我们需要转换一下。</p>
+<ul>
+<li><strong>操作</strong>：使用 <code>printf</code> 命令进行转换。
+    <div class="highlight"><pre><span></span><code><span class="nb">printf</span><span class="w"> </span><span class="s2">"%x\n"</span><span class="w"> </span><span class="m">12346</span><span class="w">  </span><span class="c1"># 输出：303a</span>
 </code></pre></div>
-<blockquote>
-<p>⚠️ <strong>性能提示</strong>：验证阶段可能消耗类加载总时间的30%-50%，现代JVM使用<strong>栈映射帧（StackMapTable）</strong> 优化此过程。</p>
-</blockquote>
-<hr/>
-<h2 id="preparation">阶段三：准备（Preparation）</h2>
-<h3 id="_9">核心任务</h3>
-<p>为<strong>类变量（静态变量）</strong> 分配内存并设置初始值</p>
-<h3 id="_10">内存分配规则</h3>
-<table>
-<thead>
-<tr>
-<th>变量类型</th>
-<th>初始值</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>int</code>/<code>short</code></td>
-<td>0</td>
-</tr>
-<tr>
-<td><code>long</code></td>
-<td>0L</td>
-</tr>
-<tr>
-<td><code>float</code></td>
-<td>0.0f</td>
-</tr>
-<tr>
-<td><code>double</code></td>
-<td>0.0d</td>
-</tr>
-<tr>
-<td><code>char</code></td>
-<td>'\u0000'</td>
-</tr>
-<tr>
-<td><code>boolean</code></td>
-<td>false</td>
-</tr>
-<tr>
-<td><strong>引用类型</strong></td>
-<td><strong>null</strong></td>
-</tr>
-</tbody>
-</table>
-<h3 id="_11">示例处理</h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// 普通静态变量 → 零值初始化</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">totalEmployees</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w">  </span><span class="c1">// 准备阶段赋值为0</span>
-
-<span class="c1">// 常量（final static）→ 直接赋真实值</span>
-<span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">COMPANY</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"TechCorp"</span><span class="p">;</span><span class="w"> </span><span class="c1">// 准备阶段赋值为"TechCorp"</span>
-</code></pre></div>
-<blockquote>
-<p>🔍 <strong>关键区别</strong>：普通静态变量在准备阶段初始化为<strong>零值</strong>，而常量直接赋予<strong>真实值</strong>。</p>
-</blockquote>
-<hr/>
-<h2 id="resolution">阶段四：解析（Resolution）</h2>
-<h3 id="_12">核心任务</h3>
-<p>将常量池中的<strong>符号引用</strong>转换为<strong>直接引用</strong></p>
-<h3 id="_13">三种核心解析</h3>
-<ol>
-<li>
-<p><strong>类/接口解析</strong>
-<div class="highlight"><pre><span></span><code><span class="c1">// 符号引用：Department</span>
-<span class="c1">// 转换为直接引用：方法区中Department类的内存指针</span>
-<span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Department</span><span class="p">();</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>字段解析</strong>
-<div class="highlight"><pre><span></span><code><span class="c1">// 字段：Department.name</span>
-<span class="c1">// 转换为：字段在内存中的偏移量</span>
-<span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"Engineering"</span><span class="p">;</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>方法解析</strong>
-<div class="highlight"><pre><span></span><code><span class="c1">// 方法：Employee.setName()</span>
-<span class="c1">// 转换为：方法在方法表中的实际入口地址</span>
-<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">setName</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</code></pre></div></p>
-</li>
+    记下这个十六进制值 <code>303a</code>。</li>
+</ul>
+<h4 id="2-java">2. 打印 Java 线程栈并分析</h4>
+<ul>
+<li><strong>操作</strong>：使用 <code>jstack</code> 命令打印进程的线程快照。
+    <div class="highlight"><pre><span></span><code>jstack<span class="w"> </span>-l<span class="w"> </span><span class="m">12345</span><span class="w"> </span>&gt;<span class="w"> </span>jstack_dump.log<span class="w">  </span><span class="c1"># 将输出重定向到文件</span>
+</code></pre></div></li>
+<li><strong>分析</strong>：<ol>
+<li>用 <code>vim</code>、<code>cat</code> 或 <code>less</code> 打开 <code>jstack_dump.log</code> 文件。</li>
+<li>在文件中搜索我们刚才转换得到的十六进制 <code>nid</code>：<code>/0x303a</code>。</li>
+<li>找到对应的线程栈信息，这就会直接告诉你<strong>正在执行的代码行</strong>。</li>
 </ol>
-<h3 id="_14">解析过程示例</h3>
-<div class="highlight"><pre><span></span><code><span class="n">常量池条目</span><span class="err">（</span><span class="n">符号引用</span><span class="err">）：</span>
-<span class="w">  </span><span class="err">#</span><span class="mi">7</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Class</span><span class="w">        </span><span class="err">#</span><span class="mi">25</span><span class="w">   </span><span class="c1">// Department</span>
-<span class="w">  </span><span class="err">#</span><span class="mi">8</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Methodref</span><span class="w">    </span><span class="err">#</span><span class="mf">7.</span><span class="err">#</span><span class="mi">26</span><span class="w"> </span><span class="c1">// Department.&lt;init&gt;()</span>
-
-<span class="n">解析后</span><span class="err">：</span>
-<span class="w">  </span><span class="n">直接引用指向</span><span class="err">：</span>
-<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">Department类在方法区的位置</span>
-<span class="w">    </span><span class="o">-</span><span class="w"> </span><span class="n">构造函数的代码入口地址</span>
+</li>
+</ul>
+<p><strong>示例分析</strong>：
+假设搜索后找到如下栈信息：
+<div class="highlight"><pre><span></span><code><span class="s">"http-nio-8080-exec-1"</span><span class="w"> </span><span class="err">#</span><span class="mi">32</span><span class="w"> </span><span class="n">daemon</span><span class="w"> </span><span class="n">prio</span><span class="o">=</span><span class="mi">5</span><span class="w"> </span><span class="n">os_prio</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">tid</span><span class="o">=</span><span class="mh">0x00007fc1d414e000</span><span class="w"> </span><span class="n">nid</span><span class="o">=</span><span class="mh">0x303a</span><span class="w"> </span><span class="n">runnable</span><span class="w"> </span><span class="o">[</span><span class="mh">0x00007fc1c5dd7000</span><span class="o">]</span>
+<span class="w">   </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">State</span><span class="p">:</span><span class="w"> </span><span class="n">RUNNABLE</span>
+<span class="w">        </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">example</span><span class="p">.</span><span class="na">app</span><span class="p">.</span><span class="na">ExpensiveService</span><span class="p">.</span><span class="na">calculate</span><span class="p">(</span><span class="n">ExpensiveService</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">25</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;--</span><span class="w"> </span><span class="n">问题在这里</span><span class="err">！</span>
+<span class="w">        </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">example</span><span class="p">.</span><span class="na">app</span><span class="p">.</span><span class="na">ExpensiveController</span><span class="p">.</span><span class="na">getData</span><span class="p">(</span><span class="n">ExpensiveController</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">15</span><span class="p">)</span>
+<span class="w">        </span><span class="p">...</span>
 </code></pre></div>
-<blockquote>
-<p>⏱️ <strong>延迟解析</strong>：现代JVM通常采用<strong>延迟解析</strong>策略，直到符号引用首次使用时才执行解析。</p>
-</blockquote>
-<hr/>
-<h2 id="_15">完整流程图示</h2>
-<div class="mermaid">sequenceDiagram
-    participant CL as ClassLoader
-    participant M as Method Area
-    participant H as Heap
-
-    Note over CL: 1. 加载
-    CL-&gt;&gt;M: 查找Employee.class
-    CL-&gt;&gt;M: 创建类元数据
-    CL-&gt;&gt;H: 创建Class对象
-
-    Note over M: 2. 验证
-    M--&gt;&gt;M: 文件格式检查
-    M--&gt;&gt;M: 元数据验证
-    M--&gt;&gt;M: 字节码验证
-    M--&gt;&gt;M: 符号引用验证
-
-    Note over M: 3. 准备
-    M-&gt;&gt;M: 分配静态变量空间
-    M-&gt;&gt;M: totalEmployees = 0
-    M-&gt;&gt;M: COMPANY = "TechCorp" (常量)
-
-    Note over M: 4. 解析
-    M-&gt;&gt;M: 解析Department类引用
-    M-&gt;&gt;M: 解析字段/方法引用
-</div>
-<hr/>
-<h2 id="_16">技术要点总结</h2>
-<table>
-<thead>
-<tr>
-<th>阶段</th>
-<th>核心任务</th>
-<th>是否触发类加载</th>
-<th>线程安全</th>
-<th>耗时占比</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>加载</td>
-<td>创建Class对象/方法区结构</td>
-<td>是</td>
-<td>❌</td>
-<td>10%-20%</td>
-</tr>
-<tr>
-<td>验证</td>
-<td>字节码安全性检查</td>
-<td>否</td>
-<td>✔</td>
-<td>30%-50%</td>
-</tr>
-<tr>
-<td>准备</td>
-<td>静态变量零值初始化</td>
-<td>否</td>
-<td>✔</td>
-<td>5%-10%</td>
-</tr>
-<tr>
-<td>解析</td>
-<td>符号引用→直接引用</td>
-<td>可能</td>
-<td>✔</td>
-<td>10%-30%</td>
-</tr>
-</tbody>
-</table>
-<p><strong>关键特性</strong>：</p>
-<ol>
-<li>
-<p><strong>解析触发加载</strong>：解析阶段可能触发其他类的加载（如解析<code>Department</code>时）</p>
-</li>
-<li>
-<p><strong>常量特殊处理</strong>：final常量在准备阶段直接赋值</p>
-</li>
-<li>
-<p><strong>线程安全</strong>：除加载阶段外，其他阶段都是线程安全的</p>
-</li>
-<li>
-<p><strong>性能优化</strong>：JIT编译器会优化高频调用的解析结果</p>
-</li>
+这清晰地指出，问题出现在 <code>ExpensiveService.java</code> 文件的第 <code>25</code> 行。可能是一个计算密集型的循环、一个死循环、或者一个阻塞操作。</p>
+<h4 id="3-arthas">3. 使用阿里 Arthas（神器推荐）</h4>
+<p>如果你觉得上面步骤麻烦，强烈推荐使用阿里开源的 <strong>Arthas</strong>。它可以在不中断服务的情况下进行动态诊断。</p>
+<ul>
+<li><strong>操作</strong>：<ol>
+<li><code>arthas-boot.jar</code> 启动 Arthas，并附加到目标 Java 进程。</li>
+<li>执行 <code>thread</code> 命令查看所有线程的 CPU 使用率。
+    <div class="highlight"><pre><span></span><code>thread<span class="w">          </span><span class="c1"># 查看所有线程信息</span>
+thread<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span><span class="w">     </span><span class="c1"># 查看最忙的3个线程</span>
+thread<span class="w"> </span>&lt;TID&gt;<span class="w">    </span><span class="c1"># 查看指定线程的栈</span>
+</code></pre></div></li>
+<li>它可以<strong>直接显示消耗 CPU 最高的线程及其栈信息</strong>，无需手动转换十六进制，非常高效。</li>
 </ol>
+</li>
+</ul>
+<h3 id="b-ccgolang">情况B：如果是 C/C++、Golang 等原生应用</h3>
+<p>对于非 Java 应用，我们使用其他工具来查看线程栈。</p>
+<h4 id="1-pstack-pid">1. 使用 <code>pstack &lt;PID&gt;</code> 命令</h4>
+<p><code>pstack</code> 可以打印一个进程的栈信息。
+<div class="highlight"><pre><span></span><code>pstack<span class="w"> </span><span class="m">12345</span>
+</code></pre></div>
+它会输出所有线程的调用栈。你需要从一大堆栈信息中找到与之前 <code>top -Hp</code> 中找到的高 CPU 线程 TID 相对应的那个栈。这可能需要一些眼力。</p>
+<h4 id="2-gdb">2. 使用 <code>gdb</code> 调试器（高级）</h4>
+<p><code>gdb</code> 功能强大，但使用时需谨慎，因为它会挂起进程。</p>
+<ul>
+<li><strong>操作</strong>：
+    <div class="highlight"><pre><span></span><code>gdb<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w">          </span><span class="c1"># 附加到进程</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w">          </span><span class="c1"># 查看所有线程</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w"> </span>apply<span class="w"> </span>all<span class="w"> </span>bt<span class="w">  </span><span class="c1"># 打印所有线程的栈信息</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w"> </span><span class="m">2</span><span class="w">        </span><span class="c1"># 切换到 TID 为 2 的线程</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>bt<span class="w">              </span><span class="c1"># 打印该线程的栈</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>detach<span class="w">          </span><span class="c1"># 脱离进程，让进程继续运行</span>
+<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>quit<span class="w">            </span><span class="c1"># 退出</span>
+</code></pre></div></li>
+</ul>
+<h4 id="3-perf">3. 使用 <code>perf</code>（性能分析神器）</h4>
+<p>Linux 的 <code>perf</code> 工具可以同时对系统和进程进行性能分析。</p>
+<ul>
+<li><strong>操作</strong>：
+    <div class="highlight"><pre><span></span><code><span class="c1"># 采样系统所有进程的 CPU 使用情况</span>
+perf<span class="w"> </span>top
+
+<span class="c1"># 采样特定进程的 CPU 使用情况，并显示调用链</span>
+perf<span class="w"> </span>top<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w"> </span>-g
+
+<span class="c1"># 记录分析数据到文件，便于详细分析</span>
+perf<span class="w"> </span>record<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w"> </span>-g<span class="w"> </span>--<span class="w"> </span>sleep<span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c1"># 采样30秒</span>
+perf<span class="w"> </span>report<span class="w"> </span>-n<span class="w">                         </span><span class="c1"># 查看报告</span>
+</code></pre></div>
+<code>perf</code> 的输出会直接显示哪些<strong>函数</strong>占用了最高的 CPU 周期，非常直观。</li>
+</ul>
 <hr/>
-<h2 id="_17">结语</h2>
-<p>理解JVM的类加载机制对于<strong>性能优化</strong>、<strong>内存管理</strong>和<strong>安全加固</strong>至关重要。通过深入分析加载、验证、准备、解析四个阶段，我们不仅能看到JVM如何保障程序的正确执行，也能理解为何Java能在保持安全性的同时实现"一次编写，到处运行"的承诺。</p>
-<blockquote>
-<p>当你在Java中写下<code>new Employee()</code>时，背后正是这些精密配合的加载阶段在默默工作，将静态的字节码转化为动态的执行能力。这正是Java虚拟机工程艺术的完美体现！</p>
-</blockquote>
+<h2 id="_2">第四步：根因分析与解决</h2>
+<p>找到具体的代码行后，剩下的就是具体的业务逻辑分析了。常见的 CPU 飙高原因包括：</p>
+<ol>
+<li><strong>无限循环/死循环</strong>：检查循环条件和终止条件。</li>
+<li><strong>算法复杂度高</strong>：是否存在未优化的 <code>O(n^2)</code>、<code>O(2^n)</code> 复杂度的算法？</li>
+<li><strong>频繁的 GC</strong>：对于 Java，如果是因为频繁 Full GC，那么 <code>%CPU</code> 高可能只是表象，根源是内存问题。需要用 <code>jstat -gcutil &lt;PID&gt;</code> 命令进一步确认 GC 情况。</li>
+<li><strong>锁竞争激烈</strong>：线程处于 <code>BLOCKED</code> 状态，疯狂自旋尝试获取锁，也会导致 CPU 飙高。查看线程栈中是否有大量的 <code>locked &lt;0x0000000712345abc&gt;</code> 等信息。</li>
+<li><strong>IO 操作变为同步阻塞</strong>：比如网络调用超时时间设置过长，导致大量线程阻塞在 IO 上（但这种情况通常 CPU 不高，如果是网络轮询则可能高）。</li>
+</ol>
+<h2 id="_3">总结与排查清单</h2>
+<p>下次遇到线上 CPU 飙高，按照这个清单操作，你就能从容应对：</p>
+<ol>
+<li><strong><code>top</code></strong> -&gt; 按 <strong><code>Shift+P</code></strong> -&gt; 找到高 CPU 的 <strong>PID</strong>。</li>
+<li><strong><code>top -Hp &lt;PID&gt;</code></strong> -&gt; 按 <strong><code>Shift+P</code></strong> -&gt; 找到高 CPU 的 <strong>TID</strong>。</li>
+<li><strong>判断应用类型</strong>：<ul>
+<li><strong>Java</strong>：<code>printf "%x\n" &lt;TID&gt;</code> -&gt; <code>jstack &lt;PID&gt; | grep -A 20 &lt;nid&gt;</code> 或直接使用 <strong>Arthas</strong> (<code>thread</code> 命令)。</li>
+<li><strong>非Java</strong>：<code>pstack &lt;PID&gt;</code> 或 <code>gdb -p &lt;PID&gt;</code> 或 <code>perf top -p &lt;PID&gt; -g</code>。</li>
+</ul>
+</li>
+<li><strong>分析线程栈</strong>，定位到具体代码行，结合业务逻辑解决问题。</li>
+</ol>
+<p>记住，预防优于治疗。在开发阶段做好代码审查、性能测试和压测，并建立完善的监控系统（如 APM 应用性能监控），才能在问题出现前或出现初期就及时发现和解决。</p>
 <h2 id="__comments">Comments</h2>
 <!-- Insert generated snippet here -->
 <script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
@@ -971,26 +807,13 @@ D --&gt; E[在堆中创建 Class 对象]
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Previous: Java 线程池深度解析：从底层原理到生产实践" class="md-footer__link md-footer__link--prev" href="../../16/java-%E7%BA%BF%E7%A8%8B%E6%B1%A0%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E7%94%9F%E4%BA%A7%E5%AE%9E%E8%B7%B5/">
-<div class="md-footer__button md-icon">
-<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
-</div>
-<div class="md-footer__title">
-<span class="md-footer__direction">
-                Previous
-              </span>
-<div class="md-ellipsis">
-                Java 线程池深度解析：从底层原理到生产实践
-              </div>
-</div>
-</a>
-<a aria-label="Next: 蚂蚁面试官：介绍设计模式及其在工作中的应用？" class="md-footer__link md-footer__link--next" href="../../19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">
+<a aria-label="Next: Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择" class="md-footer__link md-footer__link--next" href="../../../07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/">
 <div class="md-footer__title">
 <span class="md-footer__direction">
                 Next
               </span>
 <div class="md-ellipsis">
-                蚂蚁面试官：介绍设计模式及其在工作中的应用？
+                Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择
               </div>
 </div>
 <div class="md-footer__button md-icon">
