@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../../../06/05/appen%E9%9D%A2%E8%AF%95%E5%AE%98%E7%BA%BF%E4%B8%8Ajava%E5%BA%94%E7%94%A8oom%E9%97%AE%E9%A2%98%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/">
+        <link rel="prev" href="../../04/%E9%9D%A2%E8%AF%95%E5%AE%98%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3500-internal-server-error/">
       
       
-        <link rel="next" href="../../08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
+        <link rel="next" href="../../../07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择 - Gary's Blog</title>
+        <title>Appen面试官：线上Java应用OOM问题怎么排查？ - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#jvm" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择
+              Appen面试官：线上Java应用OOM问题怎么排查？
             
           </span>
         </div>
@@ -1089,7 +1089,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-07-01 00:00:00+00:00" class="md-ellipsis">Tuesday, July 1, 2025</time>
+                        <time datetime="2025-06-05 00:00:00+00:00" class="md-ellipsis">Thursday, June 5, 2025</time>
                       </div>
                     </li>
                     
@@ -1100,7 +1100,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/redis/">Redis</a></span>
+                              <a href="../../../../category/sre/">SRE</a>, 
+                              <a href="../../../../category/%E9%9D%A2%E7%BB%8F/">面经</a></span>
                         </div>
                       </li>
                     
@@ -1138,28 +1139,19 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#jvm" class="md-nav__link">
     <span class="md-ellipsis">
-      一、为什么需要持久化？
+      二、排查工具准备：JVM监控工具集
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rdbredis-database" class="md-nav__link">
-    <span class="md-ellipsis">
-      二、RDB（Redis Database）持久化
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="二、RDB（Redis Database）持久化">
+    <nav class="md-nav" aria-label="二、排查工具准备：JVM监控工具集">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
-      1. 工作原理
+      1. 基础命令行工具
     </span>
   </a>
   
@@ -1168,34 +1160,7 @@
           <li class="md-nav__item">
   <a href="#2" class="md-nav__link">
     <span class="md-ellipsis">
-      2. 创建方式
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. 优点
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. 缺点
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 核心技术与配置
+      2. 可视化分析工具
     </span>
   </a>
   
@@ -1207,19 +1172,19 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#aofappend-only-file" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      三、AOF（Append Only File）持久化
+      三、关键步骤：生成堆内存快照
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="三、AOF（Append Only File）持久化">
+    <nav class="md-nav" aria-label="三、关键步骤：生成堆内存快照">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#1_1" class="md-nav__link">
     <span class="md-ellipsis">
-      1. 工作原理
+      1. 主动生成堆转储
     </span>
   </a>
   
@@ -1228,43 +1193,7 @@
           <li class="md-nav__item">
   <a href="#2_1" class="md-nav__link">
     <span class="md-ellipsis">
-      2. 执行流程
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3-appendfsync" class="md-nav__link">
-    <span class="md-ellipsis">
-      3. appendfsync 策略
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. 优点
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      5. 缺点
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6-aof-rewrite" class="md-nav__link">
-    <span class="md-ellipsis">
-      6. AOF 重写（Rewrite）
+      2. 自动生成堆转储（推荐线上使用）
     </span>
   </a>
   
@@ -1276,9 +1205,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#rdb-aof" class="md-nav__link">
+  <a href="#oom" class="md-nav__link">
     <span class="md-ellipsis">
-      四、RDB 与 AOF 的对比总结
+      四、OOM场景复现与代码示例
     </span>
   </a>
   
@@ -1287,18 +1216,135 @@
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      五、混合持久化：两全其美的解决方案
+      五、堆转储分析实战
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="五、堆转储分析实战">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-mat" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 使用MAT分析堆转储
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 常见内存泄漏模式
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 识别问题代码
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#oom_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      六、线上OOM问题排查流程总结
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="六、线上OOM问题排查流程总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 事前预防
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 事中响应
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 事后分析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 修复验证
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      六、如何选择？
+      七、最佳实践与预防措施
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="七、最佳实践与预防措施">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 代码开发阶段
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 测试阶段
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 生产环境
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1317,156 +1363,183 @@
 
 
 
-  <h1>Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择</h1>
+  <h1>Appen面试官：线上Java应用OOM问题怎么排查？</h1>
 
-<p>Redis 因其卓越的性能和丰富的数据结构而成为最流行的缓存和内存数据库之一。然而，由于其数据主要存储在内存中，服务器断电或重启会导致所有数据丢失。为了解决这个问题，Redis 提供了两种核心的持久化机制：<strong>RDB</strong> 和 <strong>AOF</strong>。理解它们的原理、优缺点和适用场景，是高效、可靠使用 Redis 的关键。</p>
-<p>本文将深入探讨 RDB 和 AOF，并介绍结合两者优点的混合持久化方案。</p>
+<p>OutOfMemoryError（简称OOM）是Java应用程序中最严重的问题之一，它意味着JVM的堆内存已被完全耗尽，垃圾回收器无法回收出足够的空间来创建新对象。线上环境发生OOM会导致应用服务不可用，直接影响用户体验和业务连续性。本文将全面介绍如何系统化地排查和解决Java应用中的OOM问题。</p>
 <!-- more -->
 
-<p><img alt="" src="../../../../Redis/images/Redis%20%E6%8C%81%E4%B9%85%E5%8C%96.jpg" /></p>
-<h3 id="_1">一、为什么需要持久化？</h3>
-<p>Redis 基于内存，读写速度极快。但内存是<strong>易失性存储</strong>，进程退出后数据就会消失。持久化的核心目的就是将内存中的数据以某种形式保存到<strong>非易失性存储</strong>（如磁盘）上，从而在 Redis 重启后能够恢复数据，防止数据丢失，保证数据的耐久性。</p>
-<hr />
-<h3 id="rdbredis-database">二、RDB（Redis Database）持久化</h3>
-<h4 id="1">1. 工作原理</h4>
-<p>RDB 的核心思想是<strong>创建数据快照</strong>。它在<strong>某个时间点</strong>将当前 Redis 实例中所有数据以<strong>二进制压缩格式</strong>保存到一个 <code>.rdb</code> 文件中。这个文件是一个全量数据备份。</p>
-<h4 id="2">2. 创建方式</h4>
-<p>RDB 文件的创建有两种命令：
-*   <strong><code>SAVE</code></strong>：<strong>同步</strong>执行。主线程会立即执行快照保存操作，在此期间会<strong>阻塞</strong>所有其他客户端请求。<strong>生产环境严禁使用</strong>。
-*   <strong><code>BGSAVE</code></strong> (Background Save)：<strong>异步</strong>执行。主进程会 <strong><code>fork</code></strong> 出一个<strong>子进程</strong>，由子进程负责创建 RDB 文件，主进程继续处理客户端请求，避免了阻塞。这是推荐的方式。</p>
-<h4 id="3">3. 优点</h4>
-<ul>
-<li><strong>数据恢复速度快</strong>：RDB 是紧凑的二进制文件，重启时直接加载到内存，恢复大数据集的速度远快于 AOF。</li>
-<li><strong>适合灾难恢复</strong>：可以将单个 <code>.rdb</code> 文件远程传输到其他地方，用于容灾备份。</li>
-<li><strong>最大化性能</strong>：<code>fork</code> 子进程进行保存，对主进程性能影响最小。</li>
-<li><strong>文件更紧凑</strong>：二进制格式，在保存相同数据集时，文件体积通常比 AOF 小。</li>
-</ul>
-<h4 id="4">4. 缺点</h4>
-<ul>
-<li><strong>数据易丢失</strong>：RDB 是<strong>定时快照</strong>，如果 Redis 意外宕机，从上一次快照到宕机之间的数据会全部丢失。</li>
-<li><strong><code>fork</code> 可能耗时</strong>：虽然主进程不阻塞，但 <code>fork</code> 操作本身在数据量巨大时可能比较耗时，如果 CPU 性能不佳，可能会导致 Redis 服务暂停数毫秒甚至更长。</li>
-</ul>
-<h4 id="5">5. 核心技术与配置</h4>
-<ul>
-<li><strong>Copy-On-Write (COW，写时复制)</strong>：这是 <code>BGSAVE</code> 得以实现的关键。<code>fork</code> 出的子进程与主进程共享同一片内存数据。当主进程要修改某一块数据时，操作系统会将该块数据复制一份副本，主进程在这个副本上进行修改。因此，子进程看到的数据永远是 <code>fork</code> 那一刻的快照，完美解决了线程安全问题且无需加锁。</li>
-<li><strong>配置策略</strong>：在 <code>redis.conf</code> 中可配置触发 <code>BGSAVE</code> 的条件。例如：
-    <div class="highlight"><pre><span></span><code>save 900 1      # 900秒（15分钟）内至少有1个key发生变化
-save 300 10     # 300秒（5分钟）内至少有10个key发生变化
-save 60 10000   # 60秒内至少有10000个key发生变化
-</code></pre></div></li>
-</ul>
-<hr />
-<h3 id="aofappend-only-file">三、AOF（Append Only File）持久化</h3>
-<h4 id="1_1">1. 工作原理</h4>
-<p>AOF 的核心思想是<strong>记录写命令</strong>。它将每一个<strong>写操作命令</strong>以 Redis 协议格式追加到 AOF 文件的末尾。当 Redis 重启时，会<strong>重新执行</strong> AOF 文件中的所有命令来重建数据集。</p>
-<h4 id="2_1">2. 执行流程</h4>
-<ol>
-<li><strong>命令执行</strong>：客户端发送写命令。</li>
-<li><strong>命令追加</strong>：命令执行完成后，将其追加到 <strong>AOF 缓冲区</strong>。</li>
-<li><strong>文件写入与同步</strong>：根据配置的 <strong><code>appendfsync</code></strong> 策略，将缓冲区中的数据写入和同步到磁盘的 AOF 文件。</li>
-</ol>
-<h4 id="3-appendfsync">3. <code>appendfsync</code> 策略</h4>
-<p>这是影响 AOF 性能和数据安全性的关键配置：
-*   <strong><code>always</code></strong>：<strong>每次写命令</strong>都执行 <code>fsync</code> 同步刷盘。数据最安全，<strong>绝对不会丢失</strong>，但性能最差，IO 开销巨大。
-*   <strong><code>everysec</code></strong> (<strong>默认策略</strong>)：<strong>每秒</strong>执行一次 <code>fsync</code> 同步刷盘。在性能和数据安全之间取得了平衡，最多只会丢失 <strong>1 秒钟</strong>的数据。
-*   <strong><code>no</code></strong>：由操作系统决定何时刷盘。性能最好，但数据最不安全，一旦宕机可能丢失大量数据。</p>
-<h4 id="4_1">4. 优点</h4>
-<ul>
-<li><strong>数据安全性高</strong>：使用默认的 <code>everysec</code> 策略，也最多只丢失 1 秒的数据。</li>
-<li><strong>可读性强</strong>：AOF 文件以文本协议格式存储，易于理解和手动修改（例如清除某些误操作命令）。</li>
-</ul>
-<h4 id="5_1">5. 缺点</h4>
-<ul>
-<li><strong>文件体积大</strong>：即使是对同一个 key 的多次操作，所有命令都会被记录，导致文件不断膨胀。</li>
-<li><strong>数据恢复速度慢</strong>：恢复数据需要重新执行所有命令，当 AOF 文件很大时，恢复过程非常耗时。</li>
-</ul>
-<h4 id="6-aof-rewrite">6. AOF 重写（Rewrite）</h4>
-<p>为了解决 AOF 文件膨胀的问题，Redis 提供了 <strong>AOF 重写</strong>机制。
-*   <strong>原理</strong>：创建一个新的 AOF 文件，这个文件包含了<strong>重建当前数据集所需的最少命令集合</strong>。例如，对一个 key 的 100 次 <code>set</code> 操作，重写后只会保留最后一次 <code>set</code> 操作。重写过程由 <code>BGREWRITEAOF</code> 命令触发，也是通过 <code>fork</code> 子进程在后台完成，不会阻塞主进程。
-*   <strong>触发方式</strong>：可配置在 AOF 文件大小增长到一定比例时自动触发。
-    <div class="highlight"><pre><span></span><code>auto-aof-rewrite-percentage 100 # 当前AOF文件比上次重写后文件大小增长100%时
-auto-aof-rewrite-min-size 64mb  # 且AOF文件体积大于64MB时
-</code></pre></div></p>
-<hr />
-<h3 id="rdb-aof">四、RDB 与 AOF 的对比总结</h3>
+<h2 id="jvm">二、排查工具准备：JVM监控工具集</h2>
+<h3 id="1">1. 基础命令行工具</h3>
+<p>JDK提供了一系列强大的命令行工具，用于监控JVM状态和内存使用情况：</p>
 <table>
 <thead>
 <tr>
-<th style="text-align: left;">特性</th>
-<th style="text-align: left;">RDB</th>
-<th style="text-align: left;">AOF</th>
+<th>工具</th>
+<th>主要功能</th>
+<th>常用命令示例</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: left;"><strong>持久化方式</strong></td>
-<td style="text-align: left;">定时全量数据快照</td>
-<td style="text-align: left;">记录每次写命令</td>
+<td>jps</td>
+<td>查看Java进程状态</td>
+<td><code>jps -l</code>（显示所有Java进程及其主类）</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>数据完整性</strong></td>
-<td style="text-align: left;">不完整，两次备份之间数据会丢失</td>
-<td style="text-align: left;">相对完整，取决于 <code>fsync</code> 策略</td>
+<td>jstat</td>
+<td>监控JVM统计信息（GC、类加载、运行时编译等）</td>
+<td><code>jstat -gcutil &lt;pid&gt; 1s</code>（每秒显示GC统计信息）</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>文件体积</strong></td>
-<td style="text-align: left;">小（二进制压缩）</td>
-<td style="text-align: left;">大（文本命令日志）</td>
+<td>jinfo</td>
+<td>查看和修改JVM参数</td>
+<td><code>jinfo -flags &lt;pid&gt;</code>（查看进程所有JVM参数）</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>数据恢复速度</strong></td>
-<td style="text-align: left;"><strong>快</strong>（直接加载二进制数据）</td>
-<td style="text-align: left;"><strong>慢</strong>（需重新执行所有命令）</td>
+<td>jmap</td>
+<td>生成堆转储快照和堆内存使用摘要</td>
+<td><code>jmap -heap &lt;pid&gt;</code>（显示堆摘要信息）</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>对性能影响</strong></td>
-<td style="text-align: left;"><code>fork</code> 时可能耗时，但日常影响小</td>
-<td style="text-align: left;">写入和 <code>fsync</code> 会有一定开销</td>
+<td>jstack</td>
+<td>生成线程转储快照，用于分析线程状态</td>
+<td><code>jstack &lt;pid&gt;</code>（显示线程堆栈信息）</td>
 </tr>
 <tr>
-<td style="text-align: left;"><strong>灾难恢复</strong></td>
-<td style="text-align: left;">单个文件，易于备份和传输</td>
-<td style="text-align: left;">日志文件，恢复逻辑相对复杂</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>优先级</strong></td>
-<td style="text-align: left;">Redis 重启时，如果同时开启，<strong>AOF 优先级更高</strong></td>
-<td style="text-align: left;"></td>
+<td>jhat</td>
+<td>分析堆转储文件</td>
+<td><code>jhat heap-dump.hprof</code>（启动分析服务）</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h3 id="_2">五、混合持久化：两全其美的解决方案</h3>
-<p>Redis 4.0 引入了<strong>混合持久化</strong>（<code>aof-use-rdb-preamble</code>），旨在结合 RDB 和 AOF 的优点。</p>
+<h3 id="2">2. 可视化分析工具</h3>
 <ul>
-<li>
-<p><strong>工作原理</strong>：</p>
+<li><strong>VisualVM</strong>：JDK自带的全功能可视化工具，支持监控、线程分析、堆转储分析</li>
+<li><strong>MAT（Memory Analyzer Tool）</strong>：Eclipse基金会推出的专业内存分析工具，适合深度分析内存泄漏</li>
+<li><strong>JProfiler</strong>：商业级全功能性能分析工具，提供更丰富的分析和可视化功能</li>
+</ul>
+<h2 id="_1">三、关键步骤：生成堆内存快照</h2>
+<p>堆转储（Heap Dump）是分析OOM问题的关键证据，它记录了JVM堆中所有对象的内存分配情况。</p>
+<h3 id="1_1">1. 主动生成堆转储</h3>
+<p>当应用运行异常但尚未崩溃时，可以使用jmap主动生成堆转储：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 生成堆转储文件</span>
+jmap<span class="w"> </span>-dump:format<span class="o">=</span>b,file<span class="o">=</span>./heapdump.hprof<span class="w"> </span>&lt;pid&gt;
+
+<span class="c1"># 只存活对象转储（推荐）</span>
+jmap<span class="w"> </span>-dump:live,format<span class="o">=</span>b,file<span class="o">=</span>./heapdump.hprof<span class="w"> </span>&lt;pid&gt;
+</code></pre></div>
+<h3 id="2_1">2. 自动生成堆转储（推荐线上使用）</h3>
+<p>在JVM启动参数中配置，让系统在发生OOM时自动生成堆转储：</p>
+<div class="highlight"><pre><span></span><code>java<span class="w"> </span>-Xms2g<span class="w"> </span>-Xmx2g<span class="w"> </span><span class="se">\</span>
+-XX:+HeapDumpOnOutOfMemoryError<span class="w"> </span><span class="se">\</span>
+-XX:HeapDumpPath<span class="o">=</span>./logs/heapdump.hprof<span class="w"> </span><span class="se">\</span>
+-XX:+PrintGCDetails<span class="w"> </span><span class="se">\</span>
+-XX:+PrintGCDateStamps<span class="w"> </span><span class="se">\</span>
+-Xloggc:./logs/gc.log<span class="w"> </span><span class="se">\</span>
+-jar<span class="w"> </span>your-application.jar
+</code></pre></div>
+<p>关键参数说明：</p>
+<ul>
+<li><code>-XX:+HeapDumpOnOutOfMemoryError</code>：OOM时自动生成堆转储</li>
+<li><code>-XX:HeapDumpPath</code>：指定堆转储文件保存路径</li>
+<li><code>-XX:+PrintGCDetails</code>和<code>-Xloggc</code>：记录GC日志，辅助分析</li>
+</ul>
+<h2 id="oom">四、OOM场景复现与代码示例</h2>
+<p>以下是一个模拟OOM的代码示例，用于演示和练习OOM排查：</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.ArrayList</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.List</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.UUID</span><span class="p">;</span>
+
+<span class="cm">/**</span>
+<span class="cm"> * OOM测试示例</span>
+<span class="cm"> * JVM参数：-Xms10m -Xmx10m -XX:+HeapDumpOnOutOfMemoryError</span>
+<span class="cm"> */</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">OOMDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">leakList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;开始模拟内存泄漏...&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// 不断向静态列表添加数据，模拟内存泄漏</span>
+<span class="w">            </span><span class="n">leakList</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">UUID</span><span class="p">.</span><span class="na">randomUUID</span><span class="p">().</span><span class="na">toString</span><span class="p">());</span>
+<span class="w">            </span><span class="n">count</span><span class="o">++</span><span class="p">;</span>
+
+<span class="w">            </span><span class="c1">// 每添加1000条输出一次</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">count</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;已添加 &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot; 条数据，当前内存使用: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span>
+<span class="w">                    </span><span class="n">Runtime</span><span class="p">.</span><span class="na">getRuntime</span><span class="p">().</span><span class="na">totalMemory</span><span class="p">()</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;MB&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>这段代码会不断向一个静态列表添加数据，由于静态变量的生命周期与类相同，这些对象无法被GC回收，最终会导致OOM。</p>
+<h2 id="_2">五、堆转储分析实战</h2>
+<h3 id="1-mat">1. 使用MAT分析堆转储</h3>
 <ol>
-<li>当触发 AOF 重写时，<strong>子进程会先将当前内存中的数据以 RDB 二进制格式写入新的 AOF 文件</strong>。</li>
-<li>然后，<strong>主进程会将重写缓冲区中的增量写命令（以 AOF 格式）追加到新的 AOF 文件中</strong>。</li>
-<li>最终生成的新的 AOF 文件是一个“<strong>RDB 头 + AOF 尾</strong>”的混合体。</li>
+<li><strong>打开堆转储文件</strong>：启动MAT，File → Open Heap Dump</li>
+<li><strong>查看泄漏嫌疑报告</strong>：MAT会自动生成Leak Suspects Report，直接指出可能的内存问题</li>
+<li><strong>分析直方图</strong>：查看各个类的实例数量和内存占用</li>
+<li><strong>分析支配树</strong>：识别保持最多内存的对象</li>
+<li><strong>线程概览</strong>：查看线程栈和线程本地变量</li>
 </ol>
-</li>
-<li>
-<p><strong>优势</strong>：</p>
+<h3 id="2_2">2. 常见内存泄漏模式</h3>
 <ul>
-<li><strong>重启效率高</strong>：Redis 重启时，可以<strong>先快速加载 RDB 部分</strong>的数据，然后再<strong>重放增量 AOF 命令</strong>。恢复速度大幅提升。</li>
-<li><strong>数据更安全</strong>：最多只丢失重写前后一秒的数据，兼具了 AOF 的数据安全性。</li>
+<li><strong>静态集合类引起泄漏</strong>：静态集合的生命周期与应用一致，其中的对象不会释放</li>
+<li><strong>未关闭的资源</strong>：数据库连接、文件流等未正确关闭</li>
+<li><strong>监听器和回调未移除</strong>：注册了监听器但没有取消注册</li>
+<li><strong>内部类持有外部类引用</strong>：非静态内部类隐式持有外部类引用</li>
+<li><strong>缓存无限增长</strong>：使用无界缓存且没有淘汰策略</li>
 </ul>
-</li>
-</ul>
-<p><strong>开启方式</strong>：在 <code>redis.conf</code> 中设置 <code>aof-use-rdb-preamble yes</code>（需要先开启 AOF）。</p>
-<hr />
-<h3 id="_3">六、如何选择？</h3>
+<h3 id="3">3. 识别问题代码</h3>
+<p>通过MAT的"Path to GC Roots"功能，可以找到保持对象的引用链，从而定位到问题代码位置。例如，如果发现某个业务对象数量异常多，可以通过引用链找到创建这些对象的代码位置。</p>
+<h2 id="oom_1">六、线上OOM问题排查流程总结</h2>
+<h3 id="1_2">1. 事前预防</h3>
 <ul>
-<li><strong>数据安全性要求极高</strong>：优先使用 <strong>AOF</strong>，并配置 <code>appendfsync always</code>（牺牲性能）。</li>
-<li><strong>追求极致性能，允许分钟级数据丢失</strong>：使用 <strong>RDB</strong>。</li>
-<li><strong>希望平衡性能与安全</strong>：使用 <strong>AOF</strong>，并配置 <code>appendfsync everysec</code>（<strong>默认且推荐的配置</strong>）。</li>
-<li><strong>Redis 4.0+ 版本，想要快速重启且数据丢失少</strong>：开启 <strong>混合持久化</strong>，这是目前大多数生产环境的最佳实践。</li>
+<li>配置OOM时自动生成堆转储参数</li>
+<li>设置合理的JVM内存参数</li>
+<li>实施应用性能监控(APM)</li>
 </ul>
-<blockquote>
-<p><strong>重要提示</strong>：持久化机制的目的是<strong>保证数据在重启后不丢失</strong>，但它<strong>不能替代备份</strong>！你仍然需要定期将 RDB 或 AOF 文件备份到异地容灾中心，以防服务器磁盘损坏等极端情况。</p>
-</blockquote>
+<h3 id="2_3">2. 事中响应</h3>
+<ul>
+<li>收到告警后立即确认问题影响范围</li>
+<li>保存当前堆转储(如果应用尚未完全崩溃)</li>
+<li>检查GC日志和应用日志</li>
+</ul>
+<h3 id="3_1">3. 事后分析</h3>
+<ul>
+<li>使用MAT分析堆转储文件</li>
+<li>识别内存占用最大的对象和保持这些对象的引用链</li>
+<li>定位到具体代码问题</li>
+</ul>
+<h3 id="4">4. 修复验证</h3>
+<ul>
+<li>修复内存泄漏代码</li>
+<li>在测试环境验证修复效果</li>
+<li>部署到生产环境并持续监控</li>
+</ul>
+<h2 id="_3">七、最佳实践与预防措施</h2>
+<h3 id="1_3">1. 代码开发阶段</h3>
+<ul>
+<li>避免使用静态集合存储大量数据</li>
+<li>及时关闭资源，使用try-with-resources语句</li>
+<li>谨慎使用内部类和匿名类</li>
+<li>对缓存使用大小限制和过期策略</li>
+</ul>
+<h3 id="2_4">2. 测试阶段</h3>
+<ul>
+<li>进行压力测试和长时间运行测试</li>
+<li>使用Profiler工具分析内存使用情况</li>
+</ul>
+<h3 id="3_2">3. 生产环境</h3>
+<ul>
+<li>配置完善的监控和告警系统</li>
+<li>定期检查堆内存使用情况和GC效率</li>
+<li>建立应急预案和回滚机制</li>
+</ul>
+<p>通过系统化的监控、分析和预防措施，可以大大降低线上OOM发生的概率，并在问题发生时快速定位和解决，保障应用的稳定性和可靠性。</p>
 
 
 
@@ -1565,7 +1638,7 @@ auto-aof-rewrite-min-size 64mb  # 且AOF文件体积大于64MB时
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../../06/05/appen%E9%9D%A2%E8%AF%95%E5%AE%98%E7%BA%BF%E4%B8%8Ajava%E5%BA%94%E7%94%A8oom%E9%97%AE%E9%A2%98%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Appen面试官：线上Java应用OOM问题怎么排查？">
+          <a href="../../04/%E9%9D%A2%E8%AF%95%E5%AE%98%E6%80%8E%E4%B9%88%E8%A7%A3%E5%86%B3500-internal-server-error/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 面试官：怎么解决500 Internal Server Error？">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1575,20 +1648,20 @@ auto-aof-rewrite-min-size 64mb  # 且AOF文件体积大于64MB时
                 Previous
               </span>
               <div class="md-ellipsis">
-                Appen面试官：线上Java应用OOM问题怎么排查？
+                面试官：怎么解决500 Internal Server Error？
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/" class="md-footer__link md-footer__link--next" aria-label="Next: 深入分析ThreadLocal：原理、内存泄漏与最佳实践">
+          <a href="../../../07/01/redis-%E6%8C%81%E4%B9%85%E5%8C%96%E8%AF%A6%E8%A7%A3%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3-rdb-%E4%B8%8E-aof-%E7%9A%84%E6%9D%83%E8%A1%A1%E4%B8%8E%E9%80%89%E6%8B%A9/" class="md-footer__link md-footer__link--next" aria-label="Next: Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                深入分析ThreadLocal：原理、内存泄漏与最佳实践
+                Redis 持久化详解：深入理解 RDB 与 AOF 的权衡与选择
               </div>
             </div>
             <div class="md-footer__button md-icon">
