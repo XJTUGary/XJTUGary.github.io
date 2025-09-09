@@ -5,10 +5,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
-<link href="../../02/%E9%9D%A2%E8%AF%95%E5%AE%98%E5%86%85%E5%AD%98%E5%8F%AA%E6%9C%89200m%E5%A6%82%E4%BD%95%E8%AF%BB%E5%8F%961g%E6%96%87%E4%BB%B6%E5%B9%B6%E7%BB%9F%E8%AE%A1%E9%87%8D%E5%A4%8D%E5%86%85%E5%AE%B9/" rel="next"/>
+<link href="../../01/%E7%BA%BF%E4%B8%8A-cpu-%E9%A3%99%E9%AB%98%E6%80%8E%E4%B9%88%E5%AE%9A%E4%BD%8D/" rel="prev"/>
+<link href="../../03/%E5%A6%82%E4%BD%95%E6%8E%92%E6%9F%A5%E6%AD%BB%E9%94%81%E5%AE%9E%E6%88%98%E8%AF%8A%E6%96%AD%E6%B5%81%E7%A8%8B/" rel="next"/>
 <link href="../../../../../images/logo.png" rel="icon"/>
 <meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
-<title>线上 CPU 飙高怎么定位？ - Gary's Blog</title>
+<title>面试官：内存只有200M，如何读取1G文件并统计重复内容？ - Gary's Blog</title>
 <link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
 <link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -45,7 +46,7 @@
 <div class="md-header__topic" data-md-component="header-topic">
 <span class="md-ellipsis">
             
-              线上 CPU 飙高怎么定位？
+              面试官：内存只有200M，如何读取1G文件并统计重复内容？
             
           </span>
 </div>
@@ -417,7 +418,7 @@
 <li class="md-nav__item">
 <div class="md-nav__link">
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
-<time class="md-ellipsis" datetime="2025-06-01 00:00:00+00:00">Sunday, June 1, 2025</time>
+<time class="md-ellipsis" datetime="2025-06-02 00:00:00+00:00">Monday, June 2, 2025</time>
 </div>
 </li>
 <li class="md-nav__item">
@@ -426,7 +427,6 @@
 <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/sre/">SRE</a>, 
                               <a href="../../../../category/%E9%9D%A2%E7%BB%8F/">面经</a></span>
 </div>
 </li>
@@ -435,7 +435,7 @@
 <svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
 <span class="md-ellipsis">
                             
-                              3 min read
+                              2 min read
                             
                           </span>
 </div>
@@ -454,141 +454,130 @@
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_1">
 <span class="md-ellipsis">
-      核心排查思路：层层递进
+      场景分析
     </span>
 </a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#system-level-process">
-<span class="md-ellipsis">
-      第一步：定位问题进程（System Level -&gt; Process）
-    </span>
-</a>
-<nav aria-label="第一步：定位问题进程（System Level -&gt; Process）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#1-top">
-<span class="md-ellipsis">
-      1. 使用 top 命令
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#2-htop-atop">
-<span class="md-ellipsis">
-      2. 使用 htop 或 atop（增强版）
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#process-thread">
-<span class="md-ellipsis">
-      第二步：定位问题线程（Process -&gt; Thread）
-    </span>
-</a>
-<nav aria-label="第二步：定位问题线程（Process -&gt; Thread）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#1-top-hp-pid">
-<span class="md-ellipsis">
-      1. 使用 top -Hp &lt;PID&gt; 命令
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#thread-code">
-<span class="md-ellipsis">
-      第三步：定位具体问题（Thread -&gt; Code）
-    </span>
-</a>
-<nav aria-label="第三步：定位具体问题（Thread -&gt; Code）" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#a-java">
-<span class="md-ellipsis">
-      情况A：如果是 Java 应用
-    </span>
-</a>
-<nav aria-label="情况A：如果是 Java 应用" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#1-id-tid">
-<span class="md-ellipsis">
-      1. 将线程 ID (TID) 转换为十六进制
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#2-java">
-<span class="md-ellipsis">
-      2. 打印 Java 线程栈并分析
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#3-arthas">
-<span class="md-ellipsis">
-      3. 使用阿里 Arthas（神器推荐）
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#b-ccgolang">
-<span class="md-ellipsis">
-      情况B：如果是 C/C++、Golang 等原生应用
-    </span>
-</a>
-<nav aria-label="情况B：如果是 C/C++、Golang 等原生应用" class="md-nav">
-<ul class="md-nav__list">
-<li class="md-nav__item">
-<a class="md-nav__link" href="#1-pstack-pid">
-<span class="md-ellipsis">
-      1. 使用 pstack &lt;PID&gt; 命令
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#2-gdb">
-<span class="md-ellipsis">
-      2. 使用 gdb 调试器（高级）
-    </span>
-</a>
-</li>
-<li class="md-nav__item">
-<a class="md-nav__link" href="#3-perf">
-<span class="md-ellipsis">
-      3. 使用 perf（性能分析神器）
-    </span>
-</a>
-</li>
-</ul>
-</nav>
-</li>
-</ul>
-</nav>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_2">
 <span class="md-ellipsis">
-      第四步：根因分析与解决
+      为什么不能简单读取？
     </span>
 </a>
 </li>
 <li class="md-nav__item">
 <a class="md-nav__link" href="#_3">
 <span class="md-ellipsis">
-      总结与排查清单
+      解决方案：分而治之（外部排序与归并）
     </span>
 </a>
+<nav aria-label="解决方案：分而治之（外部排序与归并）" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      核心思路：哈希分片
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      详细步骤
+    </span>
+</a>
+<nav aria-label="详细步骤" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1">
+<span class="md-ellipsis">
+      1. 哈希分片阶段
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2">
+<span class="md-ellipsis">
+      2. 统计每个分片
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3">
+<span class="md-ellipsis">
+      3. 清理临时文件（可选）
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      关键考虑因素
+    </span>
+</a>
+<nav aria-label="关键考虑因素" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1_1">
+<span class="md-ellipsis">
+      1. 如何确定分片数量？
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2_1">
+<span class="md-ellipsis">
+      2. 哈希函数的选择
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3_1">
+<span class="md-ellipsis">
+      3. 处理哈希冲突
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      优化策略
+    </span>
+</a>
+<nav aria-label="优化策略" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1_2">
+<span class="md-ellipsis">
+      1. 多阶段处理
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-">
+<span class="md-ellipsis">
+      2. 磁盘-内存平衡
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3_2">
+<span class="md-ellipsis">
+      3. 并行处理
+    </span>
+</a>
+</li>
+</ul>
+</nav>
 </li>
 </ul>
 </nav>
@@ -596,166 +585,159 @@
 </div>
 </div>
 <article class="md-content__inner md-typeset">
-<h1>线上 CPU 飙高怎么定位？</h1>
-<p>CPU 使用率飙高是线上系统最常见的故障之一，它会导致服务响应变慢、超时，甚至雪崩。本文将带你一步步揭开谜底，精准定位到导致问题的具体代码行。</p>
+<h1>面试官：内存只有200M，如何读取1G文件并统计重复内容？</h1>
+<p>内存只有200M，如何读取1G文件并统计重复内容？一道经典的大数据面试题，考察的是对内存限制下数据处理思路的理解</p>
 <!-- more -->
-<h2 id="_1">核心排查思路：层层递进</h2>
-<p>整个排查过程遵循一个清晰的链条，如下图所示，它展示了从发现问题到定位根因的完整路径：</p>
+<h2 id="_1">场景分析</h2>
+<p>这是一道非常经典的大数据处理面试题，考察的核心是：<strong>当数据量远大于内存容量时，如何通过算法设计来解决问题</strong>。</p>
+<p><strong>关键约束条件：</strong></p>
+<ul>
+<li>内存限制：200MB</li>
+<li>文件大小：1GB</li>
+<li>任务：统计文件中内容的重复次数（假设文件由多行文本组成）</li>
+</ul>
+<h2 id="_2">为什么不能简单读取？</h2>
+<p>首先需要明白的是，<strong>不能</strong>使用简单的一次性读取方式：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 这是错误做法！会导致内存溢出</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'large_file.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>  <span class="c1"># 1GB文件会占用1GB内存！</span>
+    <span class="c1"># 处理内容...</span>
+</code></pre></div>
+<p>即使是逐行读取，如果尝试在内存中维护所有行的计数，同样可能超出内存限制：</p>
+<div class="highlight"><pre><span></span><code><span class="n">count_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'large_file.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">count_dict</span><span class="p">:</span>
+            <span class="n">count_dict</span><span class="p">[</span><span class="n">line</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">count_dict</span><span class="p">[</span><span class="n">line</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># 可能包含太多不重复行，导致内存不足</span>
+</code></pre></div>
+<h2 id="_3">解决方案：分而治之（外部排序与归并）</h2>
+<h3 id="_4">核心思路：哈希分片</h3>
+<p>解决方案的核心思想是：<strong>将大文件分割成多个小文件，确保相同内容总是出现在同一个文件中，然后分别处理每个小文件</strong>。</p>
 <div class="mermaid">flowchart TD
-    A[报告: CPU使用率飙高] --&gt; B[第一步: 定位问题进程]
-    B --&gt; C[第二步: 定位问题线程]
-    C --&gt; D[第三步: 定位线程内问题]
-    D --&gt; E{是否为Java进程?}
+    A[1GB大文件] --&gt; B[哈希分片处理]
 
-    E -- Yes --&gt; F[<b>Java应用</b><br/>使用jstack打印线程栈<br/>转换TID为十六进制<br/>在栈信息中查找nid]
-    F --&gt; G[分析栈信息找到问题代码行]
+    subgraph B [分片阶段]
+        B1[逐行读取文件]
+        B2[计算每行哈希值]
+        B3[根据哈希值分配到不同小文件]
+    end
 
-    E -- No --&gt; H[<b>非Java应用</b><br/>使用gdb/pstack<br/>附加到进程分析线程栈]
-    H --&gt; G
+    B --&gt; C[生成20个小文件<br/>每个约50MB]
 
-    G --&gt; I[第四步: 根因分析与解决]
+    C --&gt; D[并行处理每个小文件]
+
+    subgraph D [统计阶段]
+        D1[读取小文件1到内存]
+        D2[统计小文件1内重复内容]
+        D3[保存结果1]
+
+        D4[读取小文件2到内存]
+        D5[统计小文件2内重复内容]
+        D6[保存结果2]
+
+        D7[......]
+    end
+
+    D --&gt; E[合并所有结果]
 </div>
-<hr/>
-<h2 id="system-level-process">第一步：定位问题进程（System Level -&gt; Process）</h2>
-<p>当监控系统报警或用户反馈系统变卡时，我们首先需要确定是哪个进程在消耗大量的 CPU 资源。</p>
-<h3 id="1-top">1. 使用 <code>top</code> 命令</h3>
-<p>登录服务器，执行 <code>top</code> 命令。这是最基础、最强大的系统监控工具。</p>
-<ul>
-<li><strong>操作</strong>：<ol>
-<li>在命令行输入 <code>top</code>，然后按回车。</li>
-<li>看显示结果的第一部分（摘要信息）：<code>%Cpu(s)</code> 行会显示总的 CPU 使用情况（us-用户, sy-系统, id-空闲）。</li>
-<li><strong>看列表的左上角</strong>：<code>PID</code>（进程ID）、<code>USER</code>（用户）、<code>%CPU</code>（CPU使用率）、<code>%MEM</code>（内存使用率）、<code>COMMAND</code>（命令）。</li>
-</ol>
-</li>
-<li><strong>技巧</strong>：<ul>
-<li>按下 <strong><code>Shift + P</code></strong>（大写P），让进程列表按 <strong>CPU 使用率降序</strong>排列。消耗 CPU 最高的进程会排在第一行。</li>
-<li>按下 <strong><code>1</code></strong>（数字1），可以展开显示所有 CPU 核心的单独使用情况，看看是否是单核跑满。</li>
-</ul>
-</li>
-</ul>
-<p><strong>目标</strong>：找到 <code>%CPU</code> 异常高的进程，并记下它的 <strong>PID</strong>（例如：<code>PID 12345</code>）。</p>
-<h3 id="2-htop-atop">2. 使用 <code>htop</code> 或 <code>atop</code>（增强版）</h3>
-<p>如果系统安装了 <code>htop</code>，它提供了比 <code>top</code> 更直观的视图（支持颜色、树状结构、鼠标操作等），用法类似。</p>
-<hr/>
-<h2 id="process-thread">第二步：定位问题线程（Process -&gt; Thread）</h2>
-<p>一个进程由多个线程组成。现在我们知道是哪个进程有问题了，接下来需要深入这个进程内部，找到是哪个<strong>线程</strong>在疯狂占用 CPU。</p>
-<h3 id="1-top-hp-pid">1. 使用 <code>top -Hp &lt;PID&gt;</code> 命令</h3>
-<ul>
-<li><strong>操作</strong>：在上一步找到问题进程的 PID 后，执行 <code>top -Hp 12345</code>。<ul>
-<li><code>-H</code>：表示显示线程（Threads）。</li>
-<li><code>-p</code>：指定特定的进程 ID。</li>
-</ul>
-</li>
-<li><strong>技巧</strong>：同样，在 <code>top -Hp</code> 的界面中，按下 <strong><code>Shift + P</code></strong> 按 CPU 使用率排序。</li>
-</ul>
-<p><strong>目标</strong>：找到这个进程下 <code>%CPU</code> 异常高的线程，并记下它的 <strong>线程ID（TID）</strong>。例如，我们发现 <code>TID 12346</code> 的线程占用了 99% 的 CPU。</p>
-<hr/>
-<h2 id="thread-code">第三步：定位具体问题（Thread -&gt; Code）</h2>
-<p>这是最关键的一步，我们需要查看这个高负载线程到底在执行什么代码。</p>
-<h3 id="a-java">情况A：如果是 Java 应用</h3>
-<p>Java 应用是线上 CPU 飙高的重灾区，通常是因为死循环、频繁 GC、锁竞争等。</p>
-<h4 id="1-id-tid">1. 将线程 ID (TID) 转换为十六进制</h4>
-<p>操作系统看到的 TID 是十进制，而 Java 线程栈中的 <code>nid</code>（原生ID）是十六进制。我们需要转换一下。</p>
-<ul>
-<li><strong>操作</strong>：使用 <code>printf</code> 命令进行转换。
-    <div class="highlight"><pre><span></span><code><span class="nb">printf</span><span class="w"> </span><span class="s2">"%x\n"</span><span class="w"> </span><span class="m">12346</span><span class="w">  </span><span class="c1"># 输出：303a</span>
-</code></pre></div>
-    记下这个十六进制值 <code>303a</code>。</li>
-</ul>
-<h4 id="2-java">2. 打印 Java 线程栈并分析</h4>
-<ul>
-<li><strong>操作</strong>：使用 <code>jstack</code> 命令打印进程的线程快照。
-    <div class="highlight"><pre><span></span><code>jstack<span class="w"> </span>-l<span class="w"> </span><span class="m">12345</span><span class="w"> </span>&gt;<span class="w"> </span>jstack_dump.log<span class="w">  </span><span class="c1"># 将输出重定向到文件</span>
-</code></pre></div></li>
-<li><strong>分析</strong>：<ol>
-<li>用 <code>vim</code>、<code>cat</code> 或 <code>less</code> 打开 <code>jstack_dump.log</code> 文件。</li>
-<li>在文件中搜索我们刚才转换得到的十六进制 <code>nid</code>：<code>/0x303a</code>。</li>
-<li>找到对应的线程栈信息，这就会直接告诉你<strong>正在执行的代码行</strong>。</li>
-</ol>
-</li>
-</ul>
-<p><strong>示例分析</strong>：
-假设搜索后找到如下栈信息：
-<div class="highlight"><pre><span></span><code><span class="s">"http-nio-8080-exec-1"</span><span class="w"> </span><span class="err">#</span><span class="mi">32</span><span class="w"> </span><span class="n">daemon</span><span class="w"> </span><span class="n">prio</span><span class="o">=</span><span class="mi">5</span><span class="w"> </span><span class="n">os_prio</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">tid</span><span class="o">=</span><span class="mh">0x00007fc1d414e000</span><span class="w"> </span><span class="n">nid</span><span class="o">=</span><span class="mh">0x303a</span><span class="w"> </span><span class="n">runnable</span><span class="w"> </span><span class="o">[</span><span class="mh">0x00007fc1c5dd7000</span><span class="o">]</span>
-<span class="w">   </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">State</span><span class="p">:</span><span class="w"> </span><span class="n">RUNNABLE</span>
-<span class="w">        </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">example</span><span class="p">.</span><span class="na">app</span><span class="p">.</span><span class="na">ExpensiveService</span><span class="p">.</span><span class="na">calculate</span><span class="p">(</span><span class="n">ExpensiveService</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">25</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;--</span><span class="w"> </span><span class="n">问题在这里</span><span class="err">！</span>
-<span class="w">        </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">example</span><span class="p">.</span><span class="na">app</span><span class="p">.</span><span class="na">ExpensiveController</span><span class="p">.</span><span class="na">getData</span><span class="p">(</span><span class="n">ExpensiveController</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">15</span><span class="p">)</span>
-<span class="w">        </span><span class="p">...</span>
-</code></pre></div>
-这清晰地指出，问题出现在 <code>ExpensiveService.java</code> 文件的第 <code>25</code> 行。可能是一个计算密集型的循环、一个死循环、或者一个阻塞操作。</p>
-<h4 id="3-arthas">3. 使用阿里 Arthas（神器推荐）</h4>
-<p>如果你觉得上面步骤麻烦，强烈推荐使用阿里开源的 <strong>Arthas</strong>。它可以在不中断服务的情况下进行动态诊断。</p>
-<ul>
-<li><strong>操作</strong>：<ol>
-<li><code>arthas-boot.jar</code> 启动 Arthas，并附加到目标 Java 进程。</li>
-<li>执行 <code>thread</code> 命令查看所有线程的 CPU 使用率。
-    <div class="highlight"><pre><span></span><code>thread<span class="w">          </span><span class="c1"># 查看所有线程信息</span>
-thread<span class="w"> </span>-n<span class="w"> </span><span class="m">3</span><span class="w">     </span><span class="c1"># 查看最忙的3个线程</span>
-thread<span class="w"> </span>&lt;TID&gt;<span class="w">    </span><span class="c1"># 查看指定线程的栈</span>
-</code></pre></div></li>
-<li>它可以<strong>直接显示消耗 CPU 最高的线程及其栈信息</strong>，无需手动转换十六进制，非常高效。</li>
-</ol>
-</li>
-</ul>
-<h3 id="b-ccgolang">情况B：如果是 C/C++、Golang 等原生应用</h3>
-<p>对于非 Java 应用，我们使用其他工具来查看线程栈。</p>
-<h4 id="1-pstack-pid">1. 使用 <code>pstack &lt;PID&gt;</code> 命令</h4>
-<p><code>pstack</code> 可以打印一个进程的栈信息。
-<div class="highlight"><pre><span></span><code>pstack<span class="w"> </span><span class="m">12345</span>
-</code></pre></div>
-它会输出所有线程的调用栈。你需要从一大堆栈信息中找到与之前 <code>top -Hp</code> 中找到的高 CPU 线程 TID 相对应的那个栈。这可能需要一些眼力。</p>
-<h4 id="2-gdb">2. 使用 <code>gdb</code> 调试器（高级）</h4>
-<p><code>gdb</code> 功能强大，但使用时需谨慎，因为它会挂起进程。</p>
-<ul>
-<li><strong>操作</strong>：
-    <div class="highlight"><pre><span></span><code>gdb<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w">          </span><span class="c1"># 附加到进程</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w">          </span><span class="c1"># 查看所有线程</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w"> </span>apply<span class="w"> </span>all<span class="w"> </span>bt<span class="w">  </span><span class="c1"># 打印所有线程的栈信息</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>thread<span class="w"> </span><span class="m">2</span><span class="w">        </span><span class="c1"># 切换到 TID 为 2 的线程</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>bt<span class="w">              </span><span class="c1"># 打印该线程的栈</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>detach<span class="w">          </span><span class="c1"># 脱离进程，让进程继续运行</span>
-<span class="o">(</span>gdb<span class="o">)</span><span class="w"> </span>quit<span class="w">            </span><span class="c1"># 退出</span>
-</code></pre></div></li>
-</ul>
-<h4 id="3-perf">3. 使用 <code>perf</code>（性能分析神器）</h4>
-<p>Linux 的 <code>perf</code> 工具可以同时对系统和进程进行性能分析。</p>
-<ul>
-<li><strong>操作</strong>：
-    <div class="highlight"><pre><span></span><code><span class="c1"># 采样系统所有进程的 CPU 使用情况</span>
-perf<span class="w"> </span>top
+<h3 id="_5">详细步骤</h3>
+<h4 id="1">1. 哈希分片阶段</h4>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">hashlib</span>
 
-<span class="c1"># 采样特定进程的 CPU 使用情况，并显示调用链</span>
-perf<span class="w"> </span>top<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w"> </span>-g
+<span class="k">def</span><span class="w"> </span><span class="nf">split_file_by_hash</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="n">n_shards</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""将大文件根据哈希值分片到多个小文件中"""</span>
+    <span class="c1"># 创建分片文件</span>
+    <span class="n">shard_files</span> <span class="o">=</span> <span class="p">[</span><span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s1">'shard_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.txt'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_shards</span><span class="p">)]</span>
 
-<span class="c1"># 记录分析数据到文件，便于详细分析</span>
-perf<span class="w"> </span>record<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span><span class="w"> </span>-g<span class="w"> </span>--<span class="w"> </span>sleep<span class="w"> </span><span class="m">30</span><span class="w">  </span><span class="c1"># 采样30秒</span>
-perf<span class="w"> </span>report<span class="w"> </span>-n<span class="w">                         </span><span class="c1"># 查看报告</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="c1"># 计算行的哈希值</span>
+            <span class="n">hash_value</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+            <span class="c1"># 将哈希值转换为分片索引</span>
+            <span class="n">shard_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hash_value</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span> <span class="o">%</span> <span class="n">n_shards</span>
+            <span class="c1"># 将行写入对应的分片文件</span>
+            <span class="n">shard_files</span><span class="p">[</span><span class="n">shard_index</span><span class="p">]</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+
+    <span class="c1"># 关闭所有分片文件</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">shard_files</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
-<code>perf</code> 的输出会直接显示哪些<strong>函数</strong>占用了最高的 CPU 周期，非常直观。</li>
+<h4 id="2">2. 统计每个分片</h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">process_shards</span><span class="p">(</span><span class="n">n_shards</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""处理每个分片文件，统计重复内容"""</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_shards</span><span class="p">):</span>
+        <span class="n">shard_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'shard_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.txt'</span>
+        <span class="n">shard_counts</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># 读取单个分片文件（每个约50MB，远小于200MB内存限制）</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">shard_filename</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">shard_counts</span><span class="p">[</span><span class="n">line</span><span class="p">]</span> <span class="o">=</span> <span class="n">shard_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># 将当前分片的结果合并到总结果中</span>
+        <span class="k">for</span> <span class="n">content</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">shard_counts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># 只关注重复内容</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">content</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">count</span>
+
+        <span class="c1"># 及时清理内存</span>
+        <span class="k">del</span> <span class="n">shard_counts</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+<h4 id="3">3. 清理临时文件（可选）</h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cleanup_shards</span><span class="p">(</span><span class="n">n_shards</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""清理分片产生的临时文件"""</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_shards</span><span class="p">):</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'shard_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">.txt'</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="_6">关键考虑因素</h2>
+<h3 id="1_1">1. 如何确定分片数量？</h3>
+<p>分片数量的选择很重要：</p>
+<ul>
+<li><strong>太少</strong>：每个分片可能仍然太大，超过内存限制</li>
+<li><strong>太多</strong>：产生大量小文件，增加I/O开销</li>
 </ul>
-<hr/>
-<h2 id="_2">第四步：根因分析与解决</h2>
-<p>找到具体的代码行后，剩下的就是具体的业务逻辑分析了。常见的 CPU 飙高原因包括：</p>
-<ol>
-<li><strong>无限循环/死循环</strong>：检查循环条件和终止条件。</li>
-<li><strong>算法复杂度高</strong>：是否存在未优化的 <code>O(n^2)</code>、<code>O(2^n)</code> 复杂度的算法？</li>
-<li><strong>频繁的 GC</strong>：对于 Java，如果是因为频繁 Full GC，那么 <code>%CPU</code> 高可能只是表象，根源是内存问题。需要用 <code>jstat -gcutil &lt;PID&gt;</code> 命令进一步确认 GC 情况。</li>
-<li><strong>锁竞争激烈</strong>：线程处于 <code>BLOCKED</code> 状态，疯狂自旋尝试获取锁，也会导致 CPU 飙高。查看线程栈中是否有大量的 <code>locked &lt;0x0000000712345abc&gt;</code> 等信息。</li>
-<li><strong>IO 操作变为同步阻塞</strong>：比如网络调用超时时间设置过长，导致大量线程阻塞在 IO 上（但这种情况通常 CPU 不高，如果是网络轮询则可能高）。</li>
-</ol>
-<h2 id="_3">总结与排查清单</h2>
-<p>下次遇到线上 CPU 飙高，按照这个清单操作，你就能从容应对：</p>
-<ol>
-<li><strong><code>top</code></strong> -&gt; 按 <strong><code>Shift+P</code></strong> -&gt; 找到高 CPU 的 <strong>PID</strong>。</li>
-<li><strong><code>top -Hp &lt;PID&gt;</code></strong> -&gt; 按 <strong><code>Shift+P</code></strong> -&gt; 找到高 CPU 的 <strong>TID</strong>。</li>
-<li><strong>判断应用类型</strong>：<ul>
-<li><strong>Java</strong>：<code>printf "%x\n" &lt;TID&gt;</code> -&gt; <code>jstack &lt;PID&gt; | grep -A 20 &lt;nid&gt;</code> 或直接使用 <strong>Arthas</strong> (<code>thread</code> 命令)。</li>
-<li><strong>非Java</strong>：<code>pstack &lt;PID&gt;</code> 或 <code>gdb -p &lt;PID&gt;</code> 或 <code>perf top -p &lt;PID&gt; -g</code>。</li>
+<p><strong>经验法则</strong>：分片后每个文件的大小应该是可用内存的 1/3 到 1/2。对于200MB内存，每个分片50-100MB是安全的，所以10-20个分片是合理的。</p>
+<h3 id="2_1">2. 哈希函数的选择</h3>
+<p>选择哈希函数时需要考虑：</p>
+<ul>
+<li><strong>均匀性</strong>：确保数据均匀分布到各个分片</li>
+<li><strong>性能</strong>：计算速度不能太慢</li>
+<li><strong>一致性</strong>：相同内容必须始终映射到同一分片</li>
 </ul>
-</li>
-<li><strong>分析线程栈</strong>，定位到具体代码行，结合业务逻辑解决问题。</li>
+<p>MD5是常用选择，但也可以考虑更简单的哈希函数如CRC32。</p>
+<h3 id="3_1">3. 处理哈希冲突</h3>
+<p>即使有良好的哈希函数，也可能出现某些分片过大的情况。</p>
+<p><strong>解决方案</strong>：</p>
+<ul>
+<li>监控每个分片的大小</li>
+<li>如果某个分片过大，可以对其进行二次分片</li>
+</ul>
+<h2 id="_7">优化策略</h2>
+<h3 id="1_2">1. 多阶段处理</h3>
+<p>对于极端情况，可以采用多阶段分片：</p>
+<ol>
+<li>第一轮：将文件分为大分片</li>
+<li>第二轮：对过大的分片进行再次分片</li>
 </ol>
-<p>记住，预防优于治疗。在开发阶段做好代码审查、性能测试和压测，并建立完善的监控系统（如 APM 应用性能监控），才能在问题出现前或出现初期就及时发现和解决。</p>
+<h3 id="2-">2. 磁盘-内存平衡</h3>
+<ul>
+<li>使用缓冲区减少磁盘I/O次数</li>
+<li>合理安排读写顺序，减少磁盘寻道时间</li>
+</ul>
+<h3 id="3_2">3. 并行处理</h3>
+<p>如果可以使用多线程/多进程：</p>
+<ul>
+<li>不同分片可以并行处理</li>
+<li>需要确保线程安全和资源管理</li>
+</ul>
 <h2 id="__comments">Comments</h2>
 <!-- Insert generated snippet here -->
 <script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
@@ -807,13 +789,26 @@ perf<span class="w"> </span>report<span class="w"> </span>-n<span class="w">    
 </main>
 <footer class="md-footer">
 <nav aria-label="Footer" class="md-footer__inner md-grid">
-<a aria-label="Next: 面试官：内存只有200M，如何读取1G文件并统计重复内容？" class="md-footer__link md-footer__link--next" href="../../02/%E9%9D%A2%E8%AF%95%E5%AE%98%E5%86%85%E5%AD%98%E5%8F%AA%E6%9C%89200m%E5%A6%82%E4%BD%95%E8%AF%BB%E5%8F%961g%E6%96%87%E4%BB%B6%E5%B9%B6%E7%BB%9F%E8%AE%A1%E9%87%8D%E5%A4%8D%E5%86%85%E5%AE%B9/">
+<a aria-label="Previous: 线上 CPU 飙高怎么定位？" class="md-footer__link md-footer__link--prev" href="../../01/%E7%BA%BF%E4%B8%8A-cpu-%E9%A3%99%E9%AB%98%E6%80%8E%E4%B9%88%E5%AE%9A%E4%BD%8D/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                线上 CPU 飙高怎么定位？
+              </div>
+</div>
+</a>
+<a aria-label="Next: 如何排查死锁？实战诊断流程" class="md-footer__link md-footer__link--next" href="../../03/%E5%A6%82%E4%BD%95%E6%8E%92%E6%9F%A5%E6%AD%BB%E9%94%81%E5%AE%9E%E6%88%98%E8%AF%8A%E6%96%AD%E6%B5%81%E7%A8%8B/">
 <div class="md-footer__title">
 <span class="md-footer__direction">
                 Next
               </span>
 <div class="md-ellipsis">
-                面试官：内存只有200M，如何读取1G文件并统计重复内容？
+                如何排查死锁？实战诊断流程
               </div>
 </div>
 <div class="md-footer__button md-icon">
