@@ -9,10 +9,8 @@
       
       
       
-        <link rel="prev" href="../%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E4%BB%8Eacid%E7%89%B9%E6%80%A7%E5%88%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E5%AE%9E%E7%8E%B0/">
+        <link rel="prev" href="../../07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/">
       
-      
-        <link rel="next" href="../../03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3mysql-mvcc%E6%9C%BA%E5%88%B6%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +18,7 @@
     
     
       
-        <title>Rag intro - Gary's Blog</title>
+        <title>Java Switch 的演进与底层设计哲学：为何支持这些类型？ - Gary's Blog</title>
       
     
     
@@ -72,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rag" class="md-skip">
+        <a href="#java-switch" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Rag intro
+              Java Switch 的演进与底层设计哲学：为何支持这些类型？
             
           </span>
         </div>
@@ -1089,7 +1087,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-08-02 00:00:00+00:00" class="md-ellipsis">Saturday, August 2, 2025</time>
+                        <time datetime="2025-09-14 00:00:00+00:00" class="md-ellipsis">Sunday, September 14, 2025</time>
                       </div>
                     </li>
                     
@@ -1100,7 +1098,7 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/rag/">RAG</a></span>
+                              <a href="../../../../category/java/">JAVA</a></span>
                         </div>
                       </li>
                     
@@ -1111,7 +1109,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              1 min read
+                              2 min read
                             
                           </span>
                         </div>
@@ -1130,8 +1128,6 @@
   
   
   
-    
-  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1140,18 +1136,9 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#rag_1" class="md-nav__link">
+  <a href="#java-switch" class="md-nav__link">
     <span class="md-ellipsis">
-      RAG的工作原理
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rag_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      RAG的优势
+      一、Java Switch 参数类型演进史
     </span>
   </a>
   
@@ -1160,16 +1147,58 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      常见应用场景
+      二、底层原理深度分析：为什么是这些类型？
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="二、底层原理深度分析：为什么是这些类型？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-byte-short-char-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 原始整型：byte, short, char, int
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-enum-jdk-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 枚举类型：enum (JDK 5)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-string-jdk-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 字符串类型：String (JDK 7)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-jdk-17" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. 模式匹配：任意引用类型 (JDK 17+)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      典型框架
+      三、总结
     </span>
   </a>
   
@@ -1190,37 +1219,156 @@
 
 
 
-<p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。</p>
+  <h1>Java Switch 的演进与底层设计哲学：为何支持这些类型？</h1>
+
+<p>Java 中的 switch 语句是一种高效的多路分支选择工具。但其支持的参数类型并非一成不变，而是随着 Java 版本的迭代不断演进。这个演进过程深刻体现了 Java 语言设计者们在性能、安全性、表达力和向后兼容性之间的精妙权衡。</p>
 <!-- more -->
-<h1 id="rag">RAG 简介</h1>
-<p>RAG（Retrieval-Augmented Generation，检索增强生成）是一种结合检索和生成的LLM应用技术。它通过在生成回答前检索相关文档或知识，为LLM提供额外的上下文信息，从而提高回答的准确性和可靠性。</p>
-<h2 id="rag_1">RAG的工作原理</h2>
+
+<h2 id="java-switch">一、Java Switch 参数类型演进史</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Java 版本</th>
+<th style="text-align: left;">支持的参数类型</th>
+<th style="text-align: left;">重要特性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">JDK 1.0-1.4</td>
+<td style="text-align: left;"><code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code>（及其对应的包装类）</td>
+<td style="text-align: left;">基本整型支持</td>
+</tr>
+<tr>
+<td style="text-align: left;">JDK 5.0</td>
+<td style="text-align: left;">+ <code>enum</code>（枚举）</td>
+<td style="text-align: left;">类型安全，编译时检查</td>
+</tr>
+<tr>
+<td style="text-align: left;">JDK 7.0</td>
+<td style="text-align: left;">+ <code>String</code></td>
+<td style="text-align: left;">基于哈希值的实现，底层仍是 <code>int</code></td>
+</tr>
+<tr>
+<td style="text-align: left;">JDK 17 (Preview)</td>
+<td style="text-align: left;"><strong>任意类型</strong> (Pattern Matching for <code>switch</code>)</td>
+<td style="text-align: left;"><code>case</code> 支持类型模式、守卫模式、<code>null</code> 处理</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_1">二、底层原理深度分析：为什么是这些类型？</h2>
+<p>Java 虚拟机的指令集是理解 <code>switch</code> 设计的钥匙。JVM 是一个基于栈的虚拟机，其操作码（字节码指令）直接决定了语言层面的特性。</p>
+<h3 id="1-byte-short-char-int">1. 原始整型：<code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code></h3>
+<p><strong>为什么是它们？</strong>
+答案直接指向 JVM 的指令集。JVM 专门为 <code>switch</code> 提供了两条强大的字节码指令：</p>
+<ul>
+<li><strong><code>tableswitch</code></strong>：适用于 <strong><code>case</code> 值紧凑</strong>的情况（例如 <code>1, 2, 3, 4, 5</code>）。它像一个数组，直接通过索引进行跳转，<strong>时间复杂度是 O(1)</strong>。这是效率最高的方式。</li>
+<li><strong><code>lookupswitch</code></strong>：适用于 <strong><code>case</code> 值稀疏</strong>的情况（例如 <code>1, 100, 1000</code>）。它维护了一个 <code>(key, offset)</code> 的排序表，使用二分查找来定位跳转地址，<strong>时间复杂度是 O(log n)</strong>。</li>
+</ul>
+<p><strong>底层实现</strong>：</p>
 <ol>
-<li><strong>检索阶段</strong>：根据用户查询，从文档库或知识库中检索相关的文档片段</li>
-<li><strong>增强阶段</strong>：将检索到的文档片段与用户查询结合，形成增强的输入</li>
-<li><strong>生成阶段</strong>：LLM基于增强的输入生成回答</li>
+<li>编译时，编译器会检查 <code>case</code> 值的紧凑程度。</li>
+<li>如果值紧凑，则生成 <code>tableswitch</code> 指令。</li>
+<li>如果值稀疏，则生成 <code>lookupswitch</code> 指令，以避免生成过大的、充满未使用条目的“空洞”数组，节省空间。</li>
 </ol>
-<h2 id="rag_2">RAG的优势</h2>
+<p><code>byte</code>, <code>short</code>, <code>char</code> 都会在编译期被<strong>隐式地提升（Promote）为 <code>int</code> 类型</strong>后再进行比较操作。因此，从 JVM 的视角看，所有的整型 <code>switch</code> 都是在处理 <code>int</code> 值。</p>
+<p><strong>设计哲学</strong>：</p>
 <ul>
-<li><strong>知识更新</strong>：无需重新训练模型，通过更新文档库即可更新知识</li>
-<li><strong>事实准确性</strong>：减少模型生成幻觉（hallucination）的可能性</li>
-<li><strong>领域适应性</strong>：可针对特定领域的文档进行检索，提高领域问题的回答质量</li>
-<li><strong>可解释性</strong>：可以引用检索到的文档片段，增强回答的可解释性</li>
+<li><strong>性能优先</strong>：硬编码的字节码指令提供了接近原生代码的性能，这是 <code>switch</code> 相比 <code>if-else</code> 链的巨大优势。</li>
+<li><strong>JVM 基石</strong>：语言特性建立在 JVM 能力之上。JVM 没有为其他类型提供专门的跳转指令，因此语言层面最初也无法支持。</li>
 </ul>
-<h2 id="_1">常见应用场景</h2>
+<h3 id="2-enum-jdk-5">2. 枚举类型：<code>enum</code> (JDK 5)</h3>
+<p><strong>为什么能加入？</strong>
+枚举在编译后，每个枚举常量都会变成一个 <code>public static final</code> 的类对象。但同时，编译器会为每个枚举常量自动生成一个唯一的<strong>序数（ordinal）</strong>，这是一个 <code>int</code> 值。</p>
+<p><strong>底层实现</strong>：</p>
+<ol>
+<li>对枚举的 <code>switch</code> 操作，在编译时会被转换为基于其 <code>ordinal()</code> 值的 <code>switch</code> 操作。</li>
+<li>例如：
+    <div class="highlight"><pre><span></span><code><span class="c1">// Java 源码</span>
+<span class="kd">enum</span><span class="w"> </span><span class="n">Color</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">RED</span><span class="p">,</span><span class="w"> </span><span class="n">GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">BLUE</span><span class="w"> </span><span class="p">}</span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">RED</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">GREEN</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+    <div class="highlight"><pre><span></span><code><span class="c1">// 编译后等价于（概念上）</span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">color</span><span class="p">.</span><span class="na">ordinal</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 这里返回的是 int</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// RED.ordinal() == 0</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// GREEN.ordinal() == 1</span>
+<span class="p">}</span>
+</code></pre></div></li>
+</ol>
+<p><strong>设计哲学</strong>：</p>
 <ul>
-<li>问答系统：针对特定领域的知识问答</li>
-<li>文档摘要：基于检索到的文档生成摘要</li>
-<li>信息抽取：从大量文档中抽取特定信息并回答问题</li>
-<li>客服系统：结合企业知识库，提供更准确的客户服务</li>
+<li><strong>类型安全</strong>：使用 <code>enum</code> 和 <code>case</code> 标签，编译器可以检查你是否处理了所有可能的情况，或者是否存在无效的 <code>case</code>，彻底避免了拼写错误等问题。</li>
+<li><strong>语法糖</strong>：它是一种优秀的“语法糖”，底层仍然映射到高效且成熟的 <code>int</code> 型 <code>switch</code> 机制，在不牺牲性能的前提下，极大地提升了代码的安全性和可读性。</li>
 </ul>
-<h2 id="_2">典型框架</h2>
+<h3 id="3-string-jdk-7">3. 字符串类型：<code>String</code> (JDK 7)</h3>
+<p><strong>为什么能加入？如何解决？</strong></p>
+<p><code>String</code> 是对象，不是基本类型。JVM 并没有 <code>stringswitch</code> 指令。Java 的设计者们通过巧妙的<strong>语法糖</strong>和<strong>哈希值</strong>将其映射到了现有的 <code>int</code> <code>switch</code> 机制上。</p>
+<p><strong>底层实现</strong>：</p>
+<ol>
+<li><strong>哈希值转换</strong>：编译器首先将 <code>switch</code> 语句转换为基于字符串 <strong>哈希值（hashCode()）</strong> 的 <code>switch</code> 语句。哈希值是 <code>int</code> 类型，因此可以完美使用 <code>tableswitch</code> 或 <code>lookupswitch</code>。</li>
+<li><strong>解决哈希碰撞</strong>：哈希值可能碰撞（不同字符串有相同哈希值）。因此，在基于哈希值跳转到正确的 <code>case</code> 分支后，还需要调用 <code>equals()</code> 方法进行<strong>二次验证</strong>，以确保万无一失。</li>
+</ol>
+<p><div class="highlight"><pre><span></span><code><span class="c1">// Java 源码</span>
+<span class="n">String</span><span class="w"> </span><span class="n">fruit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">;</span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">:</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Apple&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;banana&quot;</span><span class="p">:</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Banana&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><span class="c1">// 编译后等价于（概念上）</span>
+<span class="n">String</span><span class="w"> </span><span class="n">fruit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">;</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fruit</span><span class="p">.</span><span class="na">hashCode</span><span class="p">();</span>
+<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">hash</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">93029210</span><span class="p">:</span><span class="w"> </span><span class="c1">// &quot;apple&quot;.hashCode()</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;apple&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Apple&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="o">-</span><span class="mi">1396665015</span><span class="p">:</span><span class="w"> </span><span class="c1">// &quot;banana&quot;.hashCode()</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;banana&quot;</span><span class="p">))</span>
+<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Banana&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="k">default</span><span class="p">:</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<p><strong>设计哲学</strong>：</p>
 <ul>
-<li>LangChain：提供RAG相关的工具和组件</li>
-<li>LlamaIndex：专注于构建RAG应用的框架</li>
-<li>Haystack：开源的NLP框架，支持RAG功能</li>
-<li>DeepLake：支持向量存储和RAG应用的框架</li>
+<li><strong>实用性压倒一切</strong>：<code>String</code> 是编程中最常用的类型之一，支持它在 <code>switch</code> 中极大提升了语言的表达力和便捷性。</li>
+<li><strong>巧妙的妥协</strong>：它没有改变 JVM 底层，而是通过编译器的“魔法”将新特性适配到旧有架构上，体现了 Java 强大的向后兼容能力。</li>
 </ul>
+<h3 id="4-jdk-17">4. 模式匹配：任意引用类型 (JDK 17+)</h3>
+<p>这是 <code>switch</code> 的一次范式转移（Paradigm Shift），从<strong>基于值的比较</strong>升级到了<strong>基于模式的匹配</strong>。</p>
+<p><strong>为什么是革命性的？</strong></p>
+<p>传统的 <code>switch</code> 要求表达式和 <code>case</code> 标签是常量且类型匹配。而模式匹配的 <code>switch</code> 放松了这些限制：</p>
+<ul>
+<li><code>case</code> 标签可以是<strong>类型模式</strong>（<code>case String s</code>）。</li>
+<li>可以包含<strong>守卫条件</strong>（<code>case String s when s.length() &gt; 0</code>）。</li>
+<li>必须<strong>全面覆盖</strong>所有可能情况，或提供 <code>default</code>。</li>
+<li>专门处理 <code>null</code>（不需要再在外部显式检查 <code>null</code>）。</li>
+</ul>
+<p><strong>底层实现</strong>：</p>
+<ol>
+<li>其底层实现不再单纯依赖于 <code>tableswitch/lookupswitch</code>。</li>
+<li>编译器会将其解语法糖为一系列 <code>instanceof</code> 检查、强制转换和 <code>if-else</code> 语句链。</li>
+<li>本质上，它更像一个高度优化和结构化的 <code>if-else</code> 的语法糖，但语言层面的抽象极大地提升了代码的清晰度和安全性。</li>
+</ol>
+<p><strong>设计哲学</strong>：</p>
+<ul>
+<li><strong>表达力与安全性的新高度</strong>：允许开发者更自然地表达复杂的条件逻辑，并借助编译器进行 exhaustive 检查，减少运行时错误。</li>
+<li><strong>走向现代化</strong>：这是 Java 向 Haskell, Scala 等现代函数式语言特性看齐的重要一步，旨在减少模板代码，让开发者更关注业务逻辑。</li>
+</ul>
+<h2 id="_2">三、总结</h2>
+<p>Java <code>switch</code> 参数类型的演进，是一部从“<strong>机器友好</strong>”到“<strong>程序员友好</strong>”的进化史：</p>
+<ol>
+<li><strong>性能是根基</strong>：最初的设计完全服务于最高性能，紧密贴合 JVM 的 <code>int</code> 跳转指令。所有后续扩展都建立在不显著破坏这一性能根基的前提下。</li>
+<li><strong>类型安全是方向</strong>：从原始的 <code>int</code> 到 <code>enum</code>，再到模式匹配，Java 一直在引导开发者编写更安全、更不易出错的代码。编译时检查变得越来越强大。</li>
+<li><strong>语法糖是强大武器</strong>：<code>enum</code> 和 <code>String</code> 的支持证明了，无需修改 JVM 底层，仅通过编译器层面的巧妙转换，就能为语言注入新的活力，同时保持完美的向后兼容。</li>
+<li><strong>实用性驱动演进</strong>：<code>String</code> 的加入纯粹是因为其巨大的实用性。语言特性的发展始终围绕着如何让开发者更高效地解决真实问题。</li>
+<li><strong>拥抱范式扩展</strong>：模式匹配的 <code>switch</code> 表明，Java 愿意打破传统 <code>switch</code> 的桎梏，将其进化为一个更通用、更强大的条件选择结构，以适应现代软件开发的复杂性。</li>
+</ol>
 
 
 
@@ -1237,6 +1385,60 @@
   
 
 
+
+  <h2 id="__comments">Comments</h2>
+  <!-- Insert generated snippet here -->
+    <script src="https://giscus.app/client.js"
+        data-repo="XJTUGary/XJTUGary.github.io"
+        data-repo-id="R_kgDOPeNkAA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPeNkAM4CuNUz"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
 
       
     </article>
@@ -1265,7 +1467,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BA%8B%E5%8A%A1%E4%BB%8Eacid%E7%89%B9%E6%80%A7%E5%88%B0%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E5%AE%9E%E7%8E%B0/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 深入理解数据库事务：从ACID特性到隔离级别实现">
+          <a href="../../07/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3java-synchronized%E4%BB%8E%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E5%88%B0%E9%94%81%E5%8D%87%E7%BA%A7%E6%9C%BA%E5%88%B6/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 深入理解Java synchronized：从底层原理到锁升级机制">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1275,27 +1477,11 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                深入理解数据库事务：从ACID特性到隔离级别实现
+                深入理解Java synchronized：从底层原理到锁升级机制
               </div>
             </div>
           </a>
         
-        
-          
-          <a href="../../03/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3mysql-mvcc%E6%9C%BA%E5%88%B6%E5%A4%9A%E7%89%88%E6%9C%AC%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6%E5%8E%9F%E7%90%86%E8%A7%A3%E6%9E%90/" class="md-footer__link md-footer__link--next" aria-label="Next: 深入理解MySQL MVCC机制：多版本并发控制原理解析">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                深入理解MySQL MVCC机制：多版本并发控制原理解析
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
         
       </nav>
     

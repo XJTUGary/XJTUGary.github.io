@@ -1,0 +1,1065 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../../08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" rel="prev"/>
+<link href="../../04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/" rel="next"/>
+<link href="../../../../../images/logo.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>RAG中跨页表格的处理 - Gary's Blog</title>
+<link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="black" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#_1">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Gary's Blog" class="md-header__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Gary's Blog
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              RAG中跨页表格的处理
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../..">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../../../">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Gary's Blog" class="md-nav__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Gary's Blog
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../..">
+<span class="md-ellipsis">
+    首页
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<span class="md-ellipsis">
+    技术
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+<span class="md-ellipsis">
+    Archive
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2025/">
+<span class="md-ellipsis">
+    2025
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Categories
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/agent/">
+<span class="md-ellipsis">
+    Agent
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/java/">
+<span class="md-ellipsis">
+    JAVA
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/rag/">
+<span class="md-ellipsis">
+    RAG
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/redis/">
+<span class="md-ellipsis">
+    Redis
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sft/">
+<span class="md-ellipsis">
+    SFT
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sre/">
+<span class="md-ellipsis">
+    SRE
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E5%B9%B6%E5%8F%91/">
+<span class="md-ellipsis">
+    并发
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">
+<span class="md-ellipsis">
+    数据库
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<span class="md-ellipsis">
+    设计模式
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E9%9D%A2%E7%BB%8F/">
+<span class="md-ellipsis">
+    面经
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+<span class="md-ellipsis">
+    旅行
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+<span class="md-ellipsis">
+    摄影
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+<span class="md-ellipsis">
+    运动
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content md-content--post" data-md-component="content">
+<div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner md-post">
+<nav class="md-nav md-nav--primary">
+<div class="md-post__back">
+<div class="md-nav__title md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+<span class="md-ellipsis">
+                    Back to index
+                  </span>
+</a>
+</div>
+</div>
+<ul class="md-post__meta md-nav__list">
+<li class="md-nav__item md-nav__item--section">
+<div class="md-post__title">
+<span class="md-ellipsis">
+                    Metadata
+                  </span>
+</div>
+<nav class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
+<time class="md-ellipsis" datetime="2025-09-01 00:00:00+00:00">Monday, September 1, 2025</time>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"></path></svg>
+<span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/rag/">RAG</a></span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
+<span class="md-ellipsis">
+                            
+                              3 min read
+                            
+                          </span>
+</div>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_1">
+<span class="md-ellipsis">
+      一、核心挑战：为何跨页表格如此棘手？
+    </span>
+</a>
+<nav aria-label="一、核心挑战：为何跨页表格如此棘手？" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-header-repetition">
+<span class="md-ellipsis">
+      1. 表头重复 (Header Repetition)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-rowcolumn-misalignment">
+<span class="md-ellipsis">
+      2. 行列错位 (Row/Column Misalignment)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-formatting-inconsistency">
+<span class="md-ellipsis">
+      3. 格式不一致 (Formatting Inconsistency)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#4-ocr-ocr-errors">
+<span class="md-ellipsis">
+      4. OCR识别误差 (OCR Errors)
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      二、关键技术方案：如何实现精准的表格重建？
+    </span>
+</a>
+<nav aria-label="二、关键技术方案：如何实现精准的表格重建？" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-table-structure-recognition-tsr">
+<span class="md-ellipsis">
+      1. 表格结构识别（Table Structure Recognition, TSR）
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-cross-page-merge-strategy">
+<span class="md-ellipsis">
+      2. 跨页表格合并策略（Cross-Page Merge Strategy）
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-structured-output">
+<span class="md-ellipsis">
+      3. 结构化输出（Structured Output）
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mineru">
+<span class="md-ellipsis">
+      三、他山之石： MinerU 处理流程
+    </span>
+</a>
+<nav aria-label="三、他山之石： MinerU 处理流程" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mineru_1">
+<span class="md-ellipsis">
+      MinerU 表格处理机制详解
+    </span>
+</a>
+<nav aria-label="MinerU 表格处理机制详解" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      一、表格分类系统
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      二、表格识别与结构化
+    </span>
+</a>
+<nav aria-label="二、表格识别与结构化" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1">
+<span class="md-ellipsis">
+      1. 有线表格识别
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2">
+<span class="md-ellipsis">
+      2. 无线表格识别
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      三、表格数据结构表示
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      四、跨页表格合并
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      五、表格处理完整流程
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#rag">
+<span class="md-ellipsis">
+      四、在RAG中的完整应用流程
+    </span>
+</a>
+<nav aria-label="四、在RAG中的完整应用流程" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-layout-prediction">
+<span class="md-ellipsis">
+      1. 布局预测 (Layout Prediction)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-mfd-predict">
+<span class="md-ellipsis">
+      2. 文档格式检测 (MFD Predict)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-ocr-ocr-processing">
+<span class="md-ellipsis">
+      3. OCR处理 (OCR Processing)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#4-table-prediction">
+<span class="md-ellipsis">
+      4. 表格预测 (Table Prediction)
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#5-structured-output">
+<span class="md-ellipsis">
+      5. 结构化输出 (Structured Output)
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      五、总结与核心价值
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<article class="md-content__inner md-typeset">
+<h1>RAG中跨页表格的处理</h1>
+<p>在检索增强生成（Retrieval-Augmented Generation, RAG）系统的构建中，非结构化文档（如PDF、Word）中的<strong>表格</strong>是高质量知识的重要载体。它们往往包含了浓缩的、结构化的关键信息。然而，当表格跨越两页或多页时，传统的文本提取技术会遭遇滑铁卢，导致检索到的信息碎片化、不完整，甚至错误，严重影响了后续大模型生成答案的准确性和可靠性。</p>
+<p>本文通过讲解MinerU的表格处理机制，深入探讨跨页表格处理的核心挑战、关键技术方案及在RAG中的完整应用流程，旨在解决这一"表格困境"。</p>
+<!-- more -->
+<h2 id="_1">一、核心挑战：为何跨页表格如此棘手？</h2>
+<p>跨页表格的处理绝非简单的文本拼接，其主要面临四大挑战：</p>
+<div class="mermaid">flowchart TD
+    A[跨页表格处理挑战] --&gt; B[表头重复<br/>数据冗余，破坏连贯性]
+    A --&gt; C[行列错位<br/>页面分割导致记录不完整]
+    A --&gt; D[格式不一致<br/>样式排版差异影响识别]
+    A --&gt; E[OCR识别误差<br/>字符混淆、漏识别问题]
+</div>
+<h3 id="1-header-repetition">1. 表头重复 (Header Repetition)</h3>
+<p>跨页表格的每一页通常都包含相同的表头，以实现单页的可读性。但这导致了数据冗余，直接破坏了表格的整体连贯性。在RAG中，这会使检索结果包含大量重复无用信息，干扰模型判断。</p>
+<h3 id="2-rowcolumn-misalignment">2. 行列错位 (Row/Column Misalignment)</h3>
+<p>由于分页的限制，一个完整的行或列可能被硬生生切割。例如，某一行的一半在第一页末尾，另一半在第二页开头。如果简单按页提取，这条记录就会"身首异处"，完整性被彻底破坏。</p>
+<h3 id="3-formatting-inconsistency">3. 格式不一致 (Formatting Inconsistency)</h3>
+<p>不同页面中的同一表格，可能在字体、字号、列宽、行高甚至边框样式上存在细微差异。这种不一致性降低了机器对表格结构判断的准确性，进而影响数据提取。</p>
+<h3 id="4-ocr-ocr-errors">4. OCR识别误差 (OCR Errors)</h3>
+<p>对于扫描版PDF或图片中的表格，光学字符识别（OCR）是必经步骤。然而，OCR易受印刷质量、版面复杂度和字体影响，出现字符混淆（如'1'和'l'）、漏识别等问题，直接影响最终数据的准确性。</p>
+<p><strong>示例表格（跨页混乱情况）</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>案件编号</th>
+<th>案件名称</th>
+<th>当事人姓名</th>
+<th>...</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LA2023001</td>
+<td>合同纠纷案</td>
+<td>张伟</td>
+<td>...</td>
+</tr>
+<tr>
+<td>LA2023002</td>
+<td>知识产权侵权案</td>
+<td>李娜</td>
+<td>...</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+<tr>
+<td><em>(下一页)</em></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>案件编号</strong></td>
+<td><strong>案件名称</strong></td>
+<td><strong>当事人姓名</strong></td>
+<td>...</td>
+</tr>
+<tr>
+<td>LA2023003</td>
+<td>刑事盗窃案</td>
+<td>王强</td>
+<td>...</td>
+</tr>
+<tr>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">二、关键技术方案：如何实现精准的表格重建？</h2>
+<p>应对上述挑战，需要一套融合了计算机视觉与自然语言处理的技术方案。</p>
+<h3 id="1-table-structure-recognition-tsr">1. 表格结构识别（Table Structure Recognition, TSR）</h3>
+<p>TSR是一切工作的基础，其目标是精准识别表格的物理和逻辑结构。</p>
+<ul>
+<li><strong>核心识别元素</strong>:<ul>
+<li><strong>行(Row)与列(Column)</strong>：确定数据的基本网格布局。</li>
+<li><strong>表头(Header)</strong>：识别列的名称，是理解每列数据含义的关键。</li>
+<li><strong>合并单元格(Merged Cells)</strong>：正确检测跨行或跨列的单元格，避免解析时出现错位。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-cross-page-merge-strategy">2. 跨页表格合并策略（Cross-Page Merge Strategy）</h3>
+<p>这是解决跨页问题的核心，通常采用"三步法"：</p>
+<ol>
+<li><strong>表头一致性检测</strong>：通过<strong>文本匹配</strong>或更高级的<strong>语义向量相似度</strong>计算，判断不同页面的表头是否为同一表格的重复表头。</li>
+<li><strong>表格位置分析（Bounding Box）</strong>：利用边界框技术分析表格在页面中的坐标位置，判断相邻页面的表格在垂直或水平方向上是否连续，排除无关表格的干扰。</li>
+<li><strong>自动拼接与去重</strong>：确认属于同一表格后，按行顺序进行拼接，并<strong>自动删除重复的表头行</strong>，只保留一个有效表头，形成完整表格。</li>
+</ol>
+<h3 id="3-structured-output">3. 结构化输出（Structured Output）</h3>
+<p>合并后的完整表格必须转换为机器可读、下游RAG流程可用的格式。</p>
+<ul>
+<li><strong>JSON</strong>：最常用的结构化数据格式，便于程序进行筛选、统计和自动化处理。</li>
+<li><strong>Markdown</strong>：兼具良好的可读性和结构性，非常适合与LLM配合使用，可直接嵌入提示词（Prompt）中。</li>
+</ul>
+<p><strong>结构化输出示例（JSON）</strong>:
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"table_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"法律案件信息表"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"headers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"案件编号"</span><span class="p">,</span><span class="w"> </span><span class="s2">"案件名称"</span><span class="p">,</span><span class="w"> </span><span class="s2">"当事人姓名"</span><span class="p">,</span><span class="w"> </span><span class="s2">"案件类型"</span><span class="p">,</span><span class="w"> </span><span class="s2">"立案日期"</span><span class="p">,</span><span class="w"> </span><span class="s2">"金额(万元)"</span><span class="p">,</span><span class="w"> </span><span class="s2">"备注"</span><span class="p">,</span><span class="w"> </span><span class="s2">"律师姓名"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">"案件编号"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LA2023001"</span><span class="p">,</span><span class="w"> </span><span class="nt">"案件名称"</span><span class="p">:</span><span class="w"> </span><span class="s2">"合同纠纷案"</span><span class="p">,</span><span class="w"> </span><span class="nt">"当事人姓名"</span><span class="p">:</span><span class="w"> </span><span class="s2">"张伟"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">"案件编号"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LA2023002"</span><span class="p">,</span><span class="w"> </span><span class="nt">"案件名称"</span><span class="p">:</span><span class="w"> </span><span class="s2">"知识产权侵权案"</span><span class="p">,</span><span class="w"> </span><span class="nt">"当事人姓名"</span><span class="p">:</span><span class="w"> </span><span class="s2">"李娜"</span><span class="p">,</span><span class="w"> </span><span class="err">...</span><span class="p">},</span>
+<span class="w">    </span><span class="c1">// ... 其他行数据</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h2 id="mineru">三、他山之石： MinerU 处理流程</h2>
+<p>MinerU是一款将PDF转化为机器可读格式的工具（如markdown、json），可以很方便地抽取为任意格式，MinerU诞生于书生-浦语的预训练过程中。</p>
+<h3 id="mineru_1">MinerU 表格处理机制详解</h3>
+<p>MinerU 采用了一套完整的表格处理流水线，能够高效地识别、分类、结构化各种类型的表格，并支持跨页表格合并。以下是详细的处理流程：</p>
+<h4 id="_3">一、表格分类系统</h4>
+<p>MinerU 首先使用表格分类模型区分表格类型，为后续采用不同的识别策略提供依据：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># MinerU-master/mineru/model/table/cls/paddle_table_cls.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PaddleTableClsModel</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 加载ONNX格式的表格分类模型</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sess</span> <span class="o">=</span> <span class="n">onnxruntime</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">auto_download_and_get_model_root_path</span><span class="p">(</span><span class="n">ModelPath</span><span class="o">.</span><span class="n">paddle_table_cls</span><span class="p">),</span> <span class="n">ModelPath</span><span class="o">.</span><span class="n">paddle_table_cls</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="c1"># 模型支持两种分类：有线表格和无线表格</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">AtomicModel</span><span class="o">.</span><span class="n">WiredTable</span><span class="p">,</span> <span class="n">AtomicModel</span><span class="o">.</span><span class="n">WirelessTable</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_img</span><span class="p">):</span>
+        <span class="c1"># 预处理图像（尺寸调整、归一化等）</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">np_img</span><span class="p">)</span>
+        <span class="c1"># 模型推理</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="p">})</span>
+        <span class="c1"># 获取分类结果和置信度</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">conf</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">conf</span>
+</code></pre></div>
+<p>分类模型会将表格分为两类：</p>
+<ul>
+<li><strong>有线表格</strong>：具有明显表格线的传统表格</li>
+<li><strong>无线表格</strong>：依靠文本对齐和间距来表示结构的表格</li>
+</ul>
+<h4 id="_4">二、表格识别与结构化</h4>
+<p>根据分类结果，MinerU 会使用不同的模型进行表格识别和结构化：</p>
+<h5 id="1">1. 有线表格识别</h5>
+<p>对于有线表格，MinerU 使用基于 UNet 的模型进行识别：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># MinerU-master/mineru/model/table/rec/unet_table/main.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WiredTableRecognition</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">InputType</span><span class="p">,</span> <span class="n">ocr_result</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># 加载图像</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="c1"># 使用UNet模型提取表格结构</span>
+        <span class="n">polygons</span><span class="p">,</span> <span class="n">rotated_polygons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_structure</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># 恢复表格结构（行列信息）</span>
+        <span class="n">table_res</span><span class="p">,</span> <span class="n">logi_points</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_recover</span><span class="p">(</span><span class="n">rotated_polygons</span><span class="p">,</span> <span class="n">row_threshold</span><span class="p">,</span> <span class="n">col_threshold</span><span class="p">)</span>
+        <span class="c1"># 匹配OCR结果到表格单元格</span>
+        <span class="n">cell_box_det_map</span><span class="p">,</span> <span class="n">not_match_orc_boxes</span> <span class="o">=</span> <span class="n">match_ocr_cell</span><span class="p">(</span><span class="n">ocr_result</span><span class="p">,</span> <span class="n">polygons</span><span class="p">)</span>
+        <span class="c1"># 处理空白单元格</span>
+        <span class="n">cell_box_det_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fill_blank_rec</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">cell_box_det_map</span><span class="p">)</span>
+        <span class="c1"># 生成HTML格式的表格</span>
+        <span class="n">pred_html</span> <span class="o">=</span> <span class="n">plot_html_table</span><span class="p">(</span><span class="n">logi_points</span><span class="p">,</span> <span class="n">cell_box_det_map</span><span class="p">)</span>
+        <span class="c1"># 返回表格识别结果</span>
+        <span class="k">return</span> <span class="n">WiredTableOutput</span><span class="p">(</span><span class="n">pred_html</span><span class="p">,</span> <span class="n">polygons</span><span class="p">,</span> <span class="n">logi_points</span><span class="p">,</span> <span class="n">elapse</span><span class="p">)</span>
+</code></pre></div>
+<h5 id="2">2. 无线表格识别</h5>
+<p>对于无线表格，MinerU 使用 slanet_plus 模型进行识别：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># MinerU-master/mineru/model/table/rec/slanet_plus/main.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RapidTable</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ocr_result</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># 从OCR结果提取文本框和识别文本</span>
+        <span class="n">dt_boxes</span><span class="p">,</span> <span class="n">rec_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_boxes_recs</span><span class="p">(</span><span class="n">ocr_result</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="c1"># 使用table_structure模型处理表格结构</span>
+        <span class="n">pred_structures</span><span class="p">,</span> <span class="n">cell_bboxes</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_structure</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">img</span><span class="p">))</span>
+        <span class="c1"># 适配模型输出的box缩放还原</span>
+        <span class="n">cell_bboxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapt_slanet_plus</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cell_bboxes</span><span class="p">)</span>
+        <span class="c1"># 使用表格匹配器将OCR结果与表格结构匹配</span>
+        <span class="n">pred_html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_matcher</span><span class="p">(</span><span class="n">pred_structures</span><span class="p">,</span> <span class="n">cell_bboxes</span><span class="p">,</span> <span class="n">dt_boxes</span><span class="p">,</span> <span class="n">rec_res</span><span class="p">)</span>
+        <span class="c1"># 返回表格识别结果</span>
+        <span class="k">return</span> <span class="n">RapidTableOutput</span><span class="p">(</span><span class="n">pred_html</span><span class="p">,</span> <span class="n">cell_bboxes</span><span class="p">,</span> <span class="n">logic_points</span><span class="p">,</span> <span class="n">elapse</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="_5">三、表格数据结构表示</h4>
+<p>MinerU 使用清晰的数据结构来表示表格信息：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># MinerU-master/mineru/utils/format_utils.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TableCell</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># 合并单元格属性</span>
+    <span class="n">row_span</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">col_span</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># 单元格位置信息</span>
+    <span class="n">start_row_offset_idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">end_row_offset_idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">start_col_offset_idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">end_col_offset_idx</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="c1"># 单元格内容</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="c1"># 表头标识</span>
+    <span class="n">column_header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">row_header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">row_section</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TableData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># 表格单元格列表</span>
+    <span class="n">table_cells</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TableCell</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># 表格行列数</span>
+    <span class="n">num_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">num_cols</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># 计算属性：生成表格网格表示</span>
+    <span class="nd">@computed_field</span>  
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">grid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TableCell</span><span class="p">]]:</span>
+        <span class="c1"># 初始化空表格网格</span>
+        <span class="n">table_data</span> <span class="o">=</span> <span class="p">[[</span><span class="n">TableCell</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">""</span><span class="p">,</span> <span class="n">start_row_offset_idx</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_cols</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_rows</span><span class="p">)]</span>
+        <span class="c1"># 填充实际单元格内容</span>
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_cells</span><span class="p">:</span>
+            <span class="c1"># 处理合并单元格等复杂情况</span>
+            <span class="c1"># ...</span>
+        <span class="k">return</span> <span class="n">table_data</span>
+</code></pre></div>
+<h4 id="_6">四、跨页表格合并</h4>
+<p>MinerU 支持跨页表格合并功能，能够智能识别并合并跨越多页的表格：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">#MinerU-master/mineru/utils/table_merge.py</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">can_merge_tables</span><span class="p">(</span><span class="n">current_table_block</span><span class="p">,</span> <span class="n">previous_table_block</span><span class="p">):</span>
+    <span class="c1"># 检查表格是否有caption和footnote（影响合并决策）</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">block</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">==</span> <span class="n">BlockType</span><span class="o">.</span><span class="n">TABLE_CAPTION</span> <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">current_table_block</span><span class="p">[</span><span class="s2">"blocks"</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># 获取两个表格的HTML内容</span>
+    <span class="n">current_html</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="n">previous_html</span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="c1"># ...</span>
+
+    <span class="c1"># 检查表格宽度差异（宽度差异过大则不能合并）</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">table1_width</span> <span class="o">-</span> <span class="n">table2_width</span><span class="p">)</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="n">table1_width</span><span class="p">,</span> <span class="n">table2_width</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">0.1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="c1"># 解析HTML并检查表格结构</span>
+    <span class="c1"># ...</span>
+
+<span class="c1"># 执行表格合并操作</span>
+<span class="c1"># 将第二个表格的行添加到第一个表格中</span>
+<span class="c1"># 保留表头，合并内容行</span>
+</code></pre></div>
+<p>表格合并的判断依据包括：</p>
+<ul>
+<li>表格宽度相似度（差异小于10%）</li>
+<li>表头结构和内容匹配度</li>
+<li>表格是否包含标题或脚注</li>
+</ul>
+<h4 id="_7">五、表格处理完整流程</h4>
+<p>综合以上信息，MinerU 的表格处理流程可以概括为：</p>
+<ol>
+<li><strong>表格检测与分类</strong>：识别文档中的表格区域，并分类为有线或无线表格</li>
+<li><strong>OCR文本识别</strong>：提取表格中的文字内容</li>
+<li><strong>表格结构化</strong>：根据表格类型选择合适的模型进行结构化处理，生成HTML格式</li>
+<li><strong>跨页表格合并</strong>：检测并合并跨越多页的表格</li>
+<li><strong>表格数据格式化</strong>：转换为标准化的表格数据结构，支持后续处理和导出</li>
+</ol>
+<h2 id="rag">四、在RAG中的完整应用流程</h2>
+<p>一个鲁棒的、能处理跨页表格的RAG文档解析流程，可归纳为以下五个步骤：</p>
+<div class="mermaid">flowchart LR
+    A[PDF文档输入] --&gt; B[布局预测<br/>识别表格区域]
+    B --&gt; C[格式检测<br/>判断文档类型]
+    C --&gt; D[OCR处理<br/>提取文字内容]
+    D --&gt; E[表格预测<br/>解析结构]
+    E --&gt; F[结构化输出<br/>JSON/Markdown]
+
+    C --&gt;|如果是可编辑PDF| D
+    D --&gt;|自适应模型选择| E
+</div>
+<h3 id="1-layout-prediction">1. 布局预测 (Layout Prediction)</h3>
+<p>首先对PDF文档进行整体布局分析，识别出文本、表格、图片等不同区域，精准定位表格所在范围。</p>
+<h3 id="2-mfd-predict">2. 文档格式检测 (MFD Predict)</h3>
+<p>判断文档是可编辑文本型PDF还是扫描图片型PDF，以决定是否需要启动OCR引擎。</p>
+<h3 id="3-ocr-ocr-processing">3. OCR处理 (OCR Processing)</h3>
+<p>针对扫描件或图片，调用OCR引擎提取文字信息。优秀的工具具备环境自适应能力，在CPU环境下会自动切换为轻量化模型（如<code>ch_lite</code>），以平衡速度与精度。</p>
+<h3 id="4-table-prediction">4. 表格预测 (Table Prediction)</h3>
+<p>综合前三步的所有信息（布局、格式、文字），最终预测出表格的完整结构（行、列、合并单元格等）。</p>
+<h3 id="5-structured-output">5. 结构化输出 (Structured Output)</h3>
+<p>将识别后的表格数据转换为机器可读的标准格式（JSON/Markdown），供RAG系统下游使用。</p>
+<h2 id="_8">五、总结与核心价值</h2>
+<p>将跨页表格自动化处理技术融入RAG管道，带来了显著的价值提升：</p>
+<ol>
+<li>
+<p><strong>丰富RAG知识源</strong>：PDF和图片中的表格不再是"信息黑洞"，而是被转化为<strong>高质量、结构化的知识片段</strong>，极大丰富了RAG系统的知识库来源和密度。</p>
+</li>
+<li>
+<p><strong>提升答案准确性</strong>：完整且准确的表格数据确保了检索到的上下文信息是可靠的，从而直接提高了大模型生成答案的准确性和专业性。</p>
+</li>
+<li>
+<p><strong>增强溯源能力</strong>：此类技术通常能保留数据在原始文档中的位置信息，增强了RAG的<strong>溯源（Citation）能力</strong>，让模型生成的答案更有据可查，值得信赖。</p>
+</li>
+<li>
+<p><strong>实现端到端自动化</strong>：从文档上传到知识库 Ready，整个过程无需人工干预表格处理，实现了大规模文档处理的自动化，降低了成本。</p>
+</li>
+</ol>
+<p>通过攻克跨页表格处理的难题，RAG系统得以更好地利用人类积累的大量文档资产，构建更加智能、可靠的知识问答和应用系统。</p>
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: 蚂蚁面试官：介绍设计模式及其在工作中的应用？" class="md-footer__link md-footer__link--prev" href="../../../08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                蚂蚁面试官：介绍设计模式及其在工作中的应用？
+              </div>
+</div>
+</a>
+<a aria-label="Next: 深入理解CAS：乐观锁的核心原理与实战应用" class="md-footer__link md-footer__link--next" href="../../04/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3cas%E4%B9%90%E8%A7%82%E9%94%81%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                深入理解CAS：乐观锁的核心原理与实战应用
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/XJTUGary" rel="noopener" target="_blank" title="GitHub">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="mailto:wmlgaryx@gmail.com" rel="noopener" target="_blank" title="E-mail">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
