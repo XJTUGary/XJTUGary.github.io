@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90jdbc%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E5%8E%9F%E7%90%86/">
+        <link rel="prev" href="../../14/java-switch-%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E5%BA%95%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E4%B8%BA%E4%BD%95%E6%94%AF%E6%8C%81%E8%BF%99%E4%BA%9B%E7%B1%BB%E5%9E%8B/">
       
       
-        <link rel="next" href="../../22/%E8%A5%BF%E9%97%A8%E5%AD%90%E9%9D%A2%E8%AF%95%E5%AE%98%E5%A4%9A%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%8D%8F%E4%BD%9C%E8%AE%A1%E7%AE%97/">
+        <link rel="next" href="../solid%E5%8E%9F%E5%88%99%E7%BC%96%E5%86%99%E5%8F%AF%E7%BB%B4%E6%8A%A4%E4%BB%A3%E7%A0%81%E7%9A%84%E4%BA%94%E4%B8%AA%E5%9F%BA%E7%9F%B3/">
       
       
       <link rel="icon" href="../../../../../images/logo.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Java Switch 的演进与底层设计哲学：为何支持这些类型？ - Gary's Blog</title>
+        <title>西门子面试官：多个线程协作计算 - Gary's Blog</title>
       
     
     
@@ -72,7 +72,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#java-switch" class="md-skip">
+        <a href="#_1" class="md-skip">
           Skip to content
         </a>
       
@@ -106,7 +106,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Java Switch 的演进与底层设计哲学：为何支持这些类型？
+              西门子面试官：多个线程协作计算
             
           </span>
         </div>
@@ -1089,7 +1089,7 @@
                     <li class="md-nav__item">
                       <div class="md-nav__link">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
-                        <time datetime="2025-09-14 00:00:00+00:00" class="md-ellipsis">Sunday, September 14, 2025</time>
+                        <time datetime="2025-09-22 00:00:00+00:00" class="md-ellipsis">Monday, September 22, 2025</time>
                       </div>
                     </li>
                     
@@ -1100,7 +1100,8 @@
                           <span class="md-ellipsis">
                             in
                             
-                              <a href="../../../../category/java/">JAVA</a></span>
+                              <a href="../../../../category/%E9%9D%A2%E7%BB%8F/">面经</a>, 
+                              <a href="../../../../category/%E5%B9%B6%E5%8F%91/">并发</a></span>
                         </div>
                       </li>
                     
@@ -1138,55 +1139,55 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#java-switch" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      一、Java Switch 参数类型演进史
+      题目背景
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
-      二、底层原理深度分析：为什么是这些类型？
+      题目描述
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="二、底层原理深度分析：为什么是这些类型？">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      面试过程回顾
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="面试过程回顾">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-byte-short-char-int" class="md-nav__link">
+  <a href="#5" class="md-nav__link">
     <span class="md-ellipsis">
-      1. 原始整型：byte, short, char, int
+      第一阶段：需求澄清（5分钟）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#2-enum-jdk-5" class="md-nav__link">
+  <a href="#10" class="md-nav__link">
     <span class="md-ellipsis">
-      2. 枚举类型：enum (JDK 5)
+      第二阶段：设计方案（10分钟）
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-string-jdk-7" class="md-nav__link">
+  <a href="#15" class="md-nav__link">
     <span class="md-ellipsis">
-      3. 字符串类型：String (JDK 7)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4-jdk-17" class="md-nav__link">
-    <span class="md-ellipsis">
-      4. 模式匹配：任意引用类型 (JDK 17+)
+      第三阶段：编码实现（15分钟）
     </span>
   </a>
   
@@ -1194,15 +1195,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      三、总结
-    </span>
-  </a>
   
 </li>
       
@@ -1221,156 +1213,154 @@
 
 
 
-  <h1>Java Switch 的演进与底层设计哲学：为何支持这些类型？</h1>
+  <h1>西门子面试官：多个线程协作计算</h1>
 
-<p>Java 中的 switch 语句是一种高效的多路分支选择工具。但其支持的参数类型并非一成不变，而是随着 Java 版本的迭代不断演进。这个演进过程深刻体现了 Java 语言设计者们在性能、安全性、表达力和向后兼容性之间的精妙权衡。</p>
+<p>请设计一个程序，包含四个线程：线程A、线程B：每5秒产生一个随机整数（1-100），线程C：等待A和B都产生数据后，计算A×B的乘积，线程D：等待C计算完成后，打印最终结果。</p>
 <!-- more -->
 
-<h2 id="java-switch">一、Java Switch 参数类型演进史</h2>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Java 版本</th>
-<th style="text-align: left;">支持的参数类型</th>
-<th style="text-align: left;">重要特性</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;">JDK 1.0-1.4</td>
-<td style="text-align: left;"><code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code>（及其对应的包装类）</td>
-<td style="text-align: left;">基本整型支持</td>
-</tr>
-<tr>
-<td style="text-align: left;">JDK 5.0</td>
-<td style="text-align: left;">+ <code>enum</code>（枚举）</td>
-<td style="text-align: left;">类型安全，编译时检查</td>
-</tr>
-<tr>
-<td style="text-align: left;">JDK 7.0</td>
-<td style="text-align: left;">+ <code>String</code></td>
-<td style="text-align: left;">基于哈希值的实现，底层仍是 <code>int</code></td>
-</tr>
-<tr>
-<td style="text-align: left;">JDK 17 (Preview)</td>
-<td style="text-align: left;"><strong>任意类型</strong> (Pattern Matching for <code>switch</code>)</td>
-<td style="text-align: left;"><code>case</code> 支持类型模式、守卫模式、<code>null</code> 处理</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="_1">二、底层原理深度分析：为什么是这些类型？</h2>
-<p>Java 虚拟机的指令集是理解 <code>switch</code> 设计的钥匙。JVM 是一个基于栈的虚拟机，其操作码（字节码指令）直接决定了语言层面的特性。</p>
-<h3 id="1-byte-short-char-int">1. 原始整型：<code>byte</code>, <code>short</code>, <code>char</code>, <code>int</code></h3>
-<p><strong>为什么是它们？</strong>
-答案直接指向 JVM 的指令集。JVM 专门为 <code>switch</code> 提供了两条强大的字节码指令：</p>
+<h2 id="_1">题目背景</h2>
+<p><strong>面试公司</strong>：西门子医疗</p>
+<p><strong>面试岗位</strong>：服务端开发工程师（AI） </p>
+<p><strong>面试轮次</strong>：技术二面  </p>
+<p><strong>面试形式</strong>：线下手写</p>
+<h2 id="_2">题目描述</h2>
+<p>面试官给出了一个经典的多线程协作题目：</p>
+<blockquote>
+<p>"请设计一个程序，包含四个线程：</p>
 <ul>
-<li><strong><code>tableswitch</code></strong>：适用于 <strong><code>case</code> 值紧凑</strong>的情况（例如 <code>1, 2, 3, 4, 5</code>）。它像一个数组，直接通过索引进行跳转，<strong>时间复杂度是 O(1)</strong>。这是效率最高的方式。</li>
-<li><strong><code>lookupswitch</code></strong>：适用于 <strong><code>case</code> 值稀疏</strong>的情况（例如 <code>1, 100, 1000</code>）。它维护了一个 <code>(key, offset)</code> 的排序表，使用二分查找来定位跳转地址，<strong>时间复杂度是 O(log n)</strong>。</li>
+<li>线程A、线程B：每5秒产生一个随机整数（1-100）</li>
+<li>线程C：等待A和B都产生数据后，计算A×B的乘积</li>
+<li>线程D：等待C计算完成后，打印最终结果</li>
 </ul>
-<p><strong>底层实现</strong>：</p>
+<p>要求四个线程能够循环执行，保持正确的协作顺序。"</p>
+</blockquote>
+<h2 id="_3">面试过程回顾</h2>
+<h3 id="5">第一阶段：需求澄清（5分钟）</h3>
+<p><strong>我</strong>："请问这个循环执行是指一轮结束后立即开始下一轮，还是需要等待5秒？"</p>
+<p><strong>面试官</strong>："很好的问题。A和B每5秒产生一个随机数，但整个流程的节奏应该由计算需求决定。一轮结束后可以立即开始下一轮，不需要额外等待。"</p>
+<p><strong>我</strong>："明白了。那么A和B的产生时间是否需要同步？比如是否要求它们同时产生？"</p>
+<p><strong>面试官</strong>："不要求严格同步，但要求C必须等待两个值都产生后才能计算。"</p>
+<h3 id="10">第二阶段：设计方案（10分钟）</h3>
+<p>我首先提出了三种可能的实现方案：</p>
 <ol>
-<li>编译时，编译器会检查 <code>case</code> 值的紧凑程度。</li>
-<li>如果值紧凑，则生成 <code>tableswitch</code> 指令。</li>
-<li>如果值稀疏，则生成 <code>lookupswitch</code> 指令，以避免生成过大的、充满未使用条目的“空洞”数组，节省空间。</li>
+<li><strong>CountDownLatch方案</strong>：使用门闩机制控制执行顺序</li>
+<li><strong>CyclicBarrier方案</strong>：利用可重置的屏障</li>
+<li><strong>wait/notify方案</strong>：传统的线程间通信</li>
 </ol>
-<p><code>byte</code>, <code>short</code>, <code>char</code> 都会在编译期被<strong>隐式地提升（Promote）为 <code>int</code> 类型</strong>后再进行比较操作。因此，从 JVM 的视角看，所有的整型 <code>switch</code> 都是在处理 <code>int</code> 值。</p>
-<p><strong>设计哲学</strong>：</p>
-<ul>
-<li><strong>性能优先</strong>：硬编码的字节码指令提供了接近原生代码的性能，这是 <code>switch</code> 相比 <code>if-else</code> 链的巨大优势。</li>
-<li><strong>JVM 基石</strong>：语言特性建立在 JVM 能力之上。JVM 没有为其他类型提供专门的跳转指令，因此语言层面最初也无法支持。</li>
-</ul>
-<h3 id="2-enum-jdk-5">2. 枚举类型：<code>enum</code> (JDK 5)</h3>
-<p><strong>为什么能加入？</strong>
-枚举在编译后，每个枚举常量都会变成一个 <code>public static final</code> 的类对象。但同时，编译器会为每个枚举常量自动生成一个唯一的<strong>序数（ordinal）</strong>，这是一个 <code>int</code> 值。</p>
-<p><strong>底层实现</strong>：</p>
-<ol>
-<li>对枚举的 <code>switch</code> 操作，在编译时会被转换为基于其 <code>ordinal()</code> 值的 <code>switch</code> 操作。</li>
-<li>例如：
-    <div class="highlight"><pre><span></span><code><span class="c1">// Java 源码</span>
-<span class="kd">enum</span><span class="w"> </span><span class="n">Color</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">RED</span><span class="p">,</span><span class="w"> </span><span class="n">GREEN</span><span class="p">,</span><span class="w"> </span><span class="n">BLUE</span><span class="w"> </span><span class="p">}</span>
-<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">RED</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="n">GREEN</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<p><strong>面试官</strong>："为什么你最终选择了CountDownLatch？"</p>
+<p><strong>我</strong>："CountDownLatch更适合这种'等待多个事件完成'的场景。CyclicBarrier虽然可以重置，但更适合'多个线程相互等待'的情况。wait/notify需要手动管理状态，代码相对复杂。"</p>
+<h3 id="15">第三阶段：编码实现（15分钟）</h3>
+<p>我实现了基于CountDownLatch的解决方案：</p>
+<div class="highlight"><pre><span></span><code><span class="kn">package</span><span class="w"> </span><span class="nn">Thread</span><span class="p">;</span>
+
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.Random</span><span class="p">;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">java.util.concurrent.CountDownLatch</span><span class="p">;</span>
+
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CountdownLatchDemo</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Random</span><span class="w"> </span><span class="n">random</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Random</span><span class="p">();</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="w"> </span><span class="n">abLatch</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="w"> </span><span class="n">cLatch</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="w"> </span><span class="n">dLatch</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">a</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">volatile</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">c</span><span class="p">;</span>
+
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">resetLatch</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">abLatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="w">        </span><span class="n">cLatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">        </span><span class="n">dLatch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">CountDownLatch</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">class</span> <span class="nc">TaskA</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">5000</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">random</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;Create a :&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">a</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">abLatch</span><span class="p">.</span><span class="na">countDown</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">class</span> <span class="nc">TaskB</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="mi">5000</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">random</span><span class="p">.</span><span class="na">nextInt</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;Create b :&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">abLatch</span><span class="p">.</span><span class="na">countDown</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">class</span> <span class="nc">TaskC</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">abLatch</span><span class="p">.</span><span class="na">await</span><span class="p">();</span>
+<span class="w">                    </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;Computer the result :&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">cLatch</span><span class="p">.</span><span class="na">countDown</span><span class="p">();</span>
+
+<span class="w">                    </span><span class="c1">//等待D打印完成后重置</span>
+<span class="w">                    </span><span class="n">dLatch</span><span class="p">.</span><span class="na">await</span><span class="p">();</span>
+<span class="w">                    </span><span class="n">resetLatch</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">class</span> <span class="nc">TaskD</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Runnable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nd">@Override</span>
+<span class="w">        </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">cLatch</span><span class="p">.</span><span class="na">await</span><span class="p">();</span>
+<span class="w">                    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Result is: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">c</span><span class="p">);</span>
+<span class="w">                    </span><span class="n">dLatch</span><span class="p">.</span><span class="na">countDown</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">start</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">TaskA</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Thread A&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">TaskB</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Thread B&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">TaskC</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Thread C&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">Thread</span><span class="w"> </span><span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">TaskD</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;Thread D&quot;</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">A</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">        </span><span class="n">B</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">        </span><span class="n">C</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">        </span><span class="n">D</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="nf">CountdownLatchDemo</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">resetLatch</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">new</span><span class="w"> </span><span class="n">CountdownLatchDemo</span><span class="p">().</span><span class="na">start</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
-    <div class="highlight"><pre><span></span><code><span class="c1">// 编译后等价于（概念上）</span>
-<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">color</span><span class="p">.</span><span class="na">ordinal</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// 这里返回的是 int</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">0</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// RED.ordinal() == 0</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="k">break</span><span class="p">;</span><span class="w"> </span><span class="c1">// GREEN.ordinal() == 1</span>
-<span class="p">}</span>
-</code></pre></div></li>
-</ol>
-<p><strong>设计哲学</strong>：</p>
-<ul>
-<li><strong>类型安全</strong>：使用 <code>enum</code> 和 <code>case</code> 标签，编译器可以检查你是否处理了所有可能的情况，或者是否存在无效的 <code>case</code>，彻底避免了拼写错误等问题。</li>
-<li><strong>语法糖</strong>：它是一种优秀的“语法糖”，底层仍然映射到高效且成熟的 <code>int</code> 型 <code>switch</code> 机制，在不牺牲性能的前提下，极大地提升了代码的安全性和可读性。</li>
-</ul>
-<h3 id="3-string-jdk-7">3. 字符串类型：<code>String</code> (JDK 7)</h3>
-<p><strong>为什么能加入？如何解决？</strong></p>
-<p><code>String</code> 是对象，不是基本类型。JVM 并没有 <code>stringswitch</code> 指令。Java 的设计者们通过巧妙的<strong>语法糖</strong>和<strong>哈希值</strong>将其映射到了现有的 <code>int</code> <code>switch</code> 机制上。</p>
-<p><strong>底层实现</strong>：</p>
-<ol>
-<li><strong>哈希值转换</strong>：编译器首先将 <code>switch</code> 语句转换为基于字符串 <strong>哈希值（hashCode()）</strong> 的 <code>switch</code> 语句。哈希值是 <code>int</code> 类型，因此可以完美使用 <code>tableswitch</code> 或 <code>lookupswitch</code>。</li>
-<li><strong>解决哈希碰撞</strong>：哈希值可能碰撞（不同字符串有相同哈希值）。因此，在基于哈希值跳转到正确的 <code>case</code> 分支后，还需要调用 <code>equals()</code> 方法进行<strong>二次验证</strong>，以确保万无一失。</li>
-</ol>
-<p><div class="highlight"><pre><span></span><code><span class="c1">// Java 源码</span>
-<span class="n">String</span><span class="w"> </span><span class="n">fruit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">;</span>
-<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">:</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Apple&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;banana&quot;</span><span class="p">:</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Banana&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="c1">// 编译后等价于（概念上）</span>
-<span class="n">String</span><span class="w"> </span><span class="n">fruit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;apple&quot;</span><span class="p">;</span>
-<span class="kt">int</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fruit</span><span class="p">.</span><span class="na">hashCode</span><span class="p">();</span>
-<span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">hash</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="mi">93029210</span><span class="p">:</span><span class="w"> </span><span class="c1">// &quot;apple&quot;.hashCode()</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;apple&quot;</span><span class="p">))</span>
-<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Apple&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="o">-</span><span class="mi">1396665015</span><span class="p">:</span><span class="w"> </span><span class="c1">// &quot;banana&quot;.hashCode()</span>
-<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">fruit</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;banana&quot;</span><span class="p">))</span>
-<span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Banana&quot;</span><span class="p">);</span>
-<span class="w">        </span><span class="k">break</span><span class="p">;</span>
-<span class="w">    </span><span class="k">default</span><span class="p">:</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></p>
-<p><strong>设计哲学</strong>：</p>
-<ul>
-<li><strong>实用性压倒一切</strong>：<code>String</code> 是编程中最常用的类型之一，支持它在 <code>switch</code> 中极大提升了语言的表达力和便捷性。</li>
-<li><strong>巧妙的妥协</strong>：它没有改变 JVM 底层，而是通过编译器的“魔法”将新特性适配到旧有架构上，体现了 Java 强大的向后兼容能力。</li>
-</ul>
-<h3 id="4-jdk-17">4. 模式匹配：任意引用类型 (JDK 17+)</h3>
-<p>这是 <code>switch</code> 的一次范式转移（Paradigm Shift），从<strong>基于值的比较</strong>升级到了<strong>基于模式的匹配</strong>。</p>
-<p><strong>为什么是革命性的？</strong></p>
-<p>传统的 <code>switch</code> 要求表达式和 <code>case</code> 标签是常量且类型匹配。而模式匹配的 <code>switch</code> 放松了这些限制：</p>
-<ul>
-<li><code>case</code> 标签可以是<strong>类型模式</strong>（<code>case String s</code>）。</li>
-<li>可以包含<strong>守卫条件</strong>（<code>case String s when s.length() &gt; 0</code>）。</li>
-<li>必须<strong>全面覆盖</strong>所有可能情况，或提供 <code>default</code>。</li>
-<li>专门处理 <code>null</code>（不需要再在外部显式检查 <code>null</code>）。</li>
-</ul>
-<p><strong>底层实现</strong>：</p>
-<ol>
-<li>其底层实现不再单纯依赖于 <code>tableswitch/lookupswitch</code>。</li>
-<li>编译器会将其解语法糖为一系列 <code>instanceof</code> 检查、强制转换和 <code>if-else</code> 语句链。</li>
-<li>本质上，它更像一个高度优化和结构化的 <code>if-else</code> 的语法糖，但语言层面的抽象极大地提升了代码的清晰度和安全性。</li>
-</ol>
-<p><strong>设计哲学</strong>：</p>
-<ul>
-<li><strong>表达力与安全性的新高度</strong>：允许开发者更自然地表达复杂的条件逻辑，并借助编译器进行 exhaustive 检查，减少运行时错误。</li>
-<li><strong>走向现代化</strong>：这是 Java 向 Haskell, Scala 等现代函数式语言特性看齐的重要一步，旨在减少模板代码，让开发者更关注业务逻辑。</li>
-</ul>
-<h2 id="_2">三、总结</h2>
-<p>Java <code>switch</code> 参数类型的演进，是一部从“<strong>机器友好</strong>”到“<strong>程序员友好</strong>”的进化史：</p>
-<ol>
-<li><strong>性能是根基</strong>：最初的设计完全服务于最高性能，紧密贴合 JVM 的 <code>int</code> 跳转指令。所有后续扩展都建立在不显著破坏这一性能根基的前提下。</li>
-<li><strong>类型安全是方向</strong>：从原始的 <code>int</code> 到 <code>enum</code>，再到模式匹配，Java 一直在引导开发者编写更安全、更不易出错的代码。编译时检查变得越来越强大。</li>
-<li><strong>语法糖是强大武器</strong>：<code>enum</code> 和 <code>String</code> 的支持证明了，无需修改 JVM 底层，仅通过编译器层面的巧妙转换，就能为语言注入新的活力，同时保持完美的向后兼容。</li>
-<li><strong>实用性驱动演进</strong>：<code>String</code> 的加入纯粹是因为其巨大的实用性。语言特性的发展始终围绕着如何让开发者更高效地解决真实问题。</li>
-<li><strong>拥抱范式扩展</strong>：模式匹配的 <code>switch</code> 表明，Java 愿意打破传统 <code>switch</code> 的桎梏，将其进化为一个更通用、更强大的条件选择结构，以适应现代软件开发的复杂性。</li>
-</ol>
 
 
 
@@ -1469,7 +1459,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../%E6%B7%B1%E5%85%A5%E8%A7%A3%E6%9E%90jdbc%E6%95%B0%E6%8D%AE%E5%BA%93%E8%BF%9E%E6%8E%A5%E5%8E%9F%E7%90%86/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 深入解析JDBC数据库连接原理">
+          <a href="../../14/java-switch-%E7%9A%84%E6%BC%94%E8%BF%9B%E4%B8%8E%E5%BA%95%E5%B1%82%E8%AE%BE%E8%AE%A1%E5%93%B2%E5%AD%A6%E4%B8%BA%E4%BD%95%E6%94%AF%E6%8C%81%E8%BF%99%E4%BA%9B%E7%B1%BB%E5%9E%8B/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Java Switch 的演进与底层设计哲学：为何支持这些类型？">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1479,20 +1469,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                深入解析JDBC数据库连接原理
+                Java Switch 的演进与底层设计哲学：为何支持这些类型？
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../22/%E8%A5%BF%E9%97%A8%E5%AD%90%E9%9D%A2%E8%AF%95%E5%AE%98%E5%A4%9A%E4%B8%AA%E7%BA%BF%E7%A8%8B%E5%8D%8F%E4%BD%9C%E8%AE%A1%E7%AE%97/" class="md-footer__link md-footer__link--next" aria-label="Next: 西门子面试官：多个线程协作计算">
+          <a href="../solid%E5%8E%9F%E5%88%99%E7%BC%96%E5%86%99%E5%8F%AF%E7%BB%B4%E6%8A%A4%E4%BB%A3%E7%A0%81%E7%9A%84%E4%BA%94%E4%B8%AA%E5%9F%BA%E7%9F%B3/" class="md-footer__link md-footer__link--next" aria-label="Next: SOLID原则：编写可维护代码的五个基石">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                西门子面试官：多个线程协作计算
+                SOLID原则：编写可维护代码的五个基石
               </div>
             </div>
             <div class="md-footer__button md-icon">
