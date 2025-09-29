@@ -559,6 +559,15 @@
         <li class="md-nav__item">
   <a href="#mybatis" class="md-nav__link">
     <span class="md-ellipsis">
+      MyBatis 两级缓存机制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mybatis" class="md-nav__link">
+    <span class="md-ellipsis">
       MyBatis 中的 ${}：明知它有“安全隐患”，为何还要保留它？
     </span>
   </a>
@@ -632,15 +641,6 @@
   <a href="#rag" class="md-nav__link">
     <span class="md-ellipsis">
       RAG中跨页表格的处理
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      蚂蚁面试官：介绍设计模式及其在工作中的应用？
     </span>
   </a>
   
@@ -1216,6 +1216,47 @@
           
           <li class="md-meta__item">
             
+              3 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="mybatis"><a class="toclink" href="../../2025/09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">MyBatis 两级缓存机制</a></h2>
+<p>在数据库应用开发中，性能始终是我们关注的核心焦点之一。频繁地与数据库进行交互，执行重复的 SQL 查询，会消耗大量的系统资源，成为应用性能的主要瓶颈。想象一下，在一个高并发的场景下，每秒有成千上万的用户请求同一个热门商品的信息，如果每次请求都去查询数据库，数据库的压力将不堪重负。</p>
+<p>为了解决这个问题，“缓存”技术应运而生。它像是一个高速的数据中转站，将频繁访问的数据暂存在内存中。当后续请求需要相同的数据时，无需再访问慢速的磁盘数据库，直接从内存中获取，从而极大地提升了响应速度。</p>
+<p>作为一款优秀的持久层框架，MyBatis 自然也提供了一套强大且灵活的缓存机制。理解和正确使用 MyBatis 缓存，是优化 MyBatis 性能的关键一步。 这篇博客将带你深入浅出地了解 MyBatis 的两级缓存：一级缓存和二级缓存，帮助你更好地利用它们来提升应用性能。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2025-09-23 00:00:00+00:00">Tuesday, September 23, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="md-meta__link">数据库</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
               2 min read
             
           </li>
@@ -1550,46 +1591,6 @@
     
       <nav class="md-post__action">
         <a href="../../2025/09/01/rag%E4%B8%AD%E8%B7%A8%E9%A1%B5%E8%A1%A8%E6%A0%BC%E7%9A%84%E5%A4%84%E7%90%86/">
-          Continue reading
-        </a>
-      </nav>
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2025-08-19 00:00:00+00:00">Tuesday, August 19, 2025</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="md-meta__link">设计模式</a>, 
-              <a href="../../category/%E9%9D%A2%E7%BB%8F/" class="md-meta__link">面经</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              7 min read
-            
-          </li>
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="_1"><a class="toclink" href="../../2025/08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">蚂蚁面试官：介绍设计模式及其在工作中的应用？</a></h2>
-<p>设计模式是软件设计中针对常见问题的 可复用解决方案模板 ，是 最佳实践的总结 ，能提高代码的可维护性、可扩展性和可复用性。昨天在面试蚂蚁的时候，被问到了设计模式的问题，我回答的不是很好，今天就来总结一下常见的设计模式，及其在工作中的应用。</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../2025/08/19/%E8%9A%82%E8%9A%81%E9%9D%A2%E8%AF%95%E5%AE%98%E4%BB%8B%E7%BB%8D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%85%B6%E5%9C%A8%E5%B7%A5%E4%BD%9C%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/">
           Continue reading
         </a>
       </nav>

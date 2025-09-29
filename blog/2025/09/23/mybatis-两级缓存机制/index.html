@@ -1,0 +1,1901 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../mybatis-%E4%B8%AD%E7%9A%84-%E6%98%8E%E7%9F%A5%E5%AE%83%E6%9C%89%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3%E4%B8%BA%E4%BD%95%E8%BF%98%E8%A6%81%E4%BF%9D%E7%95%99%E5%AE%83/">
+      
+      
+      
+      <link rel="icon" href="../../../../../images/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>MyBatis 两级缓存机制 - Gary's Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mybatis" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Gary&#39;s Blog" class="md-header__button md-logo" aria-label="Gary's Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Gary's Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              MyBatis 两级缓存机制
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E6%97%85%E8%A1%8C/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E6%91%84%E5%BD%B1/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E8%BF%90%E5%8A%A8/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Gary&#39;s Blog" class="md-nav__button md-logo" aria-label="Gary's Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Gary's Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    首页
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    技术
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/java/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JAVA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/redis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Redis
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SFT
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/sre/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SRE
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E5%B9%B6%E5%8F%91/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    并发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    数据库
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    设计模式
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E9%9D%A2%E7%BB%8F/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    面经
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E6%97%85%E8%A1%8C/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    旅行
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E6%91%84%E5%BD%B1/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    摄影
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E8%BF%90%E5%8A%A8/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    运动
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2025-09-23 00:00:00+00:00" class="md-ellipsis">Tuesday, September 23, 2025</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              3 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mybatis" class="md-nav__link">
+    <span class="md-ellipsis">
+      一、MyBatis缓存概览：两级缓存结构
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      二、一级缓存（本地缓存）深度解析
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、一级缓存（本地缓存）深度解析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 什么是⼀级缓存？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. ⼯作原理与验证
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. ⼀级缓存的清空时机
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-mybatis-configxml" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. ⼀级缓存的配置（在mybatis-config.xml中）
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      三、二级缓存（全局缓存）深度解析
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、二级缓存（全局缓存）深度解析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 什么是⼆级缓存？
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 如何开启⼆级缓存？
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 如何开启⼆级缓存？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1mybatis-configxml" class="md-nav__link">
+    <span class="md-ellipsis">
+      步骤1：全局开启（mybatis-config.xml）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2mapperxml" class="md-nav__link">
+    <span class="md-ellipsis">
+      步骤2：在Mapper.xml中配置缓存
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3serializable" class="md-nav__link">
+    <span class="md-ellipsis">
+      步骤3：实体类实现Serializable接口
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. ⼆级缓存的高级配置
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. ⼆级缓存的工作机制验证
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. 缓存的使用策略控制
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 缓存的使用策略控制">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      在语句级别细粒度控制缓存：
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      四、缓存执行流程与源码级原理
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、缓存执行流程与源码级原理">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 完整的查询缓存流程
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 源码层面的关键类
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      五、实战中的缓存问题与解决方案
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="五、实战中的缓存问题与解决方案">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. 脏读问题（最常见）
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. 缓存穿透/击穿/雪崩
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. 二级缓存的最佳实践
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      六、总结：缓存使用策略
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+  <h1>MyBatis 两级缓存机制</h1>
+
+<p>在数据库应用开发中，性能始终是我们关注的核心焦点之一。频繁地与数据库进行交互，执行重复的 SQL 查询，会消耗大量的系统资源，成为应用性能的主要瓶颈。想象一下，在一个高并发的场景下，每秒有成千上万的用户请求同一个热门商品的信息，如果每次请求都去查询数据库，数据库的压力将不堪重负。</p>
+<p>为了解决这个问题，“缓存”技术应运而生。它像是一个高速的数据中转站，将频繁访问的数据暂存在内存中。当后续请求需要相同的数据时，无需再访问慢速的磁盘数据库，直接从内存中获取，从而极大地提升了响应速度。</p>
+<p>作为一款优秀的持久层框架，MyBatis 自然也提供了一套强大且灵活的缓存机制。理解和正确使用 MyBatis 缓存，是优化 MyBatis 性能的关键一步。 这篇博客将带你深入浅出地了解 MyBatis 的两级缓存：一级缓存和二级缓存，帮助你更好地利用它们来提升应用性能。</p>
+<!-- more -->
+
+<h2 id="mybatis">一、MyBatis缓存概览：两级缓存结构</h2>
+<p>MyBatis提供了一套<strong>两级缓存</strong>体系，这是理解其缓存机制的核心：</p>
+<div class="highlight"><pre><span></span><code>应用层面
+    ↑
+┌─────────────────────────────────────────┐
+│          二级缓存 (Mapper级别)            │ ← 多个SqlSession共享
+└─────────────────────────────────────────┘
+    ↑
+┌─────────────────────────────────────────┐
+│          一级缓存 (SqlSession级别)        │ ← 单个SqlSession内部
+└─────────────────────────────────────────┘
+    ↑
+┌─────────────────────────────────────────┐
+│              数据库 (持久层)               │
+└─────────────────────────────────────────┘
+</code></pre></div>
+<hr />
+<h2 id="_1">二、一级缓存（本地缓存）深度解析</h2>
+<h3 id="1">1. 什么是⼀级缓存？</h3>
+<ul>
+<li><strong>作用域</strong>：<code>SqlSession</code> 级别（同一个数据库会话）</li>
+<li><strong>生命周期</strong>：与<code>SqlSession</code>共存亡</li>
+<li><strong>默认状态</strong>：<strong>默认开启</strong>，无法关闭</li>
+</ul>
+<h3 id="2">2. ⼯作原理与验证</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 验证一级缓存的示例</span>
+<span class="nd">@Test</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testFirstLevelCache</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">SqlSession</span><span class="w"> </span><span class="n">sqlSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSessionFactory</span><span class="p">.</span><span class="na">openSession</span><span class="p">();</span>
+<span class="w">    </span><span class="n">UserMapper</span><span class="w"> </span><span class="n">mapper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSession</span><span class="p">.</span><span class="na">getMapper</span><span class="p">(</span><span class="n">UserMapper</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 第一次查询 ===&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">selectUserById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w"> </span><span class="c1">// 发送SQL到数据库</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;查询结果: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user1</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 第二次查询（相同参数）===&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">selectUserById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w"> </span><span class="c1">// 从一级缓存获取，不发送SQL</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;查询结果: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user2</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;是否是同一个对象: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">user1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user2</span><span class="p">));</span><span class="w"> </span><span class="c1">// true（默认配置下）</span>
+
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 执行更新操作后再次查询 ===&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="n">mapper</span><span class="p">.</span><span class="na">updateUserStatus</span><span class="p">(</span><span class="mi">1L</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"> </span><span class="c1">// 更新操作</span>
+<span class="w">        </span><span class="n">User</span><span class="w"> </span><span class="n">user3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper</span><span class="p">.</span><span class="na">selectUserById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w"> </span><span class="c1">// 清空缓存，重新查询数据库</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;查询结果: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user3</span><span class="p">);</span>
+
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">sqlSession</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>控制台输出：</strong>
+<div class="highlight"><pre><span></span><code>=== 第一次查询 ===
+DEBUG: ==&gt;  Preparing: SELECT * FROM users WHERE id = ? 
+DEBUG: ==&gt; Parameters: 1(Long)
+查询结果: User{id=1, name=&#39;John&#39;}
+
+=== 第二次查询（相同参数） ===
+查询结果: User{id=1, name=&#39;John&#39;} 
+// 注意：没有SQL日志，说明从缓存读取
+
+是否是同一个对象: true
+
+=== 执行更新操作后再次查询 ===
+DEBUG: ==&gt;  Preparing: UPDATE users SET status = ? WHERE id = ?
+DEBUG: ==&gt; Parameters: 2(Integer), 1(Long)
+DEBUG: ==&gt;  Preparing: SELECT * FROM users WHERE id = ? 
+DEBUG: ==&gt; Parameters: 1(Long)
+查询结果: User{id=1, name=&#39;John&#39;, status=2}
+</code></pre></div></p>
+<h3 id="3">3. ⼀级缓存的清空时机</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 以下操作会清空一级缓存：</span>
+<span class="n">sqlSession</span><span class="p">.</span><span class="na">clearCache</span><span class="p">();</span><span class="w">                    </span><span class="c1">// 手动清空</span>
+<span class="n">mapper</span><span class="p">.</span><span class="na">updateUser</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">                    </span><span class="c1">// 更新操作</span>
+<span class="n">mapper</span><span class="p">.</span><span class="na">insertUser</span><span class="p">(</span><span class="n">user</span><span class="p">);</span><span class="w">                    </span><span class="c1">// 插入操作  </span>
+<span class="n">mapper</span><span class="p">.</span><span class="na">deleteUser</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w">                      </span><span class="c1">// 删除操作</span>
+<span class="n">sqlSession</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w">                        </span><span class="c1">// 提交事务</span>
+<span class="n">sqlSession</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">                      </span><span class="c1">// 回滚事务</span>
+</code></pre></div>
+<h3 id="4-mybatis-configxml">4. ⼀级缓存的配置（在mybatis-config.xml中）</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;settings&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- 本地缓存作用域（默认是SESSION） --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;setting</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;localCacheScope&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;SESSION&quot;</span><span class="nt">/&gt;</span>
+
+<span class="w">    </span><span class="cm">&lt;!-- 可选值：</span>
+<span class="cm">         SESSION: 整个SqlSession期间缓存（默认）</span>
+<span class="cm">         STATEMENT: 仅对当前语句有效，相当于关闭一级缓存</span>
+<span class="cm">    --&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div>
+<p><strong><code>STATEMENT</code>级别的使用场景</strong>：
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;settings&gt;</span>
+<span class="w">    </span><span class="nt">&lt;setting</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;localCacheScope&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;STATEMENT&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div>
+适用于需要避免脏读的场景，比如在同一个事务中先查询后更新再查询，希望第二次查询能获取最新数据。</p>
+<hr />
+<h2 id="_2">三、二级缓存（全局缓存）深度解析</h2>
+<h3 id="1_1">1. 什么是⼆级缓存？</h3>
+<ul>
+<li><strong>作用域</strong>：<code>Mapper</code> 级别（<code>namespace</code>级别）</li>
+<li><strong>生命周期</strong>：与应用生命周期一致</li>
+<li><strong>默认状态</strong>：<strong>默认关闭</strong>，需要手动开启</li>
+</ul>
+<h3 id="2_1">2. 如何开启⼆级缓存？</h3>
+<h4 id="1mybatis-configxml">步骤1：全局开启（mybatis-config.xml）</h4>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;settings&gt;</span>
+<span class="w">    </span><span class="cm">&lt;!-- 开启全局缓存（默认就是true，但显式配置更清晰） --&gt;</span>
+<span class="w">    </span><span class="nt">&lt;setting</span><span class="w"> </span><span class="na">name=</span><span class="s">&quot;cacheEnabled&quot;</span><span class="w"> </span><span class="na">value=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/settings&gt;</span>
+</code></pre></div>
+<h4 id="2mapperxml">步骤2：在Mapper.xml中配置缓存</h4>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- 最简单的开启方式 --&gt;</span>
+<span class="nt">&lt;mapper</span><span class="w"> </span><span class="na">namespace=</span><span class="s">&quot;com.example.mapper.UserMapper&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;cache/&gt;</span>
+
+<span class="w">    </span><span class="nt">&lt;select</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;selectUserById&quot;</span><span class="w"> </span><span class="na">resultType=</span><span class="s">&quot;User&quot;</span><span class="nt">&gt;</span>
+<span class="w">        </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>users<span class="w"> </span>WHERE<span class="w"> </span>id<span class="w"> </span>=<span class="w"> </span>#{id}
+<span class="w">    </span><span class="nt">&lt;/select&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</code></pre></div>
+<h4 id="3serializable">步骤3：实体类实现Serializable接口</h4>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">User</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Serializable</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">serialVersionUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1L</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// ... 属性和方法</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="3_1">3. ⼆级缓存的高级配置</h3>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;cache</span>
+<span class="w">  </span><span class="na">eviction=</span><span class="s">&quot;FIFO&quot;</span><span class="w">                          </span><span class="err">&lt;!--</span><span class="w"> </span><span class="err">回收策略：FIFO/LRU/SOFT/WEAK</span><span class="w"> </span><span class="err">--</span><span class="nt">&gt;</span>
+<span class="w">  </span>flushInterval=&quot;60000&quot;<span class="w">                    </span><span class="cm">&lt;!-- 刷新间隔：60秒 --&gt;</span>
+<span class="w">  </span>size=&quot;512&quot;<span class="w">                               </span><span class="cm">&lt;!-- 缓存对象数量 --&gt;</span>
+<span class="w">  </span>readOnly=&quot;true&quot;<span class="w">                          </span><span class="cm">&lt;!-- 是否只读 --&gt;</span>
+<span class="w">  </span>type=&quot;org.mybatis.caches.ehcache.EhcacheCache&quot;/&gt;<span class="w"> </span><span class="cm">&lt;!-- 自定义缓存实现 --&gt;</span>
+</code></pre></div>
+<p><strong>配置参数详解：</strong></p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>可选值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>eviction</code></td>
+<td><code>LRU</code>（最近最少使用）<br><code>FIFO</code>（先进先出）<br><code>SOFT</code>（软引用）<br><code>WEAK</code>（弱引用）</td>
+<td>缓存淘汰策略，默认<code>LRU</code></td>
+</tr>
+<tr>
+<td><code>flushInterval</code></td>
+<td>毫秒数</td>
+<td>定时清空缓存间隔，默认不清空</td>
+</tr>
+<tr>
+<td><code>size</code></td>
+<td>正整数</td>
+<td>缓存最多存储的对象数，默认1024</td>
+</tr>
+<tr>
+<td><code>readOnly</code></td>
+<td><code>true</code>/<code>false</code></td>
+<td><code>true</code>：返回相同对象（性能好）<br><code>false</code>：返回拷贝对象（安全）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4">4. ⼆级缓存的工作机制验证</h3>
+<div class="highlight"><pre><span></span><code><span class="nd">@Test</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">testSecondLevelCache</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 第一个SqlSession ===&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">SqlSession</span><span class="w"> </span><span class="n">sqlSession1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSessionFactory</span><span class="p">.</span><span class="na">openSession</span><span class="p">();</span>
+<span class="w">    </span><span class="n">UserMapper</span><span class="w"> </span><span class="n">mapper1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSession1</span><span class="p">.</span><span class="na">getMapper</span><span class="p">(</span><span class="n">UserMapper</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper1</span><span class="p">.</span><span class="na">selectUserById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w"> </span><span class="c1">// 查询数据库</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;第一次查询结果: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user1</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sqlSession1</span><span class="p">.</span><span class="na">close</span><span class="p">();</span><span class="w"> </span><span class="c1">// 必须关闭，一级缓存内容才会存入二级缓存</span>
+
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 第二个SqlSession ===&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">SqlSession</span><span class="w"> </span><span class="n">sqlSession2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSessionFactory</span><span class="p">.</span><span class="na">openSession</span><span class="p">();</span>
+<span class="w">    </span><span class="n">UserMapper</span><span class="w"> </span><span class="n">mapper2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqlSession2</span><span class="p">.</span><span class="na">getMapper</span><span class="p">(</span><span class="n">UserMapper</span><span class="p">.</span><span class="na">class</span><span class="p">);</span>
+<span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapper2</span><span class="p">.</span><span class="na">selectUserById</span><span class="p">(</span><span class="mi">1L</span><span class="p">);</span><span class="w"> </span><span class="c1">// 从二级缓存获取</span>
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;第二次查询结果: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">user2</span><span class="p">);</span>
+<span class="w">    </span><span class="n">sqlSession2</span><span class="p">.</span><span class="na">close</span><span class="p">();</span>
+
+<span class="w">    </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;=== 验证缓存命中 ===&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// 观察日志：第二次查询应该没有SQL输出</span>
+<span class="p">}</span>
+</code></pre></div>
+<p><strong>关键点</strong>：二级缓存只有在<code>SqlSession</code>关闭或提交后，才会生效！</p>
+<h3 id="5">5. 缓存的使用策略控制</h3>
+<h4 id="_3">在语句级别细粒度控制缓存：</h4>
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;select</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;selectUserById&quot;</span><span class="w"> </span><span class="na">resultType=</span><span class="s">&quot;User&quot;</span><span class="w"> </span>
+<span class="w">        </span><span class="na">useCache=</span><span class="s">&quot;true&quot;</span><span class="w">                     </span><span class="err">&lt;!--</span><span class="w"> </span><span class="err">是否使用缓存（默认true）</span><span class="w"> </span><span class="err">--</span><span class="nt">&gt;</span>
+<span class="w">        </span>flushCache=&quot;false&quot;&gt;<span class="w">                 </span><span class="cm">&lt;!-- 是否清空缓存（默认false） --&gt;</span>
+<span class="w">    </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>users<span class="w"> </span>WHERE<span class="w"> </span>id<span class="w"> </span>=<span class="w"> </span>#{id}
+<span class="nt">&lt;/select&gt;</span>
+
+<span class="nt">&lt;insert</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;insertUser&quot;</span><span class="w"> </span><span class="na">flushCache=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span><span class="w">  </span><span class="cm">&lt;!-- 插入后清空缓存 --&gt;</span>
+<span class="w">    </span>INSERT<span class="w"> </span>INTO<span class="w"> </span>users(name,<span class="w"> </span>email)<span class="w"> </span>VALUES(#{name},<span class="w"> </span>#{email})
+<span class="nt">&lt;/insert&gt;</span>
+
+<span class="nt">&lt;update</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;updateUser&quot;</span><span class="w"> </span><span class="na">flushCache=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span><span class="w">  </span><span class="cm">&lt;!-- 更新后清空缓存 --&gt;</span>
+<span class="w">    </span>UPDATE<span class="w"> </span>users<span class="w"> </span>SET<span class="w"> </span>name<span class="w"> </span>=<span class="w"> </span>#{name}<span class="w"> </span>WHERE<span class="w"> </span>id<span class="w"> </span>=<span class="w"> </span>#{id}
+<span class="nt">&lt;/update&gt;</span>
+</code></pre></div>
+<hr />
+<h2 id="_4">四、缓存执行流程与源码级原理</h2>
+<h3 id="1_2">1. 完整的查询缓存流程</h3>
+<div class="highlight"><pre><span></span><code>查询请求
+    ↓
+Executor.query() 
+    ↓
+检查二级缓存（CachingExecutor） 
+    ↓
+    ┌─ 缓存命中 → 返回结果
+    ↓
+检查一级缓存（BaseExecutor）
+    ↓
+    ┌─ 缓存命中 → 返回结果  
+    ↓
+查询数据库（真正执行SQL）
+    ↓
+存入一级缓存
+    ↓
+SqlSession关闭时 → 存入二级缓存
+    ↓
+返回结果
+</code></pre></div>
+<h3 id="2_2">2. 源码层面的关键类</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 二级缓存执行器（装饰器模式）</span>
+<span class="n">CachingExecutor</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">负责二级缓存逻辑</span>
+
+<span class="c1">// 基础执行器  </span>
+<span class="n">BaseExecutor</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">负责一级缓存逻辑</span>
+
+<span class="c1">// 缓存接口</span>
+<span class="n">Cache</span><span class="w"> </span><span class="err">→</span><span class="w"> </span><span class="n">所有缓存实现的统一接口</span>
+</code></pre></div>
+<hr />
+<h2 id="_5">五、实战中的缓存问题与解决方案</h2>
+<h3 id="1_3">1. 脏读问题（最常见）</h3>
+<p><strong>场景</strong>：多个应用实例或不同Mapper操作同一张表。</p>
+<p><strong>解决方案1</strong>：在关联的Mapper中引用同一个缓存
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- OrderMapper.xml --&gt;</span>
+<span class="nt">&lt;mapper</span><span class="w"> </span><span class="na">namespace=</span><span class="s">&quot;com.example.mapper.OrderMapper&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span><span class="nt">&lt;cache-ref</span><span class="w"> </span><span class="na">namespace=</span><span class="s">&quot;com.example.mapper.UserMapper&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/mapper&gt;</span>
+</code></pre></div></p>
+<p><strong>解决方案2</strong>：在更新操作中手动清空相关缓存
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;update</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;updateUser&quot;</span><span class="w"> </span><span class="na">flushCache=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span>UPDATE<span class="w"> </span>users<span class="w"> </span>SET<span class="w"> </span>...<span class="w"> </span>WHERE<span class="w"> </span>...
+<span class="nt">&lt;/update&gt;</span>
+</code></pre></div></p>
+<h3 id="2_3">2. 缓存穿透/击穿/雪崩</h3>
+<p>这些问题在MyBatis原生缓存中同样存在，解决方案：</p>
+<p><strong>自定义缓存实现</strong>（如集成Redis）：
+<div class="highlight"><pre><span></span><code><span class="nt">&lt;cache</span><span class="w"> </span><span class="na">type=</span><span class="s">&quot;org.mybatis.caches.redis.RedisCache&quot;</span><span class="nt">/&gt;</span>
+</code></pre></div></p>
+<h3 id="3_2">3. 二级缓存的最佳实践</h3>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- 推荐配置：适合读多写少的场景 --&gt;</span>
+<span class="nt">&lt;cache</span>
+<span class="w">  </span><span class="na">eviction=</span><span class="s">&quot;LRU&quot;</span>
+<span class="w">  </span><span class="na">flushInterval=</span><span class="s">&quot;300000&quot;</span><span class="w">    </span><span class="err">&lt;!--</span><span class="w"> </span><span class="err">5分钟自动刷新</span><span class="w"> </span><span class="err">--</span><span class="nt">&gt;</span>
+<span class="w">  </span>size=&quot;1024&quot;
+<span class="w">  </span>readOnly=&quot;false&quot;/&gt;<span class="w">        </span><span class="cm">&lt;!-- 保证线程安全 --&gt;</span>
+
+<span class="cm">&lt;!-- 对实时性要求高的查询禁用缓存 --&gt;</span>
+<span class="nt">&lt;select</span><span class="w"> </span><span class="na">id=</span><span class="s">&quot;getRealTimeData&quot;</span><span class="w"> </span><span class="na">useCache=</span><span class="s">&quot;false&quot;</span><span class="nt">&gt;</span>
+<span class="w">    </span>SELECT<span class="w"> </span>*<span class="w"> </span>FROM<span class="w"> </span>real_time_table
+<span class="nt">&lt;/select&gt;</span>
+</code></pre></div>
+<hr />
+<h2 id="_6">六、总结：缓存使用策略</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>一级缓存</th>
+<th>二级缓存</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>单体应用，数据量小</strong></td>
+<td>✅ 开启</td>
+<td>✅ 开启</td>
+<td>简单场景全开</td>
+</tr>
+<tr>
+<td><strong>高并发读，数据变更少</strong></td>
+<td>✅ 开启</td>
+<td>✅ 开启+合理配置</td>
+<td>缓存最大化</td>
+</tr>
+<tr>
+<td><strong>读写频繁，数据实时性要求高</strong></td>
+<td>✅ 开启</td>
+<td>❌ 关闭</td>
+<td>避免脏读</td>
+</tr>
+<tr>
+<td><strong>分布式环境</strong></td>
+<td>✅ 开启</td>
+<td>✅ 自定义缓存（如Redis）</td>
+<td>解决共享问题</td>
+</tr>
+</tbody>
+</table>
+<p><strong>最终建议</strong>：</p>
+<ul>
+<li>理解业务的数据访问模式后再决定缓存策略</li>
+<li>一级缓存通常保持开启，二级缓存根据实际情况谨慎使用</li>
+<li>生产环境务必进行压力测试，验证缓存效果</li>
+<li>监控缓存命中率，及时调整策略</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+  <h2 id="__comments">Comments</h2>
+  <!-- Insert generated snippet here -->
+    <script src="https://giscus.app/client.js"
+        data-repo="XJTUGary/XJTUGary.github.io"
+        data-repo-id="R_kgDOPeNkAA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPeNkAM4CuNUz"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../mybatis-%E4%B8%AD%E7%9A%84-%E6%98%8E%E7%9F%A5%E5%AE%83%E6%9C%89%E5%AE%89%E5%85%A8%E9%9A%90%E6%82%A3%E4%B8%BA%E4%BD%95%E8%BF%98%E8%A6%81%E4%BF%9D%E7%95%99%E5%AE%83/" class="md-footer__link md-footer__link--prev" aria-label="Previous: MyBatis 中的 ${}：明知它有“安全隐患”，为何还要保留它？">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                MyBatis 中的 ${}：明知它有“安全隐患”，为何还要保留它？
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/XJTUGary" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:wmlgaryx@gmail.com" target="_blank" rel="noopener" title="E-mail" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>

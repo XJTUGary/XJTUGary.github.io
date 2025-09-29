@@ -837,6 +837,15 @@
         <li class="md-nav__item">
   <a href="#mybatis" class="md-nav__link">
     <span class="md-ellipsis">
+      MyBatis 两级缓存机制
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mybatis" class="md-nav__link">
+    <span class="md-ellipsis">
       MyBatis 中的 ${}：明知它有“安全隐患”，为何还要保留它？
     </span>
   </a>
@@ -1162,6 +1171,47 @@
       <header class="md-typeset">
         <h1 id="_1">数据库</h1>
       </header>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2025-09-23 00:00:00+00:00">Tuesday, September 23, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">数据库</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              3 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="mybatis"><a class="toclink" href="../../2025/09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">MyBatis 两级缓存机制</a></h2>
+<p>在数据库应用开发中，性能始终是我们关注的核心焦点之一。频繁地与数据库进行交互，执行重复的 SQL 查询，会消耗大量的系统资源，成为应用性能的主要瓶颈。想象一下，在一个高并发的场景下，每秒有成千上万的用户请求同一个热门商品的信息，如果每次请求都去查询数据库，数据库的压力将不堪重负。</p>
+<p>为了解决这个问题，“缓存”技术应运而生。它像是一个高速的数据中转站，将频繁访问的数据暂存在内存中。当后续请求需要相同的数据时，无需再访问慢速的磁盘数据库，直接从内存中获取，从而极大地提升了响应速度。</p>
+<p>作为一款优秀的持久层框架，MyBatis 自然也提供了一套强大且灵活的缓存机制。理解和正确使用 MyBatis 缓存，是优化 MyBatis 性能的关键一步。 这篇博客将带你深入浅出地了解 MyBatis 的两级缓存：一级缓存和二级缓存，帮助你更好地利用它们来提升应用性能。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
       
         <article class="md-post md-post--excerpt">
   <header class="md-post__header">
