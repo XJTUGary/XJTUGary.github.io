@@ -1,0 +1,1908 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      
+        <link rel="next" href="../../../../2025/06/01/%E7%BA%BF%E4%B8%8A-cpu-%E9%A3%99%E9%AB%98%E6%80%8E%E4%B9%88%E5%AE%9A%E4%BD%8D/">
+      
+      
+      <link rel="icon" href="../../../../../images/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>线上CPU飙高事故全记录：一场正则表达式引发的“血案” - Gary's Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Gary&#39;s Blog" class="md-header__button md-logo" aria-label="Gary's Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Gary's Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              线上CPU飙高事故全记录：一场正则表达式引发的“血案”
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E6%97%85%E8%A1%8C/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E6%91%84%E5%BD%B1/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../%E8%BF%90%E5%8A%A8/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Gary&#39;s Blog" class="md-nav__button md-logo" aria-label="Gary's Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Gary's Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    首页
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    技术
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Archive
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2025/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../archive/2024/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2024
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Categories
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/agent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agent
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/java/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    JAVA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/rag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/redis/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Redis
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/sft/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SFT
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/sre/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    SRE
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E5%B9%B6%E5%8F%91/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    并发
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    数据库
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    线上问题
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    设计模式
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../category/%E9%9D%A2%E7%BB%8F/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    面经
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E6%97%85%E8%A1%8C/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    旅行
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E6%91%84%E5%BD%B1/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    摄影
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../../../%E8%BF%90%E5%8A%A8/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    运动
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href="../../../../" class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2024-03-15 00:00:00+00:00" class="md-ellipsis">Friday, March 15, 2024</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">线上问题</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              4 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+            
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      一、事故背景
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      二、问题现象
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、问题现象">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 监控告警
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      三、紧急响应
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、紧急响应">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.1 立即行动
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      3.2 效果评估
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      四、问题定位
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、问题定位">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.1 初步分析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.2 深入排查
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.3 代码分析
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#44" class="md-nav__link">
+    <span class="md-ellipsis">
+      4.4 问题邮件分析
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      五、根因分析
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="五、根因分析">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.1 技术根因
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.2 架构根因
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53" class="md-nav__link">
+    <span class="md-ellipsis">
+      5.3 业务根因
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      六、解决方案
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="六、解决方案">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.1 紧急修复
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62" class="md-nav__link">
+    <span class="md-ellipsis">
+      6.2 部署验证
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      七、复盘总结
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="七、复盘总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.1 时间线回顾
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.2 根本原因
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.3 改进措施
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#74" class="md-nav__link">
+    <span class="md-ellipsis">
+      7.4 经验教训
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      八、写在最后
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+
+
+  <h1>线上CPU飙高事故全记录：一场正则表达式引发的“血案”</h1>
+
+<p>本文详细记录一次真实的线上CPU飙高问题排查过程，涵盖从问题发现、定位、修复到复盘的完整流程，希望能为各位开发者提供参考和警示。</p>
+<!-- more -->
+
+<h2 id="_1"><strong>一、事故背景</strong></h2>
+<p><strong>系统</strong>：贷款申请邮件处理系统<br />
+<strong>服务</strong>：Email-Parser（邮件解析服务）<br />
+<strong>时间</strong>：2024-03-15 09:30<br />
+<strong>影响</strong>：邮件解析服务CPU持续95%+，贷款申请处理延迟10分钟+</p>
+<h2 id="_2"><strong>二、问题现象</strong></h2>
+<h3 id="21"><strong>2.1 监控告警</strong></h3>
+<div class="highlight"><pre><span></span><code>09:30:00 CPU使用率告警：email-parser-vm-1 CPU 95.6%
+09:30:15 CPU使用率告警：email-parser-vm-2 CPU 97.2%  
+09:30:30 业务指标告警：inbox中邮件积压超过1000封
+09:31:00 用户投诉：贷款申请超过30分钟未收到确认
+</code></pre></div>
+<h2 id="_3"><strong>三、紧急响应</strong></h2>
+<h3 id="31"><strong>3.1 立即行动</strong></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. 登录问题VM检查系统状态</span>
+ssh<span class="w"> </span>appuser@10.0.1.101
+top
+
+<span class="c1"># 2. 移动问题文件到垃圾箱</span>
+
+<span class="c1"># 3. 临时重启服务（快速恢复）</span>
+sudo<span class="w"> </span>systemctl<span class="w"> </span>restart<span class="w"> </span>email-parser
+</code></pre></div>
+<h3 id="32"><strong>3.2 效果评估</strong></h3>
+<ul>
+<li>09:45 服务重启完成，CPU暂时下降至40%</li>
+<li>09:50 Ticket生成量恢复到正常水平</li>
+</ul>
+<h2 id="_4"><strong>四、问题定位</strong></h2>
+<h3 id="41"><strong>4.1 初步分析</strong></h3>
+<p><strong>检查方向</strong>：</p>
+<ol>
+<li>内存使用：正常，无内存泄漏</li>
+<li>线程状态：大量线程处于RUNNABLE状态</li>
+<li>垃圾回收：GC频率正常，无Full GC</li>
+<li>网络IO：网络连接数正常</li>
+</ol>
+<h3 id="42"><strong>4.2 深入排查</strong></h3>
+<p><strong>步骤1：定位问题进程</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># 登录问题节点</span>
+ssh<span class="w"> </span>node-10.0.1.23
+
+<span class="c1"># 查看CPU使用率最高的进程</span>
+top<span class="w"> </span>-p<span class="w"> </span><span class="k">$(</span>pgrep<span class="w"> </span>-f<span class="w"> </span>email-parser<span class="k">)</span>
+
+PID<span class="w">    </span>USER<span class="w">     </span>PR<span class="w">  </span>NI<span class="w">    </span>VIRT<span class="w">    </span>RES<span class="w">    </span>SHR<span class="w"> </span>S<span class="w">  </span>%CPU<span class="w"> </span>%MEM<span class="w">     </span>TIME+<span class="w"> </span>COMMAND
+<span class="m">12345</span><span class="w">  </span>app<span class="w">      </span><span class="m">20</span><span class="w">   </span><span class="m">0</span><span class="w">   </span><span class="m">12</span>.8g<span class="w">   </span><span class="m">2</span>.1g<span class="w">   </span>15m<span class="w"> </span>R<span class="w">  </span><span class="m">98</span>.6<span class="w">  </span><span class="m">6</span>.8<span class="w">  </span><span class="m">15</span>:30.22<span class="w"> </span>java
+</code></pre></div></p>
+<p><strong>步骤2：分析线程CPU使用</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># 查看进程内线程CPU使用情况</span>
+top<span class="w"> </span>-H<span class="w"> </span>-p<span class="w"> </span><span class="m">12345</span>
+
+PID<span class="w">    </span>USER<span class="w">     </span>PR<span class="w">  </span>NI<span class="w">    </span>VIRT<span class="w">    </span>RES<span class="w">    </span>SHR<span class="w"> </span>S<span class="w"> </span>%CPU<span class="w"> </span>%MEM<span class="w">     </span>TIME+<span class="w"> </span>COMMAND
+<span class="m">12346</span><span class="w">  </span>app<span class="w">      </span><span class="m">20</span><span class="w">   </span><span class="m">0</span><span class="w">   </span><span class="m">12</span>.8g<span class="w">   </span><span class="m">2</span>.1g<span class="w">   </span>15m<span class="w"> </span>R<span class="w"> </span><span class="m">45</span>.2<span class="w">  </span><span class="m">6</span>.8<span class="w">   </span><span class="m">7</span>:15.10<span class="w"> </span>java
+<span class="m">12347</span><span class="w">  </span>app<span class="w">      </span><span class="m">20</span><span class="w">   </span><span class="m">0</span><span class="w">   </span><span class="m">12</span>.8g<span class="w">   </span><span class="m">2</span>.1g<span class="w">   </span>15m<span class="w"> </span>R<span class="w"> </span><span class="m">43</span>.8<span class="w">  </span><span class="m">6</span>.8<span class="w">   </span><span class="m">7</span>:12.45<span class="w"> </span>java
+<span class="m">12348</span><span class="w">  </span>app<span class="w">      </span><span class="m">20</span><span class="w">   </span><span class="m">0</span><span class="w">   </span><span class="m">12</span>.8g<span class="w">   </span><span class="m">2</span>.1g<span class="w">   </span>15m<span class="w"> </span>R<span class="w">  </span><span class="m">2</span>.1<span class="w">  </span><span class="m">6</span>.8<span class="w">   </span><span class="m">0</span>:05.23<span class="w"> </span>java
+</code></pre></div></p>
+<p><strong>步骤3：线程堆栈分析</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># 转换高CPU线程ID为十六进制</span>
+<span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;%x\n&quot;</span><span class="w"> </span><span class="m">12346</span><span class="w">  </span><span class="c1"># 输出：303a</span>
+
+<span class="c1"># 获取线程堆栈</span>
+jstack<span class="w"> </span><span class="m">12345</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/thread_dump.log
+
+<span class="c1"># 分析问题线程</span>
+grep<span class="w"> </span>-A<span class="w"> </span><span class="m">30</span><span class="w"> </span>-B<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;nid=0x303a&quot;</span><span class="w"> </span>/tmp/thread_dump.log
+</code></pre></div></p>
+<p><strong>关键堆栈信息</strong>：
+<div class="highlight"><pre><span></span><code><span class="s">&quot;pool-1-thread-3&quot;</span><span class="w"> </span><span class="err">#</span><span class="mi">25</span><span class="w"> </span><span class="n">prio</span><span class="o">=</span><span class="mi">5</span><span class="w"> </span><span class="n">os_prio</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">tid</span><span class="o">=</span><span class="mh">0x00007f8b3820b000</span><span class="w"> </span><span class="n">nid</span><span class="o">=</span><span class="mh">0x303a</span><span class="w"> </span><span class="n">runnable</span><span class="w"> </span><span class="o">[</span><span class="mh">0x00007f8b2e5f8000</span><span class="o">]</span>
+<span class="w">   </span><span class="n">java</span><span class="p">.</span><span class="na">lang</span><span class="p">.</span><span class="na">Thread</span><span class="p">.</span><span class="na">State</span><span class="p">:</span><span class="w"> </span><span class="n">RUNNABLE</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Pattern$Branch</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Pattern</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">4604</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Pattern$GroupHead</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Pattern</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">4668</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Pattern$Loop</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Pattern</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">4795</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Pattern$GroupTail</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Pattern</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">4727</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Pattern$BranchConn</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Pattern</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">4585</span><span class="p">)</span>
+<span class="w">    </span><span class="c1">// ... 大量回溯调用栈</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Matcher</span><span class="p">.</span><span class="na">match</span><span class="p">(</span><span class="n">Matcher</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">1270</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">java</span><span class="p">.</span><span class="na">util</span><span class="p">.</span><span class="na">regex</span><span class="p">.</span><span class="na">Matcher</span><span class="p">.</span><span class="na">matches</span><span class="p">(</span><span class="n">Matcher</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">604</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">company</span><span class="p">.</span><span class="na">email</span><span class="p">.</span><span class="na">HtmlEmailParser</span><span class="p">.</span><span class="na">parseLoanAmount</span><span class="p">(</span><span class="n">HtmlEmailParser</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">89</span><span class="p">)</span>
+<span class="w">    </span><span class="n">at</span><span class="w"> </span><span class="n">com</span><span class="p">.</span><span class="na">company</span><span class="p">.</span><span class="na">email</span><span class="p">.</span><span class="na">LoanEmailProcessor</span><span class="p">.</span><span class="na">processEmail</span><span class="p">(</span><span class="n">LoanEmailProcessor</span><span class="p">.</span><span class="na">java</span><span class="p">:</span><span class="mi">45</span><span class="p">)</span>
+</code></pre></div></p>
+<h3 id="43"><strong>4.3 代码分析</strong></h3>
+<p>找到问题代码 <code>HtmlEmailParser.java:89</code>：
+<div class="highlight"><pre><span></span><code><span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">HtmlEmailParser</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 问题正则表达式</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Pattern</span><span class="w"> </span><span class="n">LOAN_AMOUNT_PATTERN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">compile</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;贷款.*?(?:金额|额度).*?[:：]\\s*([\\d,]+(?:\\.\\d{1,2})?)\\s*(?:元|人民币)?&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">Pattern</span><span class="p">.</span><span class="na">CASE_INSENSITIVE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">MULTILINE</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Pattern</span><span class="p">.</span><span class="na">DOTALL</span>
+<span class="w">    </span><span class="p">);</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">parseLoanAmount</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">htmlContent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">Document</span><span class="w"> </span><span class="n">doc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Jsoup</span><span class="p">.</span><span class="na">parse</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">);</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">doc</span><span class="p">.</span><span class="na">text</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">Matcher</span><span class="w"> </span><span class="n">matcher</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LOAN_AMOUNT_PATTERN</span><span class="p">.</span><span class="na">matcher</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">matcher</span><span class="p">.</span><span class="na">find</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// 第89行 - CPU飙高点</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="n">parseAmount</span><span class="p">(</span><span class="n">matcher</span><span class="p">.</span><span class="na">group</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="44"><strong>4.4 问题邮件分析</strong></h3>
+<p>通过日志找到触发问题的邮件特征：</p>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- 问题邮件：新渠道商模板bug导致大量重复内容 --&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>贷款申请贷款申请贷款申请...<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span> <span class="cm">&lt;!-- 重复200+行 --&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;</span>
+贷款金额：测试贷款金额：测试...       <span class="cm">&lt;!-- 重复100+行 --&gt;</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>贷款金额：200,000元<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>        <span class="cm">&lt;!-- 真正的金额信息 --&gt;</span>
+</code></pre></div>
+<p><strong>问题邮件特征</strong>：</p>
+<ul>
+<li>邮件长度：25,000+ 字符</li>
+<li>"贷款"关键词：200+ 次</li>
+<li>"金额"关键词：100+ 次  </li>
+<li>HTML结构：深层嵌套 + 隐藏内容</li>
+</ul>
+<h2 id="_5"><strong>五、根因分析</strong></h2>
+<h3 id="51"><strong>5.1 技术根因</strong></h3>
+<p><strong>正则表达式灾难性回溯</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">// 问题模式：贷款.*?(?:金额|额度).*?[:：]</span>
+<span class="c1">// 匹配过程产生指数级回溯</span>
+
+<span class="n">组合尝试次数</span><span class="err">：</span><span class="mi">200</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;贷款&quot;</span><span class="p">)</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;金额&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="mo">000</span><span class="n">次</span>
+<span class="n">每次尝试包含</span><span class="err">：</span><span class="n">平均50次字符比较</span>
+<span class="n">总操作次数</span><span class="err">：</span><span class="mi">20</span><span class="p">,</span><span class="mo">000</span><span class="w"> </span><span class="err">×</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="mo">000</span><span class="p">,</span><span class="mo">000</span><span class="o">+</span><span class="w"> </span><span class="n">次</span>
+</code></pre></div></p>
+<h3 id="52"><strong>5.2 架构根因</strong></h3>
+<ol>
+<li><strong>缺乏输入验证</strong>：未对邮件内容长度和复杂度进行检查</li>
+<li><strong>无超时控制</strong>：正则匹配操作没有超时限制</li>
+<li><strong>资源无隔离</strong>：所有邮件共享同一个线程池</li>
+<li><strong>监控不完善</strong>：缺少过程指标监控</li>
+</ol>
+<h3 id="53"><strong>5.3 业务根因</strong></h3>
+<p>一个Branch邮件模板存在bug，导致生成大量重复内容。</p>
+<h2 id="_6"><strong>六、解决方案</strong></h2>
+<h3 id="61"><strong>6.1 紧急修复</strong></h3>
+<p><strong>方案1：优化正则表达式</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">// 优化前（问题模式）</span>
+<span class="s">&quot;贷款.*?(?:金额|额度).*?[:：]\\s*([\\d,]+(?:\\.\\d{1,2})?)\\s*(?:元|人民币)?&quot;</span>
+
+<span class="c1">// 优化后（安全模式）  </span>
+<span class="s">&quot;贷款[^金额]{0,100}金额[^:]{0,50}[:：]\\s*([\\d,]+(?:\\.\\d{1,2})?)\\s*(?:元|人民币)?&quot;</span>
+</code></pre></div></p>
+<p><strong>方案2：添加防御性代码</strong>
+<div class="highlight"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">parseLoanAmountSafely</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">htmlContent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// 1. 长度限制</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">htmlContent</span><span class="p">.</span><span class="na">length</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">50000</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">htmlContent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">htmlContent</span><span class="p">.</span><span class="na">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">50000</span><span class="p">);</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;邮件内容过长，已截断&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 2. 复杂度检查</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">countOccurrences</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;贷款&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;邮件内容异常复杂，启用降级解析&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">parseWithFallback</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 3. 超时控制</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">parseWithTimeout</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">SECONDS</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">private</span><span class="w"> </span><span class="n">BigDecimal</span><span class="w"> </span><span class="nf">parseWithTimeout</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">htmlContent</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">timeout</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="w"> </span><span class="n">unit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ExecutorService</span><span class="w"> </span><span class="n">executor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Executors</span><span class="p">.</span><span class="na">newSingleThreadExecutor</span><span class="p">();</span>
+<span class="w">    </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">BigDecimal</span><span class="o">&gt;</span><span class="w"> </span><span class="n">future</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">executor</span><span class="p">.</span><span class="na">submit</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">parseLoanAmount</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">));</span>
+
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">future</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span><span class="w"> </span><span class="n">unit</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">TimeoutException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">future</span><span class="p">.</span><span class="na">cancel</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">warn</span><span class="p">(</span><span class="s">&quot;邮件解析超时，启用降级方案&quot;</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">parseWithFallback</span><span class="p">(</span><span class="n">htmlContent</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">log</span><span class="p">.</span><span class="na">error</span><span class="p">(</span><span class="s">&quot;解析异常&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">executor</span><span class="p">.</span><span class="na">shutdown</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></p>
+<h3 id="62"><strong>6.2 部署验证</strong></h3>
+<p><strong>测试环境验证</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1"># 使用问题邮件样本测试</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://test-email-parser/parse<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;html&quot;: &quot;...problem_email_content...&quot;}&#39;</span>
+
+<span class="c1"># 监控CPU使用率和响应时间</span>
+<span class="c1"># 修复前：CPU 95%+, 响应时间 30s+</span>
+<span class="c1"># 修复后：CPU 15%, 响应时间 200ms</span>
+</code></pre></div></p>
+<p><strong>生产环境发布</strong>：</p>
+<ul>
+<li>14:00 修复版本部署到预发布环境</li>
+<li>14:30 验证通过，开始灰度发布</li>
+<li>15:00 50%流量切换至新版本</li>
+<li>15:30 100%流量切换，监控稳定</li>
+</ul>
+<h2 id="_7"><strong>七、复盘总结</strong></h2>
+<h3 id="71"><strong>7.1 时间线回顾</strong></h3>
+<div class="highlight"><pre><span></span><code>09:30 - 问题发生，监控告警
+09:35 - 紧急响应，服务扩容
+10:00 - 服务基本恢复
+11:15 - 定位到正则表达式问题
+14:00 - 修复版本部署验证
+15:30 - 全量发布，问题解决
+</code></pre></div>
+<h3 id="72"><strong>7.2 根本原因</strong></h3>
+<ol>
+<li><strong>直接原因</strong>：复杂正则表达式在特定输入下触发灾难性回溯</li>
+<li><strong>深层原因</strong>：缺乏对用户输入的验证和防护</li>
+<li><strong>系统原因</strong>：架构设计缺少超时控制和资源隔离</li>
+</ol>
+<h3 id="73"><strong>7.3 改进措施</strong></h3>
+<p><strong>立即执行</strong>：</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 为所有正则匹配操作添加超时控制</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 实现邮件内容长度和复杂度检查</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> 建立邮件解析性能监控看板</li>
+</ul>
+<p><strong>短期改进（1个月内）</strong>：</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 建立正则表达式代码审查规范</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 实现邮件样本库和自动化性能测试</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 完善服务熔断和降级机制</li>
+</ul>
+<p><strong>长期规划（3个月内）</strong>：</p>
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 迁移到专用解析服务，实现资源隔离</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 引入机器学习进行邮件内容分类</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> 建立全链路追踪和智能告警</li>
+</ul>
+<h3 id="74"><strong>7.4 经验教训</strong></h3>
+<p><strong>技术层面</strong>：</p>
+<ol>
+<li><strong>正则表达式需要性能测试</strong>：不仅要测试正常情况，还要测试边界和异常情况</li>
+<li><strong>用户输入永远不可信</strong>：必须对输入数据进行严格验证和清理</li>
+<li><strong>超时控制是生命线</strong>：任何可能阻塞的操作都必须有超时保护</li>
+</ol>
+<p><strong>流程层面</strong>：</p>
+<ol>
+<li><strong>新渠道接入需要严格测试</strong>：第三方集成必须经过完整的测试流程</li>
+<li><strong>代码审查要关注性能</strong>：复杂正则表达式需要专项评审</li>
+<li><strong>监控要覆盖过程指标</strong>：不仅要监控结果，还要监控处理过程</li>
+</ol>
+<p><strong>架构层面</strong>：</p>
+<ol>
+<li><strong>设计要有弹性</strong>：单点故障应该被隔离，避免影响整个系统</li>
+<li><strong>资源要有隔离</strong>：不同类型的任务应该使用不同的资源池</li>
+<li><strong>降级要有预案</strong>：核心功能必须有备选方案</li>
+</ol>
+<h2 id="_8"><strong>八、写在最后</strong></h2>
+<p>这次CPU飙高事故虽然造成了2小时的服务降级，但它为我们敲响了警钟。在分布式系统日益复杂的今天，任何一个看似微小的代码细节都可能引发连锁反应。</p>
+<p><strong>最重要的收获</strong>：在软件工程中，没有"永远不会发生"的输入，只有"我们还没有准备好"的系统。防御性编程、完善的监控和弹性架构设计，是我们应对不确定性的最好武器。</p>
+<p>希望这次事故的详细记录能够帮助大家在遇到类似问题时，能够更快地定位和解决。记住，每一次事故都是改进系统的最好机会。</p>
+<hr />
+<p><strong>附录：有用的排查命令</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 快速定位高CPU进程</span>
+ps<span class="w"> </span>-eo<span class="w"> </span>pid,ppid,cmd,%mem,%cpu<span class="w"> </span>--sort<span class="o">=</span>-%cpu<span class="w"> </span><span class="p">|</span><span class="w"> </span>head
+
+<span class="c1"># 分析Java进程线程</span>
+jstack<span class="w"> </span>&lt;pid&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="s2">&quot;nid=0x</span><span class="k">$(</span><span class="nb">printf</span><span class="w"> </span><span class="s2">&quot;%x&quot;</span><span class="w"> </span>&lt;thread_id&gt;<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># 实时监控GC情况</span>
+jstat<span class="w"> </span>-gc<span class="w"> </span>&lt;pid&gt;<span class="w"> </span>1s
+
+<span class="c1"># 生成堆转储（如果需要进一步分析）</span>
+jmap<span class="w"> </span>-dump:live,format<span class="o">=</span>b,file<span class="o">=</span>heap.hprof<span class="w"> </span>&lt;pid&gt;
+</code></pre></div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+  
+
+
+
+  <h2 id="__comments">Comments</h2>
+  <!-- Insert generated snippet here -->
+    <script src="https://giscus.app/client.js"
+        data-repo="XJTUGary/XJTUGary.github.io"
+        data-repo-id="R_kgDOPeNkAA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPeNkAM4CuNUz"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+  <!-- Synchronize Giscus theme with palette -->
+  <script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+        
+          
+          <a href="../../../../2025/06/01/%E7%BA%BF%E4%B8%8A-cpu-%E9%A3%99%E9%AB%98%E6%80%8E%E4%B9%88%E5%AE%9A%E4%BD%8D/" class="md-footer__link md-footer__link--next" aria-label="Next: 线上 CPU 飙高怎么定位？">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                线上 CPU 飙高怎么定位？
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/XJTUGary" target="_blank" rel="noopener" title="GitHub" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:wmlgaryx@gmail.com" target="_blank" rel="noopener" title="E-mail" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+    
+  </body>
+</html>
