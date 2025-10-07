@@ -1,0 +1,1138 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../../09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/" rel="prev"/>
+<link href="../../../../../images/logo.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>线上API响应慢？一线工程师的完整排查指南 - Gary's Blog</title>
+<link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="black" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#_1">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Gary's Blog" class="md-header__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Gary's Blog
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              线上API响应慢？一线工程师的完整排查指南
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../..">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../../../">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Gary's Blog" class="md-nav__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Gary's Blog
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../..">
+<span class="md-ellipsis">
+    首页
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<span class="md-ellipsis">
+    技术
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+<span class="md-ellipsis">
+    Archive
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2025/">
+<span class="md-ellipsis">
+    2025
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2024/">
+<span class="md-ellipsis">
+    2024
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Categories
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/agent/">
+<span class="md-ellipsis">
+    Agent
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/java/">
+<span class="md-ellipsis">
+    JAVA
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/rag/">
+<span class="md-ellipsis">
+    RAG
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/redis/">
+<span class="md-ellipsis">
+    Redis
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sft/">
+<span class="md-ellipsis">
+    SFT
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sre/">
+<span class="md-ellipsis">
+    SRE
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E5%B9%B6%E5%8F%91/">
+<span class="md-ellipsis">
+    并发
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">
+<span class="md-ellipsis">
+    数据库
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">
+<span class="md-ellipsis">
+    线上问题
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<span class="md-ellipsis">
+    设计模式
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E9%9D%A2%E7%BB%8F/">
+<span class="md-ellipsis">
+    面经
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+<span class="md-ellipsis">
+    旅行
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+<span class="md-ellipsis">
+    摄影
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+<span class="md-ellipsis">
+    运动
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content md-content--post" data-md-component="content">
+<div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner md-post">
+<nav class="md-nav md-nav--primary">
+<div class="md-post__back">
+<div class="md-nav__title md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+<span class="md-ellipsis">
+                    Back to index
+                  </span>
+</a>
+</div>
+</div>
+<ul class="md-post__meta md-nav__list">
+<li class="md-nav__item md-nav__item--section">
+<div class="md-post__title">
+<span class="md-ellipsis">
+                    Metadata
+                  </span>
+</div>
+<nav class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
+<time class="md-ellipsis" datetime="2025-10-07 00:00:00+00:00">Tuesday, October 7, 2025</time>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"></path></svg>
+<span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">线上问题</a></span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
+<span class="md-ellipsis">
+                            
+                              3 min read
+                            
+                          </span>
+</div>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_1">
+<span class="md-ellipsis">
+      🎯 问题来了：用户反馈系统卡顿，怎么办？
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      📊 第一步：快速判断问题范围
+    </span>
+</a>
+<nav aria-label="📊 第一步：快速判断问题范围" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      是个别接口慢还是整个系统慢？
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#-">
+<span class="md-ellipsis">
+      👁️ 第二步：建立监控体系 - 问题发现的"火眼金睛"
+    </span>
+</a>
+<nav aria-label='👁️ 第二步：建立监控体系 - 问题发现的"火眼金睛"' class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#21">
+<span class="md-ellipsis">
+      2.1 可观测性三大支柱
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#22">
+<span class="md-ellipsis">
+      2.2 关键性能指标基准
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#-_1">
+<span class="md-ellipsis">
+      🗄️ 第三步：数据库问题排查 - 最常见的"罪魁祸首"
+    </span>
+</a>
+<nav aria-label='🗄️ 第三步：数据库问题排查 - 最常见的"罪魁祸首"' class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#31">
+<span class="md-ellipsis">
+      3.1 开启慢查询日志
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#32">
+<span class="md-ellipsis">
+      3.2 慢查询分析流程
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#-_2">
+<span class="md-ellipsis">
+      🕵️ 第四步：使用链路追踪 - 请求的"行车记录仪"
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      🔧 第五步：深入问题排查
+    </span>
+</a>
+<nav aria-label="🔧 第五步：深入问题排查" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#51">
+<span class="md-ellipsis">
+      5.1 个别接口响应慢排查流程
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#52">
+<span class="md-ellipsis">
+      5.2 死锁问题排查与预防
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#53">
+<span class="md-ellipsis">
+      5.3 系统整体慢的全面排查体系
+    </span>
+</a>
+<nav aria-label="5.3 系统整体慢的全面排查体系" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#cpu">
+<span class="md-ellipsis">
+      🖥️ CPU占用过高排查实战
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      💾 内存问题排查
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      🗃️ 垃圾回收问题分类
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#-_3">
+<span class="md-ellipsis">
+      🛡️ 第六步：预防优于治疗 - 建立常态化监控
+    </span>
+</a>
+<nav aria-label="🛡️ 第六步：预防优于治疗 - 建立常态化监控" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      推荐监控工具栈：
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      🧠 排查心法：从宏观到微观
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_9">
+<span class="md-ellipsis">
+      📋 排查清单：快速参考
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_10">
+<span class="md-ellipsis">
+      🎉 总结
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<article class="md-content__inner md-typeset">
+<h1>线上API响应慢？一线工程师的完整排查指南</h1>
+<p>作为开发人员，最头疼的就是接到用户反馈"系统好慢"、"页面打不开"。面对这种模糊的问题描述，如何快速定位并解决？本文将带你建立完整的线上问题排查体系。</p>
+<!-- more -->
+<h2 id="_1">🎯 问题来了：用户反馈系统卡顿，怎么办？</h2>
+<div class="mermaid">graph TD
+    A[用户反馈系统慢] --&gt; B{问题范围判断}
+    B --&gt;|个别接口慢| C[链路追踪分析]
+    B --&gt;|整个系统慢| D[系统资源排查]
+
+    C --&gt; C1[数据库慢查询]
+    C --&gt; C2[外部服务调用]
+    C --&gt; C3[代码逻辑问题]
+
+    D --&gt; D1[CPU分析]
+    D --&gt; D2[内存分析]
+    D --&gt; D3[磁盘I/O]
+    D --&gt; D4[网络问题]
+
+    C1 --&gt; E[解决方案]
+    C2 --&gt; E
+    C3 --&gt; E
+    D1 --&gt; E
+    D2 --&gt; E
+    D3 --&gt; E
+    D4 --&gt; E
+</div>
+<h2 id="_2">📊 第一步：快速判断问题范围</h2>
+<h3 id="_3">是个别接口慢还是整个系统慢？</h3>
+<p><strong>🔍 个别接口慢的典型特征</strong>：</p>
+<ul>
+<li>✅ 只有特定功能操作缓慢</li>
+<li>✅ 其他功能响应正常  </li>
+<li>✅ 特定用户或特定数据操作时出现</li>
+</ul>
+<p><strong>🌐 整个系统慢的典型特征</strong>：</p>
+<ul>
+<li>❌ 大部分页面打开都很慢</li>
+<li>❌ 多个用户同时反馈问题</li>
+<li>❌ 系统监控告警集中出现</li>
+</ul>
+<h2 id="-">👁️ 第二步：建立监控体系 - 问题发现的"火眼金睛"</h2>
+<h3 id="21">2.1 可观测性三大支柱</h3>
+<p>现代分布式系统必须建立完善的可观测性体系：</p>
+<div class="mermaid">graph LR
+    A[可观测性] --&gt; B[Metrics<br/>指标监控]
+    A --&gt; C[Logs<br/>日志分析]
+    A --&gt; D[Traces<br/>链路追踪]
+
+    B --&gt; B1[QPS/TPS/RT]
+    B --&gt; B2[CPU/内存使用率]
+    B --&gt; B3[错误率]
+
+    C --&gt; C1[应用日志]
+    C --&gt; C2[中间件日志]
+    C --&gt; C3[系统日志]
+
+    D --&gt; D1[调用链路]
+    D --&gt; D2[耗时分析]
+    D --&gt; D3[依赖关系]
+</div>
+<p><strong>📈 Metrics（指标监控）</strong></p>
+<ul>
+<li>系统性能：请求成功率、吞吐量(QPS/TPS)、响应时间(RT)</li>
+<li>资源使用：CPU、内存、磁盘、网络使用率</li>
+<li>业务指标：订单创建成功率、支付成功率等</li>
+</ul>
+<p><strong>📝 Logs（日志分析）</strong></p>
+<ul>
+<li>应用日志：错误堆栈、业务异常记录</li>
+<li>中间件日志：数据库慢查询、Redis超时等</li>
+<li>系统日志：操作系统级异常信息</li>
+</ul>
+<p><strong>🔗 Traces（链路追踪）</strong></p>
+<ul>
+<li>请求完整调用链路</li>
+<li>每个环节的耗时分析</li>
+<li>服务间依赖关系</li>
+</ul>
+<h3 id="22">2.2 关键性能指标基准</h3>
+<table>
+<thead>
+<tr>
+<th>行业</th>
+<th>响应时间标准</th>
+<th>处理能力(TPS)</th>
+<th>错误率要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🛒 互联网电商</td>
+<td>500ms以下</td>
+<td>10,000-1,000,000</td>
+<td>≤0.6%</td>
+</tr>
+<tr>
+<td>🏦 金融行业</td>
+<td>1-3秒以下</td>
+<td>1,000-50,000</td>
+<td>≤0.6%</td>
+</tr>
+<tr>
+<td>🏭 制造业</td>
+<td>3-5秒以下</td>
+<td>10-5,000</td>
+<td>≤0.6%</td>
+</tr>
+</tbody>
+</table>
+<h2 id="-_1">🗄️ 第三步：数据库问题排查 - 最常见的"罪魁祸首"</h2>
+<h3 id="31">3.1 开启慢查询日志</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 🚀 临时开启（无需重启）</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">slow_query_log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'ON'</span><span class="p">;</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">slow_query_log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'/var/log/mysql/slow.log'</span><span class="p">;</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">long_query_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 超过2秒的记录</span>
+
+<span class="c1">-- 💾 永久开启（修改my.cnf）</span>
+<span class="p">[</span><span class="n">mysqld</span><span class="p">]</span>
+<span class="n">slow_query_log</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span>
+<span class="n">slow_query_log_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">/</span><span class="n">var</span><span class="o">/</span><span class="n">log</span><span class="o">/</span><span class="n">mysql</span><span class="o">/</span><span class="n">slow</span><span class="p">.</span><span class="n">log</span>
+<span class="n">long_query_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+</code></pre></div>
+<h3 id="32">3.2 慢查询分析流程</h3>
+<div class="mermaid">flowchart TD
+    A[发现慢查询] --&gt; B[EXPLAIN分析]
+    B --&gt; C{索引使用情况}
+    C --&gt;|无索引| D[添加合适索引]
+    C --&gt;|有索引但未使用| E[优化SQL语句]
+    C --&gt;|索引使用正确| F[其他优化]
+
+    D --&gt; G[验证优化效果]
+    E --&gt; G
+    F --&gt; G
+
+    F --&gt; F1[查询重写]
+    F --&gt; F2[数据归档]
+    F --&gt; F3[分库分表]
+</div>
+<h2 id="-_2">🕵️ 第四步：使用链路追踪 - 请求的"行车记录仪"</h2>
+<p>当接口逻辑复杂（查数据库、调外部服务、发消息等），传统排查方法效率低下。</p>
+<p><strong>SkyWalking实战效果</strong>：</p>
+<div class="highlight"><pre><span></span><code>🌐 用户请求 (总耗时: 1.2s)
+├── 🔗 网关处理 (15ms)
+├── 🏗️ 业务服务A (800ms)
+│   ├── 💾 MySQL查询 (650ms)
+│   ├── 🔴 Redis查询 (50ms) 
+│   └── ⚡ 业务逻辑 (100ms)
+├── 🔗 外部服务调用 (300ms)
+└── 📨 消息发送 (85ms)
+</code></pre></div>
+<h2 id="_4">🔧 第五步：深入问题排查</h2>
+<h3 id="51">5.1 个别接口响应慢排查流程</h3>
+<div class="mermaid">flowchart TD
+    A[个别接口慢] --&gt; B[SkyWalking链路分析]
+    B --&gt; C{瓶颈定位}
+
+    C --&gt;|数据库慢| D[SQL优化]
+    C --&gt;|外部服务慢| E[服务降级/超时设置]
+    C --&gt;|代码逻辑问题| F[代码优化]
+
+    D --&gt; D1[EXPLAIN分析]
+    D1 --&gt; D2[索引优化]
+    D2 --&gt; D3[查询重写]
+
+    E --&gt; E1[超时配置]
+    E1 --&gt; E2[熔断机制]
+    E2 --&gt; E3[异步处理]
+
+    F --&gt; F1[算法优化]
+    F1 --&gt; F2[缓存优化]
+    F2 --&gt; F3[并发优化]
+</div>
+<h3 id="52">5.2 死锁问题排查与预防</h3>
+<p><strong>🔗 死锁产生条件</strong>：</p>
+<div class="highlight"><pre><span></span><code>线程A: 持有锁1 → 等待锁2
+线程B: 持有锁2 → 等待锁1
+</code></pre></div>
+<p><strong>🛠️ 排查命令</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. 查找Java进程</span>
+jps
+
+<span class="c1"># 2. 分析线程堆栈</span>
+jstack<span class="w"> </span>&lt;pid&gt;
+
+<span class="c1"># 3. 搜索死锁信息</span>
+jstack<span class="w"> </span>&lt;pid&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">20</span><span class="w"> </span>-B<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">"deadlock"</span>
+</code></pre></div>
+<h3 id="53">5.3 系统整体慢的全面排查体系</h3>
+<div class="mermaid">graph TB
+    A[系统整体慢] --&gt; B[CPU分析]
+    A --&gt; C[内存分析]
+    A --&gt; D[磁盘I/O]
+    A --&gt; E[网络分析]
+    A --&gt; F[GC分析]
+
+    B --&gt; B1[top命令]
+    B1 --&gt; B2[定位高CPU进程]
+    B2 --&gt; B3[线程级别分析]
+    B3 --&gt; B4[jstack定位代码]
+
+    C --&gt; C1[内存使用监控]
+    C1 --&gt; C2[堆内存分析]
+    C2 --&gt; C3[GC日志分析]
+    C3 --&gt; C4[堆转储分析]
+
+    D --&gt; D1[磁盘空间]
+    D1 --&gt; D2[I/O性能]
+    D2 --&gt; D3[文件句柄]
+
+    E --&gt; E1[带宽使用]
+    E1 --&gt; E2[网络延迟]
+    E2 --&gt; E3[连接数]
+
+    F --&gt; F1[GC频率]
+    F1 --&gt; F2[GC耗时]
+    F2 --&gt; F3[内存泄漏]
+</div>
+<h4 id="cpu">🖥️ CPU占用过高排查实战</h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. 找到占用CPU最高的进程</span>
+top
+
+<span class="c1"># 2. 查看该进程的线程情况（假设进程ID为1893）</span>
+top<span class="w"> </span>-Hp<span class="w"> </span><span class="m">1893</span>
+
+<span class="c1"># 3. 将线程ID转为16进制（假设线程ID为4519）</span>
+<span class="nb">printf</span><span class="w"> </span>%x<span class="w"> </span><span class="m">4519</span><span class="w">  </span><span class="c1"># 输出：11a7</span>
+
+<span class="c1"># 4. 查看线程堆栈定位代码</span>
+jstack<span class="w"> </span><span class="m">1893</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>11a7<span class="w"> </span>-A<span class="w"> </span><span class="m">30</span>
+</code></pre></div>
+<p><strong>🚨 CPU飙升常见原因</strong>：</p>
+<ul>
+<li>🔄 无限循环或递归调用</li>
+<li>🗑️ 频繁的GC操作</li>
+<li>📝 复杂的正则表达式</li>
+<li>💾 大量的序列化操作</li>
+<li>🧵 线程上下文切换频繁</li>
+</ul>
+<h4 id="_5">💾 内存问题排查</h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># 1. 生成堆转储文件（生产环境慎用）</span>
+jmap<span class="w"> </span>-dump:format<span class="o">=</span>b,file<span class="o">=</span>heap.hprof<span class="w"> </span>&lt;pid&gt;
+
+<span class="c1"># 2. 使用MAT分析内存泄漏</span>
+</code></pre></div>
+<h4 id="_6">🗃️ 垃圾回收问题分类</h4>
+<div class="mermaid">graph LR
+    A[GC问题] --&gt; B[FGC过于频繁]
+    A --&gt; C[YGC耗时过长]
+    A --&gt; D[FGC耗时过长]
+    A --&gt; E[YGC过于频繁]
+
+    B --&gt; B1[内存泄漏]
+    B1 --&gt; B2[内存分配过大]
+
+    C --&gt; C1[Young区过小]
+    C1 --&gt; C2[对象过早晋升]
+
+    D --&gt; D1[老年代过大]
+    D1 --&gt; D2[Full GC算法]
+
+    E --&gt; E1[Young区过小]
+    E1 --&gt; E2[创建对象过多]
+</div>
+<p><strong>📊 GC监控命令</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1"># 实时监控GC情况</span>
+jstat<span class="w"> </span>-gcutil<span class="w"> </span>&lt;pid&gt;<span class="w"> </span><span class="m">1000</span>
+
+<span class="c1"># 输出说明：</span>
+<span class="c1"># S0/S1: Survivor区使用率</span>
+<span class="c1"># E: Eden区使用率  </span>
+<span class="c1"># O: 老年代使用率</span>
+<span class="c1"># YGC/YGCT: Young GC次数和耗时</span>
+<span class="c1"># FGC/FGCT: Full GC次数和耗时</span>
+</code></pre></div></p>
+<h2 id="-_3">🛡️ 第六步：预防优于治疗 - 建立常态化监控</h2>
+<h3 id="_7">推荐监控工具栈：</h3>
+<div class="mermaid">graph TD
+    A[监控体系] --&gt; B[Prometheus]
+    A --&gt; C[Grafana]
+    A --&gt; D[Alertmanager]
+
+    B --&gt; B1[指标收集]
+    B --&gt; B2[数据存储]
+
+    C --&gt; C1[数据可视化]
+    C --&gt; C2[监控大盘]
+
+    D --&gt; D1[告警路由]
+    D --&gt; D2[通知管理]
+
+    B1 --&gt; E[应用监控]
+    B1 --&gt; F[系统监控]
+    B1 --&gt; G[中间件监控]
+</div>
+<p><strong>🔔 告警策略配置</strong>：</p>
+<ul>
+<li>⏰ 设置合理的阈值（如：CPU持续&gt;80%）</li>
+<li>🎯 关键业务指标异常告警</li>
+<li>📱 建立多通道通知（邮件、短信、钉钉）</li>
+<li>👥 建立值班响应机制</li>
+</ul>
+<h2 id="_8">🧠 排查心法：从宏观到微观</h2>
+<div class="mermaid">flowchart TD
+    A[问题反馈] --&gt; B[宏观判断]
+    B --&gt; C{问题范围}
+
+    C --&gt;|系统级| D[资源监控分析]
+    C --&gt;|应用级| E[链路日志分析]
+
+    D --&gt; D1[CPU/内存/磁盘/网络]
+    D1 --&gt; D2[定位异常指标]
+
+    E --&gt; E1[链路追踪]
+    E1 --&gt; E2[日志分析]
+
+    D2 --&gt; F[根本原因定位]
+    E2 --&gt; F
+
+    F --&gt; G[解决方案实施]
+    G --&gt; H[效果验证]
+    H --&gt; I[经验沉淀]
+</div>
+<ol>
+<li><strong>🎯 先整体后局部</strong>：先判断是整个系统问题还是个别功能问题</li>
+<li><strong>🌐 先外部后内部</strong>：先排查网络、负载均衡等外部因素  </li>
+<li><strong>💻 先应用后系统</strong>：先检查应用日志，再查系统资源</li>
+<li><strong>📊 有监控不盲猜</strong>：依赖数据而不是直觉</li>
+</ol>
+<h2 id="_9">📋 排查清单：快速参考</h2>
+<table>
+<thead>
+<tr>
+<th>问题类型</th>
+<th>首要检查</th>
+<th>关键命令</th>
+<th>工具推荐</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔗 链路缓慢</td>
+<td>SkyWalking</td>
+<td>trace分析</td>
+<td>SkyWalking/Zipkin</td>
+</tr>
+<tr>
+<td>🗄️ 数据库慢</td>
+<td>慢查询日志</td>
+<td>EXPLAIN</td>
+<td>MySQL Workbench</td>
+</tr>
+<tr>
+<td>🖥️ CPU高</td>
+<td>进程线程分析</td>
+<td>top, jstack</td>
+<td>Arthas</td>
+</tr>
+<tr>
+<td>💾 内存泄漏</td>
+<td>堆内存分析</td>
+<td>jmap, jstat</td>
+<td>MAT, JProfiler</td>
+</tr>
+<tr>
+<td>🗃️ GC问题</td>
+<td>GC日志</td>
+<td>jstat, GC日志</td>
+<td>GCeasy</td>
+</tr>
+<tr>
+<td>🌐 网络问题</td>
+<td>带宽延迟</td>
+<td>ping, netstat</td>
+<td>Wireshark</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_10">🎉 总结</h2>
+<p>线上问题排查就像"破案"，需要：</p>
+<ul>
+<li>🕵️ <strong>完整的线索收集</strong>（日志、监控、追踪）</li>
+<li>🔍 <strong>系统的分析思路</strong>（从外到内、从整体到局部）  </li>
+<li>🛠️ <strong>合适的工具使用</strong>（jstack、jmap、SkyWalking等）</li>
+<li>📊 <strong>数据的客观判断</strong>（依赖监控数据而非主观感受）</li>
+</ul>
+<blockquote>
+<p>💡 <strong>记住</strong>：最好的故障排查是没有故障发生。建立完善的监控预警体系，在用户反馈前发现问题、解决问题，这才是工程能力的真正体现。</p>
+</blockquote>
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: MyBatis 两级缓存机制" class="md-footer__link md-footer__link--prev" href="../../../09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                MyBatis 两级缓存机制
+              </div>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/XJTUGary" rel="noopener" target="_blank" title="GitHub">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="mailto:wmlgaryx@gmail.com" rel="noopener" target="_blank" title="E-mail">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

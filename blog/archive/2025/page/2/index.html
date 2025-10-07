@@ -557,6 +557,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      RAG中跨页表格的处理
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       蚂蚁面试官：介绍设计模式及其在工作中的应用？
@@ -632,15 +641,6 @@
   <a href="#agent-intro" class="md-nav__link">
     <span class="md-ellipsis">
       Agent intro
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#threadlocal" class="md-nav__link">
-    <span class="md-ellipsis">
-      深入分析ThreadLocal：原理、内存泄漏与最佳实践
     </span>
   </a>
   
@@ -1257,6 +1257,46 @@
     <div class="md-post__meta md-meta">
       <ul class="md-meta__list">
         <li class="md-meta__item">
+          <time datetime="2025-09-01 00:00:00+00:00">Monday, September 1, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="../../../../category/rag/" class="md-meta__link">RAG</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              3 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="rag"><a class="toclink" href="../../../../2025/09/01/rag%E4%B8%AD%E8%B7%A8%E9%A1%B5%E8%A1%A8%E6%A0%BC%E7%9A%84%E5%A4%84%E7%90%86/">RAG中跨页表格的处理</a></h2>
+<p>在检索增强生成（Retrieval-Augmented Generation, RAG）系统的构建中，非结构化文档（如PDF、Word）中的<strong>表格</strong>是高质量知识的重要载体。它们往往包含了浓缩的、结构化的关键信息。然而，当表格跨越两页或多页时，传统的文本提取技术会遭遇滑铁卢，导致检索到的信息碎片化、不完整，甚至错误，严重影响了后续大模型生成答案的准确性和可靠性。</p>
+<p>本文通过讲解MinerU的表格处理机制，深入探讨跨页表格处理的核心挑战、关键技术方案及在RAG中的完整应用流程，旨在解决这一"表格困境"。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../../../2025/09/01/rag%E4%B8%AD%E8%B7%A8%E9%A1%B5%E8%A1%A8%E6%A0%BC%E7%9A%84%E5%A4%84%E7%90%86/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
           <time datetime="2025-08-19 00:00:00+00:00">Tuesday, August 19, 2025</time></li>
         
           <li class="md-meta__item">
@@ -1596,47 +1636,6 @@
     
       <nav class="md-post__action">
         <a href="../../../../2025/07/15/agent-intro/">
-          Continue reading
-        </a>
-      </nav>
-    
-  </div>
-</article>
-      
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2025-07-08 00:00:00+00:00">Tuesday, July 8, 2025</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="../../../../category/java/" class="md-meta__link">JAVA</a>, 
-              <a href="../../../../category/%E5%B9%B6%E5%8F%91/" class="md-meta__link">并发</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              2 min read
-            
-          </li>
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="threadlocal"><a class="toclink" href="../../../../2025/07/08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">深入分析ThreadLocal：原理、内存泄漏与最佳实践</a></h2>
-<p>你是否也曾在项目中使用ThreadLocal却对它的内部机制一知半解？是否遇到过莫名其妙的内存泄漏问题却找不到根源？ThreadLocal作为Java并发编程中的重要工具，既能优雅地解决线程隔离问题，也可能在不规范使用时埋下性能隐患。</p>
-<p>从SimpleDateFormat的线程安全包装，到数据库连接管理，再到用户会话传递，ThreadLocal的应用无处不在。但它为什么要用弱引用作为key？内存泄漏又是如何发生的？怎样才能安全地使用它？本文将从底层原理出发，深入剖析ThreadLocal的工作机制，揭示内存泄漏的本质原因，并总结一套切实可行的最佳实践。无论你是Java初学者还是有经验的开发者，相信这篇文章都能帮你彻底掌握ThreadLocal，让它成为你编程工具箱中的得力助手。</p>
-
-    
-      <nav class="md-post__action">
-        <a href="../../../../2025/07/08/%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90threadlocal%E5%8E%9F%E7%90%86%E5%86%85%E5%AD%98%E6%B3%84%E6%BC%8F%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5/">
           Continue reading
         </a>
       </nav>
