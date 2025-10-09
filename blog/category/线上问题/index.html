@@ -889,9 +889,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#jvm-oom" class="md-nav__link">
+    <span class="md-ellipsis">
+      JVM OOM 问题排查与解决
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#full-gc" class="md-nav__link">
+    <span class="md-ellipsis">
+      线上服务器频繁Full GC？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#api" class="md-nav__link">
     <span class="md-ellipsis">
       线上API响应慢？一线工程师的完整排查指南
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      线上服务器死锁怎么排查？
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      数据库死锁问题排查？
     </span>
   </a>
   
@@ -1187,6 +1223,84 @@
     <div class="md-post__meta md-meta">
       <ul class="md-meta__list">
         <li class="md-meta__item">
+          <time datetime="2025-10-08 00:00:00+00:00">Wednesday, October 8, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">线上问题</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              4 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="jvm-oom"><a class="toclink" href="../../2025/10/08/jvm-oom-%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E4%B8%8E%E8%A7%A3%E5%86%B3/">JVM OOM 问题排查与解决</a></h2>
+<p><code>OutOfMemoryError</code>（简称 OOM）是 Java 应用中最严重的内存问题之一。当 JVM 内存耗尽，垃圾回收器无法回收足够内存来满足新对象分配时，就会抛出这个错误。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/10/08/jvm-oom-%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E4%B8%8E%E8%A7%A3%E5%86%B3/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2025-10-08 00:00:00+00:00">Wednesday, October 8, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">线上问题</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              4 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="full-gc"><a class="toclink" href="../../2025/10/08/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%A2%91%E7%B9%81full-gc/">线上服务器频繁Full GC？</a></h2>
+<p>Full GC（全局垃圾回收）是JVM中<strong>最耗时的垃圾回收操作</strong>，它会<strong>暂停所有应用线程</strong>（Stop-The-World），导致服务响应变慢甚至超时。频繁的Full GC通常是系统性能问题的<strong>红色警报</strong>！</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/10/08/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%A2%91%E7%B9%81full-gc/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
           <time datetime="2025-10-07 00:00:00+00:00">Tuesday, October 7, 2025</time></li>
         
           <li class="md-meta__item">
@@ -1213,6 +1327,84 @@
     
       <nav class="md-post__action">
         <a href="../../2025/10/07/%E7%BA%BF%E4%B8%8Aapi%E5%93%8D%E5%BA%94%E6%85%A2%E4%B8%80%E7%BA%BF%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%9A%84%E5%AE%8C%E6%95%B4%E6%8E%92%E6%9F%A5%E6%8C%87%E5%8D%97/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2025-10-05 00:00:00+00:00">Sunday, October 5, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">线上问题</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              5 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="_1"><a class="toclink" href="../../2025/10/05/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%AD%BB%E9%94%81%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/">线上服务器死锁怎么排查？</a></h2>
+<p><strong>死锁</strong>是指两个或多个线程互相等待对方持有的资源，导致所有线程都无法继续执行的状态。在线生产环境中，死锁会导致服务<strong>部分或完全不可用</strong>，且通常<strong>不会自动恢复</strong>。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/10/05/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%AD%BB%E9%94%81%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/">
+          Continue reading
+        </a>
+      </nav>
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2025-10-01 00:00:00+00:00">Wednesday, October 1, 2025</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="./" class="md-meta__link">线上问题</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              6 min read
+            
+          </li>
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="_1"><a class="toclink" href="../../2025/10/01/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">数据库死锁问题排查？</a></h2>
+<p>数据库死锁是指两个或多个事务互相等待对方持有的锁资源，导致所有事务都无法继续执行的状态。与应用程序死锁不同，数据库死锁具有<strong>偶发性、难以复现、需要专业知识分析</strong>的特点。</p>
+
+    
+      <nav class="md-post__action">
+        <a href="../../2025/10/01/%E6%95%B0%E6%8D%AE%E5%BA%93%E6%AD%BB%E9%94%81%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
           Continue reading
         </a>
       </nav>

@@ -1,0 +1,1296 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../../09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/" rel="prev"/>
+<link href="../../05/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%AD%BB%E9%94%81%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/" rel="next"/>
+<link href="../../../../../images/logo.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>数据库死锁问题排查？ - Gary's Blog</title>
+<link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="black" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#_1">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Gary's Blog" class="md-header__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Gary's Blog
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              数据库死锁问题排查？
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../..">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../../../">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Gary's Blog" class="md-nav__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Gary's Blog
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../..">
+<span class="md-ellipsis">
+    首页
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<span class="md-ellipsis">
+    技术
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+<span class="md-ellipsis">
+    Archive
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2025/">
+<span class="md-ellipsis">
+    2025
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2024/">
+<span class="md-ellipsis">
+    2024
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Categories
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/agent/">
+<span class="md-ellipsis">
+    Agent
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/java/">
+<span class="md-ellipsis">
+    JAVA
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/rag/">
+<span class="md-ellipsis">
+    RAG
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/redis/">
+<span class="md-ellipsis">
+    Redis
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sft/">
+<span class="md-ellipsis">
+    SFT
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sre/">
+<span class="md-ellipsis">
+    SRE
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E5%B9%B6%E5%8F%91/">
+<span class="md-ellipsis">
+    并发
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">
+<span class="md-ellipsis">
+    数据库
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">
+<span class="md-ellipsis">
+    线上问题
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<span class="md-ellipsis">
+    设计模式
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E9%9D%A2%E7%BB%8F/">
+<span class="md-ellipsis">
+    面经
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+<span class="md-ellipsis">
+    旅行
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+<span class="md-ellipsis">
+    摄影
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+<span class="md-ellipsis">
+    运动
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content md-content--post" data-md-component="content">
+<div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner md-post">
+<nav class="md-nav md-nav--primary">
+<div class="md-post__back">
+<div class="md-nav__title md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+<span class="md-ellipsis">
+                    Back to index
+                  </span>
+</a>
+</div>
+</div>
+<ul class="md-post__meta md-nav__list">
+<li class="md-nav__item md-nav__item--section">
+<div class="md-post__title">
+<span class="md-ellipsis">
+                    Metadata
+                  </span>
+</div>
+<nav class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
+<time class="md-ellipsis" datetime="2025-10-01 00:00:00+00:00">Wednesday, October 1, 2025</time>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"></path></svg>
+<span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">线上问题</a></span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
+<span class="md-ellipsis">
+                            
+                              6 min read
+                            
+                          </span>
+</div>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_1">
+<span class="md-ellipsis">
+      💥 什么是数据库死锁？为什么它如此棘手？
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#sop">
+<span class="md-ellipsis">
+      🚨 死锁排查标准作业流程（SOP）
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      🔍 死锁日志的获取与配置
+    </span>
+</a>
+<nav aria-label="🔍 死锁日志的获取与配置" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1">
+<span class="md-ellipsis">
+      1. 实时获取死锁信息
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2">
+<span class="md-ellipsis">
+      2. 监控脚本自动化
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      📊 死锁日志深度解析
+    </span>
+</a>
+<nav aria-label="📊 死锁日志深度解析" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      死锁日志结构详解
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      关键信息解读指南
+    </span>
+</a>
+<nav aria-label="关键信息解读指南" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      锁类型识别表
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#binlog">
+<span class="md-ellipsis">
+      🔎 Binlog日志分析实战
+    </span>
+</a>
+<nav aria-label="🔎 Binlog日志分析实战" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-binlog">
+<span class="md-ellipsis">
+      1. 获取Binlog日志
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-binlog">
+<span class="md-ellipsis">
+      2. Binlog日志分析示例
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3">
+<span class="md-ellipsis">
+      3. 自动化分析脚本
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      🛠️ 常见死锁场景与解决方案
+    </span>
+</a>
+<nav aria-label="🛠️ 常见死锁场景与解决方案" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1_1">
+<span class="md-ellipsis">
+      场景1：不同顺序更新相同记录
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2gap">
+<span class="md-ellipsis">
+      场景2：Gap锁冲突
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3_1">
+<span class="md-ellipsis">
+      场景3：索引缺失导致的表锁升级
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      📈 死锁预防最佳实践
+    </span>
+</a>
+<nav aria-label="📈 死锁预防最佳实践" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1_2">
+<span class="md-ellipsis">
+      1. 应用层设计规范
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2_1">
+<span class="md-ellipsis">
+      2. 数据库设计优化
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3_2">
+<span class="md-ellipsis">
+      3. 架构层面预防
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_9">
+<span class="md-ellipsis">
+      🔧 高级排查工具与技巧
+    </span>
+</a>
+<nav aria-label="🔧 高级排查工具与技巧" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-schema">
+<span class="md-ellipsis">
+      1. 性能Schema死锁分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2_2">
+<span class="md-ellipsis">
+      2. 实时死锁监控面板
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_10">
+<span class="md-ellipsis">
+      🎯 排查总结与经验分享
+    </span>
+</a>
+<nav aria-label="🎯 排查总结与经验分享" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_11">
+<span class="md-ellipsis">
+      排查心法
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_12">
+<span class="md-ellipsis">
+      核心要点总结
+    </span>
+</a>
+<nav aria-label="核心要点总结" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_13">
+<span class="md-ellipsis">
+      🛡️ 预防优于治疗
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_14">
+<span class="md-ellipsis">
+      🔧 工具熟练使用
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_15">
+<span class="md-ellipsis">
+      📊 数据驱动分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_16">
+<span class="md-ellipsis">
+      🚀 持续改进文化
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<article class="md-content__inner md-typeset">
+<h1>数据库死锁问题排查？</h1>
+<p>数据库死锁是指两个或多个事务互相等待对方持有的锁资源，导致所有事务都无法继续执行的状态。与应用程序死锁不同，数据库死锁具有<strong>偶发性、难以复现、需要专业知识分析</strong>的特点。</p>
+<!-- more -->
+<h2 id="_1">💥 什么是数据库死锁？为什么它如此棘手？</h2>
+<p>数据库死锁是指两个或多个事务互相等待对方持有的锁资源，导致所有事务都无法继续执行的状态。与应用程序死锁不同，数据库死锁具有<strong>偶发性、难以复现、需要专业知识分析</strong>的特点。</p>
+<div class="mermaid">graph TD
+    A[事务A] --&gt; B[持有锁1]
+    C[事务B] --&gt; D[持有锁2]
+    B --&gt; E[等待锁2]
+    D --&gt; F[等待锁1]
+    E --&gt; G[死锁形成]
+    F --&gt; G
+    G --&gt; H[数据库自动检测并回滚]
+
+    style G fill:#ff4444,color:white
+    style H fill:#ffaa00
+</div>
+<h2 id="sop">🚨 死锁排查标准作业流程（SOP）</h2>
+<p>建立标准化的排查流程，是快速解决死锁问题的关键。</p>
+<div class="mermaid">flowchart TD
+    A[死锁异常报警] --&gt; B[分析错误日志堆栈]
+    B --&gt; C[获取MySQL死锁日志]
+    C --&gt; D[分析binlog事务内容]
+    D --&gt; E[定位冲突SQL语句]
+    E --&gt; F[分析锁冲突原因]
+    F --&gt; G[修复业务代码]
+
+    style A fill:#ff6b6b
+    style C fill:#74b9ff
+    style F fill:#ffeaa7
+    style G fill:#00b894
+</div>
+<h2 id="_2">🔍 死锁日志的获取与配置</h2>
+<h3 id="1">1. 实时获取死锁信息</h3>
+<p><strong>方法一：查看最近一次死锁</strong>
+<div class="highlight"><pre><span></span><code><span class="k">SHOW</span><span class="w"> </span><span class="n">ENGINE</span><span class="w"> </span><span class="n">INNODB</span><span class="w"> </span><span class="n">STATUS</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>方法二：开启InnoDB监控（推荐）</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 开启标准监控</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">innodb_status_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="p">;</span>
+
+<span class="c1">-- 开启锁监控  </span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">innodb_status_output_locks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="p">;</span>
+
+<span class="c1">-- 开启死锁日志记录到错误日志</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">innodb_print_all_deadlocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>方法三：配置持久化监控</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 在my.cnf中配置，重启生效</span>
+<span class="p">[</span><span class="n">mysqld</span><span class="p">]</span>
+<span class="n">innodb_status_output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span>
+<span class="n">innodb_status_output_locks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span>
+<span class="n">innodb_print_all_deadlocks</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">ON</span>
+</code></pre></div></p>
+<h3 id="2">2. 监控脚本自动化</h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># 死锁监控脚本</span>
+
+<span class="nv">MYSQL_HOST</span><span class="o">=</span><span class="s2">"localhost"</span>
+<span class="nv">MYSQL_USER</span><span class="o">=</span><span class="s2">"monitor"</span>
+<span class="nv">MYSQL_PASS</span><span class="o">=</span><span class="s2">"password"</span>
+<span class="nv">ERROR_LOG</span><span class="o">=</span><span class="s2">"/var/log/mysql/error.log"</span>
+
+<span class="c1"># 检查最近死锁</span>
+check_recent_deadlock<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>mysql<span class="w"> </span>-h<span class="nv">$MYSQL_HOST</span><span class="w"> </span>-u<span class="nv">$MYSQL_USER</span><span class="w"> </span>-p<span class="nv">$MYSQL_PASS</span><span class="w"> </span>-e<span class="w"> </span><span class="s2">"SHOW ENGINE INNODB STATUS\G"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="s2">"LATEST DETECTED DEADLOCK"</span>
+<span class="o">}</span>
+
+<span class="c1"># 监控错误日志中的死锁</span>
+monitor_error_log<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span>tail<span class="w"> </span>-f<span class="w"> </span><span class="nv">$ERROR_LOG</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>--line-buffered<span class="w"> </span><span class="s2">"DEADLOCK"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>line<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"🚨 检测到死锁: </span><span class="nv">$line</span><span class="s2">"</span>
+<span class="w">        </span><span class="c1"># 发送告警</span>
+<span class="w">        </span>send_alert<span class="w"> </span><span class="s2">"MySQL死锁检测"</span><span class="w"> </span><span class="s2">"</span><span class="nv">$line</span><span class="s2">"</span>
+<span class="w">    </span><span class="k">done</span>
+<span class="o">}</span>
+
+<span class="c1"># 发送告警函数</span>
+send_alert<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">subject</span><span class="o">=</span><span class="nv">$1</span>
+<span class="w">    </span><span class="nb">local</span><span class="w"> </span><span class="nv">message</span><span class="o">=</span><span class="nv">$2</span>
+<span class="w">    </span><span class="c1"># 邮件、钉钉、企业微信等告警集成</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="k">$(</span>date<span class="k">)</span><span class="s2">: </span><span class="nv">$subject</span><span class="s2"> - </span><span class="nv">$message</span><span class="s2">"</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/var/log/deadlock_monitor.log
+<span class="o">}</span>
+</code></pre></div>
+<h2 id="_3">📊 死锁日志深度解析</h2>
+<h3 id="_4">死锁日志结构详解</h3>
+<div class="highlight"><pre><span></span><code>LATEST DETECTED DEADLOCK
+------------------------
+2024-01-15 10:57:23 0x7f8e4416a700  # 死锁发生时间
+*** (1) TRANSACTION:                  # 事务一信息
+TRANSACTION 2078, ACTIVE 74 sec starting index read
+mysql tables in use 1, locked 1       # 使用1个表，锁定1个表
+LOCK WAIT 3 lock struct(s), heap size 1136, 2 row lock(s), undo log entries 1
+MySQL thread id 8, OS thread handle 123145432113152, query id 123 localhost root updating
+UPDATE t SET name = 'Tom2' WHERE id = 1
+
+*** (1) HOLDS THE LOCK(S):           # 事务一持有的锁
+RECORD LOCKS space id 2 page no 4 n bits 80 index PRIMARY of table `test`.`t` trx id 2078 lock_mode X locks rec but not gap
+
+*** (1) WAITING FOR THIS LOCK(S):    # 事务一等待的锁  
+RECORD LOCKS space id 2 page no 4 n bits 80 index PRIMARY of table `test`.`t` trx id 2078 lock_mode X locks rec but not gap waiting
+
+*** (2) TRANSACTION:                  # 事务二信息
+TRANSACTION 2079, ACTIVE 65 sec starting index read
+mysql tables in use 1, locked 1
+3 lock struct(s), heap size 1136, 2 row lock(s), undo log entries 1
+MySQL thread id 9, OS thread handle 123145432379392, query id 124 localhost root updating
+UPDATE t SET name = 'Teddy1' WHERE id = 2
+
+*** (2) HOLDS THE LOCK(S):           # 事务二持有的锁
+RECORD LOCKS space id 2 page no 4 n bits 80 index PRIMARY of table `test`.`t` trx id 2079 lock_mode X locks rec but not gap
+
+*** (2) WAITING FOR THIS LOCK(S):    # 事务二等待的锁
+RECORD LOCKS space id 2 page no 4 n bits 80 index PRIMARY of table `test`.`t` trx id 2079 lock_mode X locks rec but not gap waiting
+
+*** WE ROLL BACK TRANSACTION (1)     # 回滚的事务
+</code></pre></div>
+<h3 id="_5">关键信息解读指南</h3>
+<div class="mermaid">graph LR
+    A[事务信息] --&gt; A1[TRANSACTION ID]
+    A --&gt; A2[活跃时间]
+    A --&gt; A3[当前状态]
+
+    B[锁信息] --&gt; B1[锁类型识别]
+    B --&gt; B2[持有锁列表]
+    B --&gt; B3[等待锁列表]
+
+    C[SQL语句] --&gt; C1[冲突SQL]
+    C --&gt; C2[表信息]
+    C --&gt; C3[条件信息]
+
+    style B1 fill:#74b9ff
+    style B2 fill:#ff6b6b
+    style B3 fill:#ffaa00
+</div>
+<h4 id="_6">锁类型识别表</h4>
+<table>
+<thead>
+<tr>
+<th>锁类型</th>
+<th>死锁日志标识</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>记录锁</strong></td>
+<td><code>lock_mode X locks rec but not gap</code></td>
+<td>锁定单条记录</td>
+</tr>
+<tr>
+<td><strong>间隙锁</strong></td>
+<td><code>lock_mode X locks gap before rec</code></td>
+<td>锁定记录间隙</td>
+</tr>
+<tr>
+<td><strong>Next-Key锁</strong></td>
+<td><code>lock_mode X</code></td>
+<td>记录锁+间隙锁</td>
+</tr>
+<tr>
+<td><strong>插入意向锁</strong></td>
+<td><code>lock_mode X locks gap before rec insert intention</code></td>
+<td>插入操作使用的锁</td>
+</tr>
+</tbody>
+</table>
+<h2 id="binlog">🔎 Binlog日志分析实战</h2>
+<h3 id="1-binlog">1. 获取Binlog日志</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 远程获取binlog日志</span>
+mysqlbinlog<span class="w"> </span>-h127.0.0.1<span class="w"> </span>-u<span class="w"> </span>root<span class="w"> </span>-p<span class="w"> </span>--read-from-remote-server<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>binlog.000001<span class="w"> </span>--base64-output<span class="o">=</span>decode-rows<span class="w"> </span>-v<span class="w"> </span>&gt;<span class="w"> </span>binlog_analysis.log
+
+<span class="c1"># 本地分析binlog</span>
+mysqlbinlog<span class="w"> </span>--base64-output<span class="o">=</span>decode-rows<span class="w"> </span>-v<span class="w"> </span>binlog.000001<span class="w"> </span>&gt;<span class="w"> </span>transaction_analysis.log
+</code></pre></div>
+<h3 id="2-binlog">2. Binlog日志分析示例</h3>
+<div class="highlight"><pre><span></span><code><span class="o">#</span><span class="w"> </span><span class="err">在</span><span class="n">binlog中找到的事务信息</span>
+<span class="o">#</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="mi">123456</span>
+<span class="o">#</span><span class="mi">240115</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">18</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="n">end_log_pos</span><span class="w"> </span><span class="mi">123987</span><span class="w"> </span><span class="n">CRC32</span><span class="w"> </span><span class="mi">0</span><span class="n">xabcd1234</span>
+<span class="o">#</span><span class="w"> </span><span class="n">Query</span><span class="w"> </span><span class="n">thread_id</span><span class="o">=</span><span class="mi">8</span><span class="w"> </span><span class="n">exec_time</span><span class="o">=</span><span class="mi">0</span><span class="w"> </span><span class="n">error_code</span><span class="o">=</span><span class="mi">0</span>
+<span class="k">BEGIN</span>
+
+<span class="o">#</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="mi">123987</span><span class="w">  </span>
+<span class="o">#</span><span class="mi">240115</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">19</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="n">end_log_pos</span><span class="w"> </span><span class="mi">124123</span><span class="w"> </span><span class="n">CRC32</span><span class="w"> </span><span class="mi">0</span><span class="n">xefgh5678</span>
+<span class="o">#</span><span class="w"> </span><span class="n">Table_map</span><span class="p">:</span><span class="w"> </span><span class="o">`</span><span class="n">test</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">t</span><span class="o">`</span><span class="w"> </span><span class="n">mapped</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nb">number</span><span class="w"> </span><span class="mi">17</span>
+<span class="o">#</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="mi">124123</span>
+<span class="o">#</span><span class="mi">240115</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">20</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="n">end_log_pos</span><span class="w"> </span><span class="mi">124256</span><span class="w"> </span><span class="n">CRC32</span><span class="w"> </span><span class="mi">0</span><span class="n">ijkl9012</span>
+<span class="o">#</span><span class="w"> </span><span class="n">Update_rows</span><span class="p">:</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="mi">17</span><span class="w"> </span><span class="n">flags</span><span class="p">:</span><span class="w"> </span><span class="n">STMT_END_F</span>
+<span class="o">###</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="o">`</span><span class="n">test</span><span class="o">`</span><span class="p">.</span><span class="o">`</span><span class="n">t</span><span class="o">`</span>
+<span class="o">###</span><span class="w"> </span><span class="k">WHERE</span>
+<span class="o">###</span><span class="w">   </span><span class="o">@</span><span class="mi">1</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="cm">/* INT meta=0 nullable=0 is_null=0 */</span>
+<span class="o">###</span><span class="w">   </span><span class="o">@</span><span class="mi">2</span><span class="o">=</span><span class="s1">'Tom1'</span><span class="w"> </span><span class="cm">/* VARSTRING(60) meta=60 nullable=1 is_null=0 */</span>
+<span class="o">###</span><span class="w"> </span><span class="k">SET</span>
+<span class="o">###</span><span class="w">   </span><span class="o">@</span><span class="mi">1</span><span class="o">=</span><span class="mi">1</span><span class="w"> </span><span class="cm">/* INT meta=0 nullable=0 is_null=0 */</span>
+<span class="o">###</span><span class="w">   </span><span class="o">@</span><span class="mi">2</span><span class="o">=</span><span class="s1">'Tom2'</span><span class="w"> </span><span class="cm">/* VARSTRING(60) meta=60 nullable=1 is_null=0 */</span>
+
+<span class="o">#</span><span class="w"> </span><span class="k">at</span><span class="w"> </span><span class="mi">124256</span>
+<span class="o">#</span><span class="mi">240115</span><span class="w"> </span><span class="mi">10</span><span class="p">:</span><span class="mi">57</span><span class="p">:</span><span class="mi">21</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="mi">1</span><span class="w">  </span><span class="n">end_log_pos</span><span class="w"> </span><span class="mi">124345</span><span class="w"> </span><span class="n">CRC32</span><span class="w"> </span><span class="mi">0</span><span class="n">mnop3456</span>
+<span class="k">COMMIT</span>
+</code></pre></div>
+<h3 id="3">3. 自动化分析脚本</h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># Binlog死锁事务分析脚本</span>
+
+<span class="nv">BINLOG_FILE</span><span class="o">=</span><span class="nv">$1</span>
+<span class="nv">DEADLOCK_TIME</span><span class="o">=</span><span class="nv">$2</span><span class="w">  </span><span class="c1"># 死锁发生时间，格式：2024-01-15 10:57:23</span>
+
+analyze_deadlock_transactions<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"分析死锁时间: </span><span class="nv">$DEADLOCK_TIME</span><span class="s2">"</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"Binlog文件: </span><span class="nv">$BINLOG_FILE</span><span class="s2">"</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"="</span><span class="w"> </span>*<span class="w"> </span><span class="m">50</span>
+
+<span class="w">    </span><span class="c1"># 转换时间格式用于搜索</span>
+<span class="w">    </span><span class="nv">SEARCH_TIME</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$DEADLOCK_TIME</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sed<span class="w"> </span><span class="s1">'s/ /\\\\ /g'</span><span class="k">)</span>
+
+<span class="w">    </span><span class="c1"># 提取死锁前后的事务</span>
+<span class="w">    </span>mysqlbinlog<span class="w"> </span>--base64-output<span class="o">=</span>decode-rows<span class="w"> </span>-v<span class="w"> </span><span class="s2">"</span><span class="nv">$BINLOG_FILE</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>awk<span class="w"> </span>-v<span class="w"> </span><span class="nv">deadlock_time</span><span class="o">=</span><span class="s2">"</span><span class="nv">$DEADLOCK_TIME</span><span class="s2">"</span><span class="w"> </span><span class="s1">'</span>
+<span class="s1">    BEGIN { found=0; transaction=0 }</span>
+<span class="s1">    /^#.*/ {</span>
+<span class="s1">        if (index($0, deadlock_time) &gt; 0) {</span>
+<span class="s1">            found=1</span>
+<span class="s1">            print "🚨 发现死锁相关事务:"</span>
+<span class="s1">            print "时间: " deadlock_time</span>
+<span class="s1">        }</span>
+<span class="s1">        if (found &amp;&amp; /BEGIN/) {</span>
+<span class="s1">            transaction=1</span>
+<span class="s1">            print "--- 事务开始 ---"</span>
+<span class="s1">        }</span>
+<span class="s1">        if (transaction) {</span>
+<span class="s1">            print $0</span>
+<span class="s1">        }</span>
+<span class="s1">        if (found &amp;&amp; /COMMIT/) {</span>
+<span class="s1">            transaction=0</span>
+<span class="s1">            print "--- 事务结束 ---"</span>
+<span class="s1">            found=0</span>
+<span class="s1">        }</span>
+<span class="s1">    }'</span>
+<span class="o">}</span>
+</code></pre></div>
+<h2 id="_7">🛠️ 常见死锁场景与解决方案</h2>
+<h3 id="1_1">场景1：不同顺序更新相同记录</h3>
+<p><strong>死锁代码示例</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 事务A执行顺序</span>
+<span class="k">BEGIN</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 锁定id=1</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 等待id=2的锁</span>
+
+<span class="c1">-- 事务B执行顺序  </span>
+<span class="k">BEGIN</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 锁定id=2</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">50</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 等待id=1的锁</span>
+</code></pre></div></p>
+<p><strong>解决方案</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 统一更新顺序：按id排序更新</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="n">transfer_funds</span><span class="p">(</span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">from_account</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">to_account</span><span class="w"> </span><span class="nb">INT</span><span class="p">,</span><span class="w"> </span>
+<span class="w">    </span><span class="k">IN</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="nb">DECIMAL</span>
+<span class="p">)</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">min_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">;</span>
+<span class="w">    </span><span class="k">DECLARE</span><span class="w"> </span><span class="n">max_id</span><span class="w"> </span><span class="nb">INT</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">min_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LEAST</span><span class="p">(</span><span class="n">from_account</span><span class="p">,</span><span class="w"> </span><span class="n">to_account</span><span class="p">);</span>
+<span class="w">    </span><span class="k">SET</span><span class="w"> </span><span class="n">max_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GREATEST</span><span class="p">(</span><span class="n">from_account</span><span class="p">,</span><span class="w"> </span><span class="n">to_account</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">START</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">-- 始终按id顺序更新</span>
+<span class="w">    </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min_id</span><span class="p">;</span>
+<span class="w">    </span><span class="k">UPDATE</span><span class="w"> </span><span class="n">accounts</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">balance</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max_id</span><span class="p">;</span>
+
+<span class="w">    </span><span class="k">COMMIT</span><span class="p">;</span>
+<span class="k">END</span><span class="p">;</span>
+</code></pre></div></p>
+<h3 id="2gap">场景2：Gap锁冲突</h3>
+<p><strong>死锁代码示例</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 事务A</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 获取gap锁</span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">150</span><span class="p">);</span><span class="w">           </span><span class="c1">-- 等待插入意向锁</span>
+
+<span class="c1">-- 事务B</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 获取gap锁  </span>
+<span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="p">(</span><span class="n">amount</span><span class="p">)</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">200</span><span class="p">);</span><span class="w">           </span><span class="c1">-- 等待插入意向锁</span>
+</code></pre></div></p>
+<p><strong>解决方案</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 方案1：使用更精确的查询条件</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">100</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">200</span><span class="w"> </span><span class="k">FOR</span><span class="w"> </span><span class="k">UPDATE</span><span class="p">;</span>
+
+<span class="c1">-- 方案2：降低隔离级别（需评估业务影响）</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="k">TRANSACTION</span><span class="w"> </span><span class="k">ISOLATION</span><span class="w"> </span><span class="k">LEVEL</span><span class="w"> </span><span class="k">READ</span><span class="w"> </span><span class="k">COMMITTED</span><span class="p">;</span>
+
+<span class="c1">-- 方案3：使用乐观锁</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">COLUMN</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="nb">INT</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">-- 更新时检查版本</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">orders</span><span class="w"> </span>
+<span class="k">SET</span><span class="w"> </span><span class="n">amount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">150</span><span class="p">,</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="k">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">@</span><span class="n">old_version</span><span class="p">;</span>
+</code></pre></div></p>
+<h3 id="3_1">场景3：索引缺失导致的表锁升级</h3>
+<p><strong>问题代码</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 没有合适的索引，导致锁升级</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'inactive'</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%@old-company.com'</span><span class="p">;</span>
+</code></pre></div></p>
+<p><strong>解决方案</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1">-- 添加合适的索引</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_email_status</span><span class="w"> </span><span class="p">(</span><span class="n">email</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
+
+<span class="c1">-- 分批更新，减少锁竞争</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'inactive'</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%@old-company.com'</span><span class="w"> </span>
+<span class="k">AND</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'inactive'</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%@old-company.com'</span><span class="w"> </span>
+<span class="k">AND</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mi">1001</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mi">2000</span><span class="p">;</span>
+</code></pre></div></p>
+<h2 id="_8">📈 死锁预防最佳实践</h2>
+<h3 id="1_2">1. 应用层设计规范</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 统一的事务顺序管理</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">OrderService</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="nd">@Transactional</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">processOrder</span><span class="p">(</span><span class="n">OrderRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 按照固定顺序处理资源</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">&gt;</span><span class="w"> </span><span class="n">resourceIds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Arrays</span><span class="p">.</span><span class="na">asList</span><span class="p">(</span>
+<span class="w">            </span><span class="n">request</span><span class="p">.</span><span class="na">getAccountId</span><span class="p">(),</span><span class="w"> </span>
+<span class="w">            </span><span class="n">request</span><span class="p">.</span><span class="na">getProductId</span><span class="p">()</span>
+<span class="w">        </span><span class="p">);</span>
+<span class="w">        </span><span class="n">Collections</span><span class="p">.</span><span class="na">sort</span><span class="p">(</span><span class="n">resourceIds</span><span class="p">);</span><span class="w">  </span><span class="c1">// 统一排序</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">resourceIds</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">processResource</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">request</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="c1">// 使用超时机制</span>
+<span class="w">    </span><span class="nd">@Transactional</span><span class="p">(</span><span class="n">timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">30</span><span class="p">)</span><span class="w">  </span><span class="c1">// 30秒超时</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">updateWithTimeout</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 业务逻辑</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2_1">2. 数据库设计优化</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 合理的索引设计</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_account_transfer</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">accounts</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">balance</span><span class="p">);</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="n">idx_order_amount</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">orders</span><span class="p">(</span><span class="n">amount</span><span class="p">,</span><span class="w"> </span><span class="n">status</span><span class="p">);</span>
+
+<span class="c1">-- 避免长事务</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="n">autocommit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="k">SET</span><span class="w"> </span><span class="k">SESSION</span><span class="w"> </span><span class="n">innodb_lock_wait_timeout</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 锁等待超时10秒</span>
+
+<span class="c1">-- 监控长事务</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_trx</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">TIME_TO_SEC</span><span class="p">(</span><span class="n">TIMEDIFF</span><span class="p">(</span><span class="n">NOW</span><span class="p">(),</span><span class="w"> </span><span class="n">trx_started</span><span class="p">))</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">60</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="3_2">3. 架构层面预防</h3>
+<div class="mermaid">graph TD
+    A[应用架构] --&gt; B[统一事务顺序]
+    A --&gt; C[超时控制]
+    A --&gt; D[重试机制]
+
+    B --&gt; B1[资源排序]
+    B --&gt; B2[锁顺序化]
+
+    C --&gt; C1[事务超时]
+    C --&gt; C2[锁等待超时]
+
+    D --&gt; D1[指数退避]
+    D --&gt; D2[死锁检测]
+
+    style B1 fill:#74b9ff
+    style C1 fill:#ff6b6b
+    style D2 fill:#00b894
+</div>
+<h2 id="_9">🔧 高级排查工具与技巧</h2>
+<h3 id="1-schema">1. 性能Schema死锁分析</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 启用性能schema监控</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">setup_consumers</span><span class="w"> </span>
+<span class="k">SET</span><span class="w"> </span><span class="n">ENABLED</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'YES'</span><span class="w"> </span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">NAME</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'events_transactions%'</span><span class="p">;</span>
+
+<span class="c1">-- 查看当前锁信息</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">data_locks</span><span class="p">;</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">data_lock_waits</span><span class="p">;</span>
+
+<span class="c1">-- 分析锁等待链</span>
+<span class="k">SELECT</span><span class="w"> </span>
+<span class="w">    </span><span class="n">r</span><span class="p">.</span><span class="n">trx_id</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">waiting_trx_id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">r</span><span class="p">.</span><span class="n">trx_mysql_thread_id</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">waiting_thread</span><span class="p">,</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="n">trx_id</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">blocking_trx_id</span><span class="p">,</span>
+<span class="w">    </span><span class="n">b</span><span class="p">.</span><span class="n">trx_mysql_thread_id</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">blocking_thread</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_lock_waits</span><span class="w"> </span><span class="n">w</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_trx</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">b</span><span class="p">.</span><span class="n">trx_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">blocking_trx_id</span>
+<span class="k">INNER</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_trx</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="n">trx_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">w</span><span class="p">.</span><span class="n">requesting_trx_id</span><span class="p">;</span>
+</code></pre></div>
+<h3 id="2_2">2. 实时死锁监控面板</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">-- 创建死锁监控视图</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">VIEW</span><span class="w"> </span><span class="n">deadlock_monitor</span><span class="w"> </span><span class="k">AS</span>
+<span class="k">SELECT</span><span class="w"> </span>
+<span class="w">    </span><span class="n">d</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+<span class="w">    </span><span class="n">t</span><span class="p">.</span><span class="o">*</span><span class="p">,</span>
+<span class="w">    </span><span class="n">p</span><span class="p">.</span><span class="o">*</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_metrics</span><span class="w"> </span><span class="n">d</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">information_schema</span><span class="p">.</span><span class="n">innodb_trx</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="mi">1</span><span class="o">=</span><span class="mi">1</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">performance_schema</span><span class="p">.</span><span class="n">threads</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="mi">1</span><span class="o">=</span><span class="mi">1</span>
+<span class="k">WHERE</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">NAME</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%deadlock%'</span>
+<span class="w">   </span><span class="k">OR</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">NAME</span><span class="w"> </span><span class="k">LIKE</span><span class="w"> </span><span class="s1">'%lock%'</span><span class="p">;</span>
+</code></pre></div>
+<h2 id="_10">🎯 排查总结与经验分享</h2>
+<h3 id="_11">排查心法</h3>
+<div class="mermaid">flowchart TD
+    A[死锁发生] --&gt; B[保留现场]
+    B --&gt; C[日志分析]
+    C --&gt; D[SQL定位]
+    D --&gt; E[原因分析]
+    E --&gt; F[方案验证]
+    F --&gt; G[监控预防]
+
+    style B fill:#ffeaa7
+    style D fill:#74b9ff
+    style G fill:#00b894
+</div>
+<h3 id="_12">核心要点总结</h3>
+<h4 id="_13">🛡️ 预防优于治疗</h4>
+<ul>
+<li>统一的事务顺序</li>
+<li>合理的索引设计</li>
+<li>适当的超时设置</li>
+</ul>
+<h4 id="_14">🔧 工具熟练使用</h4>
+<ul>
+<li>掌握死锁日志分析方法</li>
+<li>熟练使用binlog分析工具</li>
+<li>理解不同锁类型的特征</li>
+</ul>
+<h4 id="_15">📊 数据驱动分析</h4>
+<ul>
+<li>基于日志而非猜测</li>
+<li>重现事务执行顺序</li>
+<li>验证修复方案有效性</li>
+</ul>
+<h4 id="_16">🚀 持续改进文化</h4>
+<ul>
+<li>建立死锁排查SOP</li>
+<li>分享排查经验</li>
+<li>优化系统架构</li>
+</ul>
+<blockquote>
+<p>💡 <strong>经验之谈</strong>：数据库死锁往往在特定业务场景下才会出现，建立完善的监控体系和标准化的排查流程，比解决单个死锁问题更重要。</p>
+</blockquote>
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: MyBatis 两级缓存机制" class="md-footer__link md-footer__link--prev" href="../../../09/23/mybatis-%E4%B8%A4%E7%BA%A7%E7%BC%93%E5%AD%98%E6%9C%BA%E5%88%B6/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                MyBatis 两级缓存机制
+              </div>
+</div>
+</a>
+<a aria-label="Next: 线上服务器死锁怎么排查？" class="md-footer__link md-footer__link--next" href="../../05/%E7%BA%BF%E4%B8%8A%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%AD%BB%E9%94%81%E6%80%8E%E4%B9%88%E6%8E%92%E6%9F%A5/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                线上服务器死锁怎么排查？
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/XJTUGary" rel="noopener" target="_blank" title="GitHub">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="mailto:wmlgaryx@gmail.com" rel="noopener" target="_blank" title="E-mail">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>

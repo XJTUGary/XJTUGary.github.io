@@ -1,0 +1,1229 @@
+
+<!DOCTYPE html>
+
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<link href="../../07/%E7%BA%BF%E4%B8%8Aapi%E5%93%8D%E5%BA%94%E6%85%A2%E4%B8%80%E7%BA%BF%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%9A%84%E5%AE%8C%E6%95%B4%E6%8E%92%E6%9F%A5%E6%8C%87%E5%8D%97/" rel="prev"/>
+<link href="../jvm-oom-%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E4%B8%8E%E8%A7%A3%E5%86%B3/" rel="next"/>
+<link href="../../../../../images/logo.png" rel="icon"/>
+<meta content="mkdocs-1.6.1, mkdocs-material-9.6.16" name="generator"/>
+<title>线上服务器频繁Full GC？ - Gary's Blog</title>
+<link href="../../../../../assets/stylesheets/main.7e37652d.min.css" rel="stylesheet"/>
+<link href="../../../../../assets/stylesheets/palette.06af60db.min.css" rel="stylesheet"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&amp;display=fallback" rel="stylesheet"/>
+<style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+<script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+</head>
+<body data-md-color-accent="indigo" data-md-color-primary="black" data-md-color-scheme="default" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#full-gc">
+          Skip to content
+        </a>
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header__inner md-grid">
+<a aria-label="Gary's Blog" class="md-header__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+<label class="md-header__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"></path></svg>
+</label>
+<div class="md-header__title" data-md-component="header-title">
+<div class="md-header__ellipsis">
+<div class="md-header__topic">
+<span class="md-ellipsis">
+            Gary's Blog
+          </span>
+</div>
+<div class="md-header__topic" data-md-component="header-topic">
+<span class="md-ellipsis">
+            
+              线上服务器频繁Full GC？
+            
+          </span>
+</div>
+</div>
+</div>
+<form class="md-header__option" data-md-component="palette">
+<input aria-label="Switch to light mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_0" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_1" hidden="" title="Switch to light mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"></path></svg>
+</label>
+<input aria-label="Switch to dark mode" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: light)" data-md-color-primary="black" data-md-color-scheme="default" id="__palette_1" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_2" hidden="" title="Switch to dark mode">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+<input aria-label="Switch to system preference" class="md-option" data-md-color-accent="indigo" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-primary="black" data-md-color-scheme="slate" id="__palette_2" name="__palette" type="radio"/>
+<label class="md-header__button md-icon" for="__palette_0" hidden="" title="Switch to system preference">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"></path></svg>
+</label>
+</form>
+<script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+<label class="md-header__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+</label>
+<div class="md-search" data-md-component="search" role="dialog">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" name="query" placeholder="Search" required="" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</label>
+<nav aria-label="Search" class="md-search__options">
+<button aria-label="Clear" class="md-search__icon md-icon" tabindex="-1" title="Clear" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+</button>
+</nav>
+<div class="md-search__suggest" data-md-component="search-suggest"></div>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="" tabindex="0">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
+            Initializing search
+          </div>
+<ol class="md-search-result__list" role="presentation"></ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+</nav>
+</header>
+<div class="md-container" data-md-component="container">
+<nav aria-label="Tabs" class="md-tabs" data-md-component="tabs">
+<div class="md-grid">
+<ul class="md-tabs__list">
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../..">
+        
+  
+  
+    
+  
+  首页
+
+      </a>
+</li>
+<li class="md-tabs__item md-tabs__item--active">
+<a class="md-tabs__link" href="../../../../">
+          
+  
+  
+    
+  
+  技术
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+          
+  
+  
+    
+  
+  旅行
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+          
+  
+  
+    
+  
+  摄影
+
+        </a>
+</li>
+<li class="md-tabs__item">
+<a class="md-tabs__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+          
+  
+  
+    
+  
+  运动
+
+        </a>
+</li>
+</ul>
+</div>
+</nav>
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden="">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="Gary's Blog" class="md-nav__button md-logo" data-md-component="logo" href="../../../../.." title="Gary's Blog">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"></path></svg>
+</a>
+    Gary's Blog
+  </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../..">
+<span class="md-ellipsis">
+    首页
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" id="__nav_2" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<span class="md-ellipsis">
+    技术
+    
+  </span>
+</a>
+<label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+<span class="md-nav__icon md-icon"></span>
+</label>
+</div>
+<nav aria-expanded="true" aria-labelledby="__nav_2_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_2">
+<span class="md-nav__icon md-icon"></span>
+            技术
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_2" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+<span class="md-ellipsis">
+    Archive
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_2_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_2">
+<span class="md-nav__icon md-icon"></span>
+            Archive
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2025/">
+<span class="md-ellipsis">
+    2025
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../archive/2024/">
+<span class="md-ellipsis">
+    2024
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--section md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_2_3" type="checkbox"/>
+<label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+<span class="md-ellipsis">
+    Categories
+    
+  </span>
+<span class="md-nav__icon md-icon"></span>
+</label>
+<nav aria-expanded="false" aria-labelledby="__nav_2_3_label" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="__nav_2_3">
+<span class="md-nav__icon md-icon"></span>
+            Categories
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/agent/">
+<span class="md-ellipsis">
+    Agent
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/java/">
+<span class="md-ellipsis">
+    JAVA
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/rag/">
+<span class="md-ellipsis">
+    RAG
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/redis/">
+<span class="md-ellipsis">
+    Redis
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sft/">
+<span class="md-ellipsis">
+    SFT
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/sre/">
+<span class="md-ellipsis">
+    SRE
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E5%B9%B6%E5%8F%91/">
+<span class="md-ellipsis">
+    并发
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E6%95%B0%E6%8D%AE%E5%BA%93/">
+<span class="md-ellipsis">
+    数据库
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">
+<span class="md-ellipsis">
+    线上问题
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+<span class="md-ellipsis">
+    设计模式
+    
+  </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../category/%E9%9D%A2%E7%BB%8F/">
+<span class="md-ellipsis">
+    面经
+    
+  </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_3" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%97%85%E8%A1%8C/">
+<span class="md-ellipsis">
+    旅行
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_3_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_3">
+<span class="md-nav__icon md-icon"></span>
+            旅行
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_4" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E6%91%84%E5%BD%B1/">
+<span class="md-ellipsis">
+    摄影
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_4_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_4">
+<span class="md-nav__icon md-icon"></span>
+            摄影
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle md-toggle--indeterminate" id="__nav_5" type="checkbox"/>
+<div class="md-nav__link md-nav__container">
+<a class="md-nav__link" href="../../../../../%E8%BF%90%E5%8A%A8/">
+<span class="md-ellipsis">
+    运动
+    
+  </span>
+</a>
+</div>
+<nav aria-expanded="false" aria-labelledby="__nav_5_label" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="__nav_5">
+<span class="md-nav__icon md-icon"></span>
+            运动
+          </label>
+<ul class="md-nav__list" data-md-scrollfix="">
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content md-content--post" data-md-component="content">
+<div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner md-post">
+<nav class="md-nav md-nav--primary">
+<div class="md-post__back">
+<div class="md-nav__title md-nav__container">
+<a class="md-nav__link" href="../../../../">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+<span class="md-ellipsis">
+                    Back to index
+                  </span>
+</a>
+</div>
+</div>
+<ul class="md-post__meta md-nav__list">
+<li class="md-nav__item md-nav__item--section">
+<div class="md-post__title">
+<span class="md-ellipsis">
+                    Metadata
+                  </span>
+</div>
+<nav class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"></path></svg>
+<time class="md-ellipsis" datetime="2025-10-08 00:00:00+00:00">Wednesday, October 8, 2025</time>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"></path></svg>
+<span class="md-ellipsis">
+                            in
+                            
+                              <a href="../../../../category/%E7%BA%BF%E4%B8%8A%E9%97%AE%E9%A2%98/">线上问题</a></span>
+</div>
+</li>
+<li class="md-nav__item">
+<div class="md-nav__link">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"></path></svg>
+<span class="md-ellipsis">
+                            
+                              4 min read
+                            
+                          </span>
+</div>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+<ul class="md-nav__list" data-md-component="toc" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#full-gc">
+<span class="md-ellipsis">
+      💥 问题背景：Full GC的严重性
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#full-gc_1">
+<span class="md-ellipsis">
+      🔍 问题发现：如何识别Full GC问题
+    </span>
+</a>
+<nav aria-label="🔍 问题发现：如何识别Full GC问题" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-">
+<span class="md-ellipsis">
+      1. 监控告警 - 第一道防线
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-gc-">
+<span class="md-ellipsis">
+      2. GC日志分析 - 必备配置
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3">
+<span class="md-ellipsis">
+      3. 实时监控命令
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_1">
+<span class="md-ellipsis">
+      🕵️ 问题定位：系统性排查方法
+    </span>
+</a>
+<nav aria-label="🕵️ 问题定位：系统性排查方法" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_2">
+<span class="md-ellipsis">
+      完整排查流程
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-gc">
+<span class="md-ellipsis">
+      1. GC日志深度分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2-jstat">
+<span class="md-ellipsis">
+      2. JStat实时监控分析
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3-heap-dump">
+<span class="md-ellipsis">
+      3. 堆内存分析 - 生成和分析Heap Dump
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_3">
+<span class="md-ellipsis">
+      🔧 常见问题模式及解决方案
+    </span>
+</a>
+<nav aria-label="🔧 常见问题模式及解决方案" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1">
+<span class="md-ellipsis">
+      模式1：内存泄漏
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2">
+<span class="md-ellipsis">
+      模式2：内存分配不足
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#3_1">
+<span class="md-ellipsis">
+      模式3：大对象分配
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_4">
+<span class="md-ellipsis">
+      🛠️ 实战排查案例
+    </span>
+</a>
+<nav aria-label="🛠️ 实战排查案例" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#full-gc_2">
+<span class="md-ellipsis">
+      案例：电商订单服务频繁Full GC
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_5">
+<span class="md-ellipsis">
+      📊 监控和预防体系
+    </span>
+</a>
+<nav aria-label="📊 监控和预防体系" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#1-gc_1">
+<span class="md-ellipsis">
+      1. GC监控大盘配置
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#2_1">
+<span class="md-ellipsis">
+      2. 健康检查与自动恢复
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_6">
+<span class="md-ellipsis">
+      🎯 高级调优技巧
+    </span>
+</a>
+<nav aria-label="🎯 高级调优技巧" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#g1-gc">
+<span class="md-ellipsis">
+      G1 GC专项优化
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#zgc">
+<span class="md-ellipsis">
+      ZGC低延迟方案
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_7">
+<span class="md-ellipsis">
+      📋 排查工具箱
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_8">
+<span class="md-ellipsis">
+      💡 总结与最佳实践
+    </span>
+</a>
+<nav aria-label="💡 总结与最佳实践" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_9">
+<span class="md-ellipsis">
+      排查心法
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_10">
+<span class="md-ellipsis">
+      核心要点
+    </span>
+</a>
+<nav aria-label="核心要点" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_11">
+<span class="md-ellipsis">
+      🛡️ 预防优于治疗
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_12">
+<span class="md-ellipsis">
+      🔧 工具熟练使用
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_13">
+<span class="md-ellipsis">
+      📊 数据驱动决策
+    </span>
+</a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="#_14">
+<span class="md-ellipsis">
+      🔄 持续优化文化
+    </span>
+</a>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<article class="md-content__inner md-typeset">
+<h1>线上服务器频繁Full GC？</h1>
+<p>Full GC（全局垃圾回收）是JVM中<strong>最耗时的垃圾回收操作</strong>，它会<strong>暂停所有应用线程</strong>（Stop-The-World），导致服务响应变慢甚至超时。频繁的Full GC通常是系统性能问题的<strong>红色警报</strong>！</p>
+<!-- more -->
+<h2 id="full-gc">💥 问题背景：Full GC的严重性</h2>
+<div class="mermaid">graph TD
+    A[频繁Full GC] --&gt; B[应用线程暂停]
+    B --&gt; C[请求响应变慢]
+    C --&gt; D[用户体验下降]
+    D --&gt; E[业务损失]
+
+    style A fill:#ff4444,color:white
+    style C fill:#ffaa00
+    style E fill:#ff4444,color:white
+</div>
+<h2 id="full-gc_1">🔍 问题发现：如何识别Full GC问题</h2>
+<h3 id="1-">1. 监控告警 - 第一道防线</h3>
+<p><strong>监控指标</strong>：</p>
+<ul>
+<li>Full GC频率 &gt; 1次/分钟</li>
+<li>Full GC耗时 &gt; 1秒/次</li>
+<li>应用响应时间(P95)突增</li>
+<li>系统吞吐量下降</li>
+</ul>
+<h3 id="2-gc-">2. GC日志分析 - 必备配置</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// JVM启动参数 - 必须配置！</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">PrintGCDetails</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">PrintGCDateStamps</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">PrintGCTimeStamps</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">PrintGCCause</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">UseGCLogFileRotation</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">NumberOfGCLogFiles</span><span class="o">=</span><span class="mi">5</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">GCLogFileSize</span><span class="o">=</span><span class="mi">10</span><span class="n">M</span>
+<span class="o">-</span><span class="n">Xloggc</span><span class="p">:</span><span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">gc</span><span class="p">.</span><span class="na">log</span>
+</code></pre></div>
+<h3 id="3">3. 实时监控命令</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 实时查看GC情况</span>
+jstat<span class="w"> </span>-gcutil<span class="w"> </span>&lt;pid&gt;<span class="w"> </span><span class="m">1000</span>
+
+<span class="c1"># 输出示例：</span>
+<span class="c1">#  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT</span>
+<span class="c1">#  0.00   0.00  65.00  95.00  88.24  66.67    150    1.200    25    15.450   16.650</span>
+<span class="c1">#  ↑重点关注：FGC(Full GC次数)和FGCT(Full GC总时间)快速增长</span>
+</code></pre></div>
+<h2 id="_1">🕵️ 问题定位：系统性排查方法</h2>
+<h3 id="_2">完整排查流程</h3>
+<div class="mermaid">flowchart TD
+    A[发现频繁Full GC] --&gt; B[GC日志分析]
+    A --&gt; C[实时监控分析]
+    A --&gt; D[内存快照分析]
+
+    B --&gt; E[确定GC模式]
+    C --&gt; F[定位内存趋势]
+    D --&gt; G[分析对象分布]
+
+    E --&gt; H[问题根因分类]
+    F --&gt; H
+    G --&gt; H
+
+    H --&gt; I[内存泄漏]
+    H --&gt; J[内存分配不足]
+    H --&gt; K[代码问题]
+
+    I --&gt; L[修复泄漏]
+    J --&gt; M[调整参数]
+    K --&gt; N[优化代码]
+
+    L --&gt; O[问题解决]
+    M --&gt; O
+    N --&gt; O
+</div>
+<h3 id="1-gc">1. GC日志深度分析</h3>
+<p><strong>典型的Full GC日志</strong>：</p>
+<div class="highlight"><pre><span></span><code>2024-01-15T10:30:00.123+0800: 12045.876: [Full GC (Allocation Failure) 
+  [PSYoungGen: 0K-&gt;0K(921600K)] 
+  [ParOldGen: 819200K-&gt;819190K(819200K)] 819200K-&gt;819190K(1740800K), 
+  [Metaspace: 85632K-&gt;85632K(1146880K)], 1.2345678 secs]
+</code></pre></div>
+<p><strong>关键信息解读</strong>：</p>
+<ul>
+<li><code>Allocation Failure</code>：分配失败触发Full GC</li>
+<li><code>ParOldGen: 819200K-&gt;819190K</code>：老年代回收前后变化很小 → 可能内存泄漏</li>
+<li><code>1.2345678 secs</code>：Full GC耗时过长</li>
+</ul>
+<h3 id="2-jstat">2. JStat实时监控分析</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 持续监控，重点关注O(老年代)和FGC</span>
+watch<span class="w"> </span><span class="s2">"jstat -gcutil &lt;pid&gt; | awk '{print \"O:\" \$4 \" FGC:\" \$8 \" FGCT:\" \$9}'"</span>
+
+<span class="c1"># 自动化监控脚本</span>
+<span class="c1">#!/bin/bash</span>
+<span class="nv">PID</span><span class="o">=</span><span class="nv">$1</span>
+<span class="k">while</span><span class="w"> </span>true<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span><span class="nv">gc_info</span><span class="o">=</span><span class="k">$(</span>jstat<span class="w"> </span>-gcutil<span class="w"> </span><span class="nv">$PID</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-1<span class="k">)</span>
+<span class="w">    </span><span class="nv">o_usage</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$gc_info</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{print $4}'</span><span class="k">)</span>
+<span class="w">    </span><span class="nv">fgc_count</span><span class="o">=</span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="nv">$gc_info</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{print $8}'</span><span class="k">)</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span><span class="s2">"</span><span class="nv">$o_usage</span><span class="s2"> &gt; 90"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>bc<span class="k">)</span><span class="w"> </span>-eq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$fgc_count</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">        </span><span class="nb">echo</span><span class="w"> </span><span class="s2">"警告：内存使用率 </span><span class="nv">$o_usage</span><span class="s2">%, FGC: </span><span class="nv">$fgc_count</span><span class="s2">"</span>
+<span class="w">        </span><span class="c1"># 自动生成堆转储</span>
+<span class="w">        </span>jmap<span class="w"> </span>-dump:live,format<span class="o">=</span>b,file<span class="o">=</span>/tmp/heap_emergency.hprof<span class="w"> </span><span class="nv">$PID</span>
+<span class="w">        </span><span class="k">break</span>
+<span class="w">    </span><span class="k">fi</span>
+<span class="w">    </span>sleep<span class="w"> </span><span class="m">30</span>
+<span class="k">done</span>
+</code></pre></div>
+<h3 id="3-heap-dump">3. 堆内存分析 - 生成和分析Heap Dump</h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># 生成堆转储文件</span>
+jmap<span class="w"> </span>-dump:live,format<span class="o">=</span>b,file<span class="o">=</span>heap.hprof<span class="w"> </span>&lt;pid&gt;
+
+<span class="c1"># 如果jmap不可用，使用JVM参数自动生成</span>
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath<span class="o">=</span>/path/to/heapdumps
+</code></pre></div>
+<h2 id="_3">🔧 常见问题模式及解决方案</h2>
+<h3 id="1">模式1：内存泄漏</h3>
+<div class="mermaid">graph LR
+    A[内存泄漏特征] --&gt; B[老年代持续增长]
+    A --&gt; C[Full GC后回收很少]
+    A --&gt; D[内存使用率居高不下]
+
+    B --&gt; E[分析支配树]
+    C --&gt; F[查找GC根路径]
+    D --&gt; G[识别大对象]
+
+    E --&gt; H[定位泄漏点]
+    F --&gt; H
+    G --&gt; H
+</div>
+<p><strong>使用MAT(Memory Analyzer Tool)分析</strong>：</p>
+<ol>
+<li><strong>Leak Suspects Report</strong> - 自动检测泄漏嫌疑</li>
+<li><strong>Dominator Tree</strong> - 查看支配关系，找到保持大量内存的对象</li>
+<li><strong>Path to GC Roots</strong> - 分析为什么对象不能被回收</li>
+</ol>
+<p><strong>常见泄漏场景</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 场景1：静态集合累积</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">CacheManager</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">HashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">addToCache</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">cache</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span><span class="w">  </span><span class="c1">// 永远不会移除！</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// 修复：使用有大小限制的缓存</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Cache</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CacheBuilder</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">maximumSize</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">expireAfterWrite</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">MINUTES</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+
+<span class="c1">// 场景2：ThreadLocal未清理</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">UserContext</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">currentUser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="c1">// 必须在使用后清理！</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">currentUser</span><span class="p">.</span><span class="na">remove</span><span class="p">();</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="2">模式2：内存分配不足</h3>
+<p><strong>症状</strong>：</p>
+<ul>
+<li>年轻代过小，对象过早晋升老年代</li>
+<li>堆内存总体不足</li>
+</ul>
+<p><strong>解决方案</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// JVM参数调整示例</span>
+<span class="o">-</span><span class="n">Xmx4g</span><span class="w"> </span><span class="o">-</span><span class="n">Xms4g</span><span class="w">           </span><span class="err">#</span><span class="w"> </span><span class="n">堆大小</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">NewRatio</span><span class="o">=</span><span class="mi">2</span><span class="w">          </span><span class="err">#</span><span class="w"> </span><span class="n">年轻代</span><span class="p">:</span><span class="n">老年代</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">SurvivorRatio</span><span class="o">=</span><span class="mi">8</span><span class="w">     </span><span class="err">#</span><span class="w"> </span><span class="n">Eden</span><span class="p">:</span><span class="n">Survivor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="p">:</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span>
+
+<span class="c1">// 或者使用G1 GC的region大小调整</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">UseG1GC</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">G1HeapRegionSize</span><span class="o">=</span><span class="mi">16</span><span class="n">m</span>
+</code></pre></div>
+<h3 id="3_1">模式3：大对象分配</h3>
+<p><strong>问题代码</strong>：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 在循环中创建大对象</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">processBatch</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">hasMoreData</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">byte</span><span class="o">[]</span><span class="w"> </span><span class="n">largeBuffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="kt">byte</span><span class="o">[</span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="c1">// 10MB</span>
+<span class="w">        </span><span class="c1">// 处理逻辑...</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="c1">// 大对象直接进入老年代！</span>
+<span class="p">}</span>
+
+<span class="c1">// 优化：重用缓冲区或使用堆外内存</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">BufferPool</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">ThreadLocal</span><span class="o">&lt;</span><span class="n">ByteBuffer</span><span class="o">&gt;</span><span class="w"> </span><span class="n">bufferPool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>
+<span class="w">        </span><span class="n">ThreadLocal</span><span class="p">.</span><span class="na">withInitial</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">ByteBuffer</span><span class="p">.</span><span class="na">allocateDirect</span><span class="p">(</span><span class="mi">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1024</span><span class="p">));</span>
+
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">processBatch</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ByteBuffer</span><span class="w"> </span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bufferPool</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">        </span><span class="n">buffer</span><span class="p">.</span><span class="na">clear</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// 使用buffer处理数据...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="_4">🛠️ 实战排查案例</h2>
+<h3 id="full-gc_2">案例：电商订单服务频繁Full GC</h3>
+<p><strong>问题现象</strong>：</p>
+<ul>
+<li>每分钟发生2-3次Full GC</li>
+<li>每次Full GC耗时2-3秒</li>
+<li>订单创建接口P99响应时间从50ms上升到2000ms</li>
+</ul>
+<p><strong>排查过程</strong>：</p>
+<ol>
+<li>
+<p><strong>GC日志分析</strong>：
+<div class="highlight"><pre><span></span><code>[Full GC (Allocation Failure) 
+  [PSYoungGen: 0K-&gt;0K(764800K)] 
+  [ParOldGen: 819200K-&gt;818500K(819200K)] 819200K-&gt;818500K(1584000K), 2.345 secs]
+</code></pre></div>
+发现老年代回收效率极低，怀疑内存泄漏。</p>
+</li>
+<li>
+<p><strong>生成Heap Dump分析</strong>：</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code>jmap<span class="w"> </span>-dump:live,format<span class="o">=</span>b,file<span class="o">=</span>order_service.hprof<span class="w"> </span>&lt;pid&gt;
+</code></pre></div>
+<ol>
+<li>
+<p><strong>MAT分析结果</strong>：</p>
+</li>
+<li>
+<p><code>Order</code>对象占用堆内存的65%</p>
+</li>
+<li>
+<p>通过GC根路径分析，发现静态<code>Map</code>持有所有<code>Order</code>对象引用</p>
+</li>
+<li>
+<p><strong>问题代码定位</strong>：</p>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nd">@Component</span>
+<span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">OrderStatistics</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span><span class="w"> </span><span class="n">Order</span><span class="o">&gt;</span><span class="w"> </span><span class="n">orderCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="w">    </span><span class="nd">@EventListener</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">handleOrderCreate</span><span class="p">(</span><span class="n">OrderCreateEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 订单创建后缓存，但从未清理！</span>
+<span class="w">        </span><span class="n">orderCache</span><span class="p">.</span><span class="na">put</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="na">getOrderId</span><span class="p">(),</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="na">getOrder</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<ol>
+<li><strong>解决方案</strong>：</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1">// 方案1：使用WeakReference避免强引用</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span><span class="w"> </span><span class="n">WeakReference</span><span class="o">&lt;</span><span class="n">Order</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">orderCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ConcurrentHashMap</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+
+<span class="c1">// 方案2：使用Caffeine缓存设置过期时间</span>
+<span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Cache</span><span class="o">&lt;</span><span class="n">Long</span><span class="p">,</span><span class="w"> </span><span class="n">Order</span><span class="o">&gt;</span><span class="w"> </span><span class="n">orderCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Caffeine</span><span class="p">.</span><span class="na">newBuilder</span><span class="p">()</span>
+<span class="w">    </span><span class="p">.</span><span class="na">maximumSize</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">expireAfterWrite</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">TimeUnit</span><span class="p">.</span><span class="na">HOURS</span><span class="p">)</span>
+<span class="w">    </span><span class="p">.</span><span class="na">build</span><span class="p">();</span>
+</code></pre></div>
+<h2 id="_5">📊 监控和预防体系</h2>
+<h3 id="1-gc_1">1. GC监控大盘配置</h3>
+<p><strong>Prometheus + Grafana监控关键指标</strong>：
+<div class="highlight"><pre><span></span><code><span class="c1"># prometheus.yml</span>
+<span class="nt">scrape_configs</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">job_name</span><span class="p">:</span><span class="w"> </span><span class="s">'jvm'</span>
+<span class="w">    </span><span class="nt">static_configs</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">targets</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">'localhost:1234'</span><span class="p p-Indicator">]</span>
+
+<span class="c1"># 关键告警规则</span>
+<span class="nt">groups</span><span class="p">:</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">JVM_GC</span>
+<span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">alert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FrequentFullGC</span>
+<span class="w">    </span><span class="nt">expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">increase(jvm_gc_collection_seconds_count{gc="G1 Old Generation"}[5m]) &gt; 5</span>
+<span class="w">    </span><span class="nt">for</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2m</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">critical</span>
+<span class="w">    </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="s">"5分钟内Full</span><span class="nv"> </span><span class="s">GC次数超过5次"</span>
+
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">alert</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LongFullGCTime</span>
+<span class="w">    </span><span class="nt">expr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jvm_gc_collection_seconds_sum{gc="G1 Old Generation"} / jvm_gc_collection_seconds_count{gc="G1 Old Generation"} &gt; 1</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">warning</span>
+<span class="w">    </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="s">"Full</span><span class="nv"> </span><span class="s">GC平均耗时超过1秒"</span>
+</code></pre></div></p>
+<h3 id="2_1">2. 健康检查与自动恢复</h3>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># 健康检查脚本</span>
+<span class="nv">PID</span><span class="o">=</span><span class="k">$(</span>jps<span class="w"> </span>-l<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>my-app<span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{print $1}'</span><span class="k">)</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-z<span class="w"> </span><span class="s2">"</span><span class="nv">$PID</span><span class="s2">"</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="c1"># 检查最近1分钟Full GC次数</span>
+<span class="nv">FGC_COUNT</span><span class="o">=</span><span class="k">$(</span>jstat<span class="w"> </span>-gcutil<span class="w"> </span><span class="nv">$PID</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-1<span class="w"> </span><span class="p">|</span><span class="w"> </span>awk<span class="w"> </span><span class="s1">'{print $8}'</span><span class="k">)</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="nv">$FGC_COUNT</span><span class="w"> </span>-gt<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="c1"># 触发告警并自动生成诊断信息</span>
+<span class="w">    </span>jstack<span class="w"> </span><span class="nv">$PID</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/thread_dump_<span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>.log
+<span class="w">    </span>jmap<span class="w"> </span>-histo:live<span class="w"> </span><span class="nv">$PID</span><span class="w"> </span>&gt;<span class="w"> </span>/tmp/heap_histo_<span class="k">$(</span>date<span class="w"> </span>+%s<span class="k">)</span>.log
+<span class="w">    </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span>
+<span class="k">fi</span>
+
+<span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<h2 id="_6">🎯 高级调优技巧</h2>
+<h3 id="g1-gc">G1 GC专项优化</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// G1 GC推荐配置</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">UseG1GC</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">MaxGCPauseMillis</span><span class="o">=</span><span class="mi">200</span><span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">目标暂停时间</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">G1HeapRegionSize</span><span class="o">=</span><span class="mi">16</span><span class="n">m</span><span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">Region大小</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">G1NewSizePercent</span><span class="o">=</span><span class="mi">30</span><span class="w">         </span><span class="err">#</span><span class="w"> </span><span class="n">年轻代最小占比</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">G1MaxNewSizePercent</span><span class="o">=</span><span class="mi">60</span><span class="w">      </span><span class="err">#</span><span class="w"> </span><span class="n">年轻代最大占比</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">InitiatingHeapOccupancyPercent</span><span class="o">=</span><span class="mi">45</span><span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="n">启动并发GC的堆占用率</span>
+</code></pre></div>
+<h3 id="zgc">ZGC低延迟方案</h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// 对于超大堆内存应用，考虑ZGC</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="o">+</span><span class="n">UseZGC</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">ZAllocationSpikeTolerance</span><span class="o">=</span><span class="mf">5.0</span>
+<span class="o">-</span><span class="n">XX</span><span class="p">:</span><span class="n">ZCollectionInterval</span><span class="o">=</span><span class="mi">120</span>
+<span class="o">-</span><span class="n">Xmx16g</span><span class="w"> </span><span class="o">-</span><span class="n">Xms16g</span>
+</code></pre></div>
+<h2 id="_7">📋 排查工具箱</h2>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+<th>使用场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jstat -gcutil</code></td>
+<td>实时GC监控</td>
+<td>问题发现和实时观察</td>
+</tr>
+<tr>
+<td><code>jmap -dump</code></td>
+<td>生成堆转储</td>
+<td>内存泄漏分析</td>
+</tr>
+<tr>
+<td>Eclipse MAT</td>
+<td>堆转储分析</td>
+<td>定位内存泄漏点</td>
+</tr>
+<tr>
+<td><code>jstack</code></td>
+<td>线程分析</td>
+<td>检查GC时线程状态</td>
+</tr>
+<tr>
+<td>GC日志分析工具</td>
+<td>GC日志解析</td>
+<td>历史问题分析</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_8">💡 总结与最佳实践</h2>
+<h3 id="_9">排查心法</h3>
+<div class="mermaid">graph TD
+    A[发现问题] --&gt; B[保留现场]
+    B --&gt; C[分析数据]
+    C --&gt; D[定位根因]
+    D --&gt; E[验证修复]
+    E --&gt; F[监控预防]
+
+    style A fill:#74b9ff
+    style D fill:#ff6b6b
+    style F fill:#00b894
+</div>
+<h3 id="_10">核心要点</h3>
+<h4 id="_11">🛡️ 预防优于治疗</h4>
+<ul>
+<li>完善的GC日志配置</li>
+<li>建立监控告警体系</li>
+<li>定期性能压测</li>
+</ul>
+<h4 id="_12">🔧 工具熟练使用</h4>
+<ul>
+<li>掌握jstat实时监控</li>
+<li>熟练使用MAT分析堆转储</li>
+<li>理解GC日志格式</li>
+</ul>
+<h4 id="_13">📊 数据驱动决策</h4>
+<ul>
+<li>基于数据而非直觉</li>
+<li>建立性能基线</li>
+<li>A/B测试验证优化效果</li>
+</ul>
+<h4 id="_14">🔄 持续优化文化</h4>
+<ul>
+<li>代码审查关注性能</li>
+<li>分享排查经验</li>
+<li>建立性能知识库</li>
+</ul>
+<blockquote>
+<p>🚀 <strong>记住</strong>：频繁Full GC不是单一问题，而是系统性的性能病症。通过系统化的排查方法和完善的监控体系，我们不仅能够快速解决当前问题，更能预防未来类似问题的发生。</p>
+</blockquote>
+<h2 id="__comments">Comments</h2>
+<!-- Insert generated snippet here -->
+<script async="" crossorigin="anonymous" data-category="Announcements" data-category-id="DIC_kwDOPeNkAM4CuNUz" data-emit-metadata="0" data-input-position="bottom" data-lang="zh-CN" data-mapping="pathname" data-reactions-enabled="1" data-repo="XJTUGary/XJTUGary.github.io" data-repo-id="R_kgDOPeNkAA" data-strict="0" data-theme="preferred_color_scheme" src="https://giscus.app/client.js">
+</script>
+<!-- Synchronize Giscus theme with palette -->
+<script>
+    var giscus = document.querySelector("script[src*=giscus]")
+
+    // Set palette on initial load
+    var palette = __md_get("__palette")
+    if (palette && typeof palette.color === "object") {
+      var theme = palette.color.scheme === "slate"
+        ? "transparent_dark"
+        : "light"
+
+      // Instruct Giscus to set theme
+      giscus.setAttribute("data-theme", theme)
+    }
+
+    // Register event handlers after documented loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      var ref = document.querySelector("[data-md-component=palette]")
+      ref.addEventListener("change", function() {
+        var palette = __md_get("__palette")
+        if (palette && typeof palette.color === "object") {
+          var theme = palette.color.scheme === "slate"
+            ? "transparent_dark"
+            : "light"
+
+          // Instruct Giscus to change theme
+          var frame = document.querySelector(".giscus-frame")
+          frame.contentWindow.postMessage(
+            { giscus: { setConfig: { theme } } },
+            "https://giscus.app"
+          )
+        }
+      })
+    })
+  </script>
+</article>
+</div>
+<script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+</div>
+<button class="md-top md-icon" data-md-component="top" hidden="" type="button">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"></path></svg>
+  Back to top
+</button>
+</main>
+<footer class="md-footer">
+<nav aria-label="Footer" class="md-footer__inner md-grid">
+<a aria-label="Previous: 线上API响应慢？一线工程师的完整排查指南" class="md-footer__link md-footer__link--prev" href="../../07/%E7%BA%BF%E4%B8%8Aapi%E5%93%8D%E5%BA%94%E6%85%A2%E4%B8%80%E7%BA%BF%E5%B7%A5%E7%A8%8B%E5%B8%88%E7%9A%84%E5%AE%8C%E6%95%B4%E6%8E%92%E6%9F%A5%E6%8C%87%E5%8D%97/">
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"></path></svg>
+</div>
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Previous
+              </span>
+<div class="md-ellipsis">
+                线上API响应慢？一线工程师的完整排查指南
+              </div>
+</div>
+</a>
+<a aria-label="Next: JVM OOM 问题排查与解决" class="md-footer__link md-footer__link--next" href="../jvm-oom-%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E4%B8%8E%E8%A7%A3%E5%86%B3/">
+<div class="md-footer__title">
+<span class="md-footer__direction">
+                Next
+              </span>
+<div class="md-ellipsis">
+                JVM OOM 问题排查与解决
+              </div>
+</div>
+<div class="md-footer__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"></path></svg>
+</div>
+</a>
+</nav>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-copyright">
+<div class="md-copyright__highlight">
+      © 2024 - 2025 Gary. All Rights Reserved.
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
+      Material for MkDocs
+    </a>
+</div>
+<div class="md-social">
+<a class="md-social__link" href="https://github.com/XJTUGary" rel="noopener" target="_blank" title="GitHub">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2" fill="currentColor"></path></svg>
+</a>
+<a class="md-social__link" href="mailto:wmlgaryx@gmail.com" rel="noopener" target="_blank" title="E-mail">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="m20 8-8 5-8-5V6l8 5 8-5m0-2H4c-1.11 0-2 .89-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+</footer>
+</div>
+<div class="md-dialog" data-md-component="dialog">
+<div class="md-dialog__inner md-typeset"></div>
+</div>
+<script id="__config" type="application/json">{"base": "../../../../..", "features": ["content.tabs.link", "content.code.annotate", "content.code.copy", "navigation.expand", "navigation.footer", "navigation.tabs", "navigation.sections", "navigation.path", "navigation.indexes", "navigation.top", "navigation.tracking", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+<script src="../../../../../assets/javascripts/bundle.50899def.min.js"></script>
+<script type="module">import mermaid from "https://unpkg.com/mermaid@10.4.0/dist/mermaid.esm.min.mjs";
+mermaid.initialize({});</script></body>
+</html>
